@@ -1,4 +1,4 @@
-package com.lbaol;
+package com.lbaol.test;
 
 import java.util.List;
 
