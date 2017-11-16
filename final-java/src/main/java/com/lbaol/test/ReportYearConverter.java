@@ -14,7 +14,7 @@ import com.lbaol.mapper.ReportYearMapper;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class ReportYearMapperTest {
+public class ReportYearConverter {
 
     @Autowired
     private ReportYearMapper reportYearMapper;
@@ -22,21 +22,26 @@ public class ReportYearMapperTest {
     @Autowired
     private ReportMapper reportMapper;
 
+    /**
+     * 从外部导入的数据没有年份，从年份表中取出合并到report表
+     * @throws Exception
+     */
     @Test
-    public void testQuery() throws Exception {
-        List<ReportDO> reportYearList = reportYearMapper.getAll("2017");
+    public void getYearDataToReport() throws Exception {
+    	String year = "2017";
+        List<ReportDO> reportYearList = reportYearMapper.getAll(year);
         for(ReportDO r1 : reportYearList) {
-        	List<ReportDO> listDB = reportMapper.getByCodeAndReportDate(r1.getCode(), "2017-"+r1.getReportDate());
+        	List<ReportDO> listDB = reportMapper.getByCodeAndReportDate(r1.getCode(),year +"-"+r1.getReportDate());
         	if(listDB != null && listDB.size()>=1) {
+//        		System.out.println("找到 "+r1.getCode()+ " "+year +"-"+r1.getReportDate()+" "+listDB.size()+"条，准备删除");
         		for(ReportDO rDB : listDB) {
         			reportMapper.deleteById(rDB.getId());
         		}
-        		r1.setReportDate("2017-"+r1.getReportDate());
+        		r1.setReportDate(year+"-"+r1.getReportDate());
         		reportMapper.insert(r1);
         	}else {
-        		r1.setReportDate("2017-"+r1.getReportDate());
+        		r1.setReportDate(year+"-"+r1.getReportDate());
         		reportMapper.insert(r1);
-        		
         	}
         }
     }

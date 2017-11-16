@@ -31,6 +31,15 @@ public interface ReportMapper {
         @Result(property = "reportDate", column = "report_date")
     })
 	List<ReportDO> getByCodeAndReportDate(@Param("code") String code,@Param("reportDate") String reportDate);
+	
+	@Select("SELECT * FROM report WHERE code = #{code}")
+	@Results({
+        @Result(property = "epsYoy", column = "eps_yoy"),
+        @Result(property = "netProfits", column = "net_profits"),
+        @Result(property = "profitsYoy", column = "profits_yoy"),
+        @Result(property = "reportDate", column = "report_date")
+    })
+	List<ReportDO> getByCode(@Param("code") String code);
 
     @Insert("INSERT INTO report(code,name,eps,eps_yoy,bvps,roe,epcf,net_profits,profits_yoy,distrib,report_date) VALUES(#{code}, #{name}, #{eps}, #{epsYoy}, #{bvps}, #{roe}, #{epcf}, #{netProfits}, #{profitsYoy}, #{distrib}, #{reportDate})")
     void insert(ReportDO reportDO);

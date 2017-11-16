@@ -1,4 +1,4 @@
-package com.lbaol.web;
+package com.lbaol.web.control;
 
 import java.util.List;
 

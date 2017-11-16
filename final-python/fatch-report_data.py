@@ -2,9 +2,16 @@ from sqlalchemy import create_engine
 import tushare as ts
 print(ts.__version__)
 
-df = ts.get_report_data(2017,3)
+year = 2017
+month = 2
+
 engine = create_engine('mysql://root:hello@127.0.0.1/final?charset=utf8')
-df.to_sql('report_2017',engine,if_exists='replace')
+with engine.connect() as con:
+    con.execute(('delete from report_'+str(year)))
+    
+df = ts.get_report_data(year,month)
+
+df.to_sql(('report_'+str(year)),engine,if_exists='replace')
 
 #追加数据到现有表
 #df.to_sql('report_data',engine,if_exists='append')
