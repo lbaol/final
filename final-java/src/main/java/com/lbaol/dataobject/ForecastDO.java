@@ -1,6 +1,7 @@
 package com.lbaol.dataobject;
 
 public class ForecastDO {
+	private Integer id;
 	private Long index;
 	private String code;
 	private String name;
@@ -8,6 +9,15 @@ public class ForecastDO {
 	private String reportDate;
 	private Long preEps;
 	private String range;
+	private String ranges;
+	
+	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
 	public Long getIndex() {
 		return index;
 	}
@@ -49,6 +59,12 @@ public class ForecastDO {
 	}
 	public void setRange(String range) {
 		this.range = range;
+	}
+	public String getRanges() {
+		return ranges;
+	}
+	public void setRanges(String ranges) {
+		this.ranges = ranges;
 	}
 	
 	
