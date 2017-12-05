@@ -1,0 +1,2 @@
+mysql workbench 设置可删除模式：
+SET SQL_SAFE_UPDATES = 0;

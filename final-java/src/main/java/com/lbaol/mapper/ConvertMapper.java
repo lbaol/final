@@ -14,21 +14,21 @@ public interface ConvertMapper {
 	
 	
 	
-	@Select("SELECT * FROM report_${year}")
+	@Select("SELECT * FROM report_${year}_${quarter}")
     @Results({
         @Result(property = "epsYoy", column = "eps_yoy"),
         @Result(property = "netProfits", column = "net_profits"),
         @Result(property = "profitsYoy", column = "profits_yoy"),
         @Result(property = "reportDate", column = "report_date")
     })
-    List<ReportDO> getReportByYear(@Param("year") String year);
+    List<ReportDO> getReportByYearAndQuarter(@Param("year") String year,@Param("quarter") String quarter);
 	
-	@Select("SELECT * FROM forecast_temp")
+	@Select("SELECT * FROM forecast_${year}_${quarter}")
     @Results({
     	@Result(property = "reportDate", column = "report_date"),
         @Result(property = "preEps", column = "pre_eps")
     })
-    List<ForecastDO> getForecast();
+    List<ForecastDO> getForecastByYearAndQuarter(@Param("year") String year,@Param("quarter") String quarter);
 
 
 }

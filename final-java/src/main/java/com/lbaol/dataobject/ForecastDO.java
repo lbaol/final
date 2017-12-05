@@ -66,6 +66,11 @@ public class ForecastDO {
 	public void setRanges(String ranges) {
 		this.ranges = ranges;
 	}
+	@Override
+	public String toString() {
+		return "ForecastDO [id=" + id + ", index=" + index + ", code=" + code + ", name=" + name + ", type=" + type
+				+ ", reportDate=" + reportDate + ", preEps=" + preEps + ", range=" + range + ", ranges=" + ranges + "]";
+	}
 	
 	
 	

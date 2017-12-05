@@ -1,10 +1,17 @@
 import React from 'react';
 import { render } from 'react-dom';
-import StockChart from "../../components/StockChart/index.jsx";
+import SFilter from "../../components/SFilter/index.jsx";
+import SChart from "../../components/SChart/index.jsx";
 import './index.scss';
 
 render(<div className="hw">
-        <StockChart />
+        <div className="left-nav">
+            <SFilter />
+        </div>
+        <div className="main-content">
+            <SChart />
+        </div>
+        
     </div>, 
     document.getElementById('root')
 );

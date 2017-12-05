@@ -34,42 +34,54 @@ public class ConverterTest {
 //    @Test
 //    public void convertReport() throws Exception {
 //    	String year = "2017";
-//        List<ReportDO> reportYearList = convertMapper.getReportByYear(year);
-//        for(ReportDO r1 : reportYearList) {
-//        	List<ReportDO> listDB = reportMapper.getByCodeAndReportDate(r1.getCode(),year +"-"+r1.getReportDate());
+//    	String quarter = "2";
+//        List<ReportDO> reportYearList = convertMapper.getReportByYearAndQuarter(year,quarter);
+//        for(ReportDO rr : reportYearList) {
+//        	List<ReportDO> listDB = reportMapper.getByCodeAndReportDate(rr.getCode(),year +"-"+rr.getReportDate());
+//        	System.out.println("正在处理  "+rr.getCode()+ " "+rr.getName()+ " "+year +"-"+rr.getReportDate());
 //        	if(listDB != null && listDB.size()>=1) {
-////        		System.out.println("找到 "+r1.getCode()+ " "+year +"-"+r1.getReportDate()+" "+listDB.size()+"条，准备删除");
-//        		for(ReportDO rDB : listDB) {
-//        			reportMapper.deleteById(rDB.getId());
+//        		if(listDB.size()>1) {
+//            		System.out.println("找到 "+rr.getCode()+ " "+rr.getName()+  " "+year +"-"+rr.getReportDate()+" "+listDB.size()+"条，准备删除");
+//        			for(ReportDO rDB : listDB) {
+//            			reportMapper.deleteById(rDB.getId());
+//            		}
+//            		rr.setReportDate(year+"-"+rr.getReportDate());
+//            		reportMapper.insert(rr);
 //        		}
-//        		r1.setReportDate(year+"-"+r1.getReportDate());
-//        		reportMapper.insert(r1);
+//        		
 //        	}else {
-//        		r1.setReportDate(year+"-"+r1.getReportDate());
-//        		reportMapper.insert(r1);
+//        		
+//        		rr.setReportDate(year+"-"+rr.getReportDate());
+//        		reportMapper.insert(rr);
 //        	}
 //        }
 //    }
-    
+//    
     
     @Test
     public void convertForecast() throws Exception {
-        List<ForecastDO> list = convertMapper.getForecast();
+    	String year = "2017";
+    	String quarter = "1";
+        List<ForecastDO> list = convertMapper.getForecastByYearAndQuarter(year, quarter);
         for(ForecastDO ff : list) {
         	List<ForecastDO> listDB = forecastMapper.getByCodeAndReportDate(ff.getCode(),ff.getReportDate());
+        	System.out.println("正在处理  "+ff.getCode()+ " "+ff.getName()+ " "+year +"-"+ff.getReportDate());
         	if(listDB != null && listDB.size()>=1) {
-        		for(ForecastDO rDB : listDB) {
-        			forecastMapper.deleteById(rDB.getId());
+        		if(listDB.size()>1) {
+        			for(ForecastDO rDB : listDB) {
+            			forecastMapper.deleteById(rDB.getId());
+            		}
+            		ff.setRanges(ff.getRange());
+            		forecastMapper.insert(ff);
         		}
-        		ff.setRanges(ff.getRange());
-        		forecastMapper.insert(ff);
+        		
         	}else {
         		ff.setRanges(ff.getRange());
         		forecastMapper.insert(ff);
         	}
         }
     }
-    
+ 
     
 
     

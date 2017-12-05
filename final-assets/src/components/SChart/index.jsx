@@ -8,8 +8,7 @@ import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/title';
 import _ from 'lodash';
 import fecha from 'fecha';
-
-
+import FEvents from "../FEvent/index.js";
 import {request} from "../../common/ajax.js";
 import {URL, Util} from "../../common/config.js";
 
@@ -150,7 +149,7 @@ const rawData = [
 ]
 
 
-
+@FEvents
 export default class App extends Component {
 
 	constructor(props) {
@@ -162,7 +161,11 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-		this.fatchChartData();
+        this.fatchChartData();
+        
+        this.on('chart:refresh', (data) => {
+            console.log('get',data)
+        });
 	}
 
 	fatchChartData(){
