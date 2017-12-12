@@ -2,7 +2,6 @@ import EE from 'event-emitter';
 import mixin from 'smart-mixin';
 
 const mixinProto = mixin({
-  // lifecycle stuff is as you'd expect
   componentDidMount: mixin.MANY,
   componentWillMount: mixin.MANY,
   componentWillReceiveProps: mixin.MANY,

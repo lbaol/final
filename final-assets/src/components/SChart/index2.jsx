@@ -1,8 +1,13 @@
 import React, {Component} from 'react';
 // 引入 ECharts 主模块
-import ReactEcharts from 'echarts-for-react';
+import * as echarts from 'echarts';
+// 引入candlestick图
+import  'echarts/lib/chart/candlestick';
+// 引入提示框和标题组件
+import 'echarts/lib/component/tooltip';
+import 'echarts/lib/component/title';
 import _ from 'lodash';
-import moment from 'moment';
+import fecha from 'fecha';
 import FEvents from "../FEvent/index.js";
 import {request} from "../../common/ajax.js";
 import {URL, Util} from "../../common/config.js";
@@ -10,7 +15,138 @@ import {URL, Util} from "../../common/config.js";
 const upColor = '#00da3c';
 const downColor = '#ec0000';
 
-
+let stockChart ;
+let chartData;
+const rawData = [
+	[
+		"2016-06-01",
+		17754.55,
+		17789.67,
+		17664.79,
+		17809.18,
+		78530000
+	],
+	[
+		"2016-06-02",
+		17789.05,
+		17838.56,
+		17703.55,
+		17838.56,
+		75560000
+	],
+	[
+		"2016-06-03",
+		17799.8,
+		17807.06,
+		17689.68,
+		17833.17,
+		82270000
+	],
+	[
+		"2016-06-06",
+		17825.69,
+		17920.33,
+		17822.81,
+		17949.68,
+		71870000
+	],
+	[
+		"2016-06-07",
+		17936.22,
+		17938.28,
+		17936.22,
+		18003.23,
+		78750000
+	],
+	[
+		"2016-06-08",
+		17931.91,
+		18005.05,
+		17931.91,
+		18016,
+		71260000
+	],
+	[
+		"2016-06-09",
+		17969.98,
+		17985.19,
+		17915.88,
+		18005.22,
+		69690000
+	],
+	[
+		"2016-06-10",
+		17938.82,
+		17865.34,
+		17812.34,
+		17938.82,
+		90540000
+	],
+	[
+		"2016-06-13",
+		17830.5,
+		17732.48,
+		17731.35,
+		17893.28,
+		101690000
+	],
+	[
+		"2016-06-14",
+		17710.77,
+		17674.82,
+		17595.79,
+		17733.92,
+		93740000
+	],
+	[
+		"2016-06-15",
+		17703.65,
+		17640.17,
+		17629.01,
+		17762.96,
+		94130000
+	],
+	[
+		"2016-06-16",
+		17602.23,
+		17733.1,
+		17471.29,
+		17754.91,
+		91950000
+	],
+	[
+		"2016-06-17",
+		17733.44,
+		17675.16,
+		17602.78,
+		17733.44,
+		248680000
+	],
+	[
+		"2016-06-20",
+		17736.87,
+		17804.87,
+		17736.87,
+		17946.36,
+		99380000
+	],
+	[
+		"2016-06-21",
+		17827.33,
+		17829.73,
+		17799.8,
+		17877.84,
+		85130000
+	],
+	[
+		"2016-06-22",
+		17832.67,
+		17780.83,
+		17770.36,
+		17920.16,
+		89440000
+	]
+]
 
 
 @FEvents
@@ -19,13 +155,8 @@ export default class App extends Component {
 	constructor(props) {
         super(props);
         this.state = {
-			code:'002008',
-            period:'day',
-            startDate:'',
-            endDate:'',
-            chartData:{},
-            baseInfo:{},
-            chartOption:{}
+			code:props.code,
+			cycle:props.cycle?props.cycle:'day'
         };
     }
 
@@ -33,73 +164,19 @@ export default class App extends Component {
         this.fatchChartData();
         
         this.on('chart:refresh', (data) => {
-            console.log("data",data)
-            const {code,period,startDate,endDate}  = this.state;
-            this.setState({
-                code:data.code?data.code:code,
-                period:data.period?data.period:period,
-                startDate:data.startDate?data.startDate:startDate,
-                endDate:data.endDate?data.endDate:endDate
-            },this.fatchChartData)
-            
+            console.log('get',data)
         });
-    }
-    
-
+	}
 
 	fatchChartData(){
-        const self = this;
-        const {code,period,startDate,endDate}  = this.state;
-        
-        if(code){
-            let newCode = code;
-            if(_.startsWith(code,'6')){
-                newCode = 'SH'+code;
-            }else if(_.startsWith(code,'0') || _.startsWith(code,'3')){
-                newCode = 'SZ'+code;
-            }
-
-            let newStartDate = startDate ? moment(startDate) :moment().subtract(365, 'day');
-            let newEndDate = endDate ? moment(endDate):moment()
-
-            request('https://xueqiu.com/stock/forchartk/stocklist.json?type=before',
-            (res)=>{
-    
-                const chartData = self.parseXQStockData(res.chartlist)
-                self.setState({
-                    chartData:chartData
-                },self.fatchBaseInfo)
-            },{
-                symbol:newCode,
-                period:period=='day' && '1day',
-                begin:newStartDate.set('hour', 0).set('minute', 0).format('x'),
-                end:newEndDate.set('hour', 23).set('minute', 59).format('x'),
-            },'jsonp')
-        }
-
-		
-    }
-    
-    fatchBaseInfo=()=>{
-        const self = this;
-        const {code} = this.state;
-        request('http://localhost:8080/stock/getByCode',
+		const self = this;
+		request('https://xueqiu.com/stock/forchartk/stocklist.json?symbol=SZ002008&period=1day&type=before&begin=1479282359497&end=1510818359497',
 		(res)=>{
 
-			self.setState({
-                baseInfo:res
-            },self.renderChart)
-		},{
-            code:code
-        },'jsonp')
-    }
-
-
-    renderChart=()=>{
-        this.setState({
-            chartOption:this.getOption()
-        })
-    }
+			chartData = self.parseXQStockData(res.chartlist)
+			self.renderChart();
+		},{},'jsonp')
+	}
 
 	parseXQStockData=(dataList)=>{
 		if(dataList){
@@ -107,7 +184,7 @@ export default class App extends Component {
 			let values = [];
 			let volumes = [];
 			for (let d1 of dataList) {
-				categoryData.push(moment(new Date(d1.timestamp)).format('YYYY-MM-DD'));
+				categoryData.push(fecha.format(new Date(d1.timestamp), 'YYYY-MM-DD'));
 				values.push([d1.open,d1.close,d1.low,d1.high]);
 				volumes.push(d1.lot_volume);
 			}
@@ -122,7 +199,22 @@ export default class App extends Component {
 	}
 
 
+	splitData =(rawData) =>{
+		var categoryData = [];
+		var values = [];
+		var volumes = [];
+		for (var i = 0; i < rawData.length; i++) {
+			categoryData.push(rawData[i].splice(0, 1)[0]);
+			values.push(rawData[i]);
+			volumes.push([i, rawData[i][4], rawData[i][0] > rawData[i][1] ? 1 : -1]);
+		}
 	
+		return {
+			categoryData: categoryData,
+			values: values,
+			volumes: volumes
+		};
+	}
 	
 	calculateMA =(dayCount, data)=> {
 		var result = [];
@@ -138,72 +230,17 @@ export default class App extends Component {
 			result.push(+(sum / dayCount).toFixed(3));
 		}
 		return result;
-    }
-
-    getReportPriceByDate(date){
-        let {chartData} = this.state;
-        if(chartData){
-            let index = _.indexOf(chartData.categoryData,date);
-            //如果有日期
-            if(index>=0){
-                return {
-                    date:date,
-                    price:chartData.values[index][3] //取最高价
-                }
-            }
-        }
-    }
-    
-    getOption=()=>{
-
-        let {chartData,baseInfo} = this.state;
-
-        let pointList = [];
-        let pointCfgSource = {
-            name: '',
-            coord: [],
-            value:'',
-            itemStyle: {
-                normal: {color: '#ccc'}
-            },
-            symbol:'pin',
-            symbolSize:[0,100],
-            label:{
-                normal:{
-                    formatter: function (param) {
-                        return param.value;
-                    }
-                }
-            }
-        }
-        if(baseInfo.report && _.isArray(baseInfo.report) && baseInfo.report.length>0){
-            let reportList = baseInfo.report;
-            for(let d of reportList){
-                let datePrice = this.getReportPriceByDate(d.reportDate)
-                let price = datePrice && datePrice.price;
-                let pointCfg = _.cloneDeep(pointCfgSource);
-                pointCfg.name = d.reportDate;
-                pointCfg.coord =  [d.reportDate,price];
-                pointCfg.value = d.profitsYoy;
-                pointList.push(pointCfg)
-            }
-        }
-
-        if(baseInfo.forecast && _.isArray(baseInfo.forecast) && baseInfo.forecast.length>0){
-            let forecastList = baseInfo.forecast;
-            for(let d of forecastList){
-                let datePrice = this.getReportPriceByDate(d.reportDate)
-                
-                let pointCfg = _.cloneDeep(pointCfgSource);
-                pointCfg.name = d.reportDate;
-                pointCfg.coord =  [datePrice.date,datePrice.price];
-                pointCfg.value = d.ranges;
-                pointCfg.symbolSize = [0,150];
-                pointList.push(pointCfg)
-            }
-        }
-
-        return {
+	}
+	
+	renderChart=()=>{
+		// 基于准备好的dom，初始化echarts实例
+		
+        
+        
+        
+        
+        stockChart = echarts.init(document.getElementById('main'));
+        stockChart.setOption({
             backgroundColor: '#fff',
             animation: false,
             legend: {
@@ -265,7 +302,7 @@ export default class App extends Component {
                 {
                     show:false,
                     type: 'category',
-                    data: chartData && chartData.categoryData,
+                    data: chartData.categoryData,
                     scale: true,
                     boundaryGap : false,
                     axisLine: {onZero: false},
@@ -280,7 +317,7 @@ export default class App extends Component {
                 {
                     type: 'category',
                     gridIndex: 1,
-                    data: chartData && chartData.categoryData,
+                    data: chartData.categoryData,
                     scale: true,
                     boundaryGap : false,
                     axisLine: {onZero: false},
@@ -335,7 +372,7 @@ export default class App extends Component {
                 {
                     name: 'k',
                     type: 'candlestick',
-                    data: chartData && chartData.values,
+                    data: chartData.values,
                     itemStyle: {
                         normal: {
                             color: '#fff',
@@ -345,43 +382,42 @@ export default class App extends Component {
                         }
                     },
                     markPoint: {
-                        data: pointList 
-                        // [
-                        //     {
-                        //         name: 'XX标点',
-                        //         coord: ['2016-06-15',17760],
-                        //         value:'asdfdf',
-                        //         itemStyle: {
-                        //             normal: {color: '#ccc'}
-                        //         },
-                        //         symbol:'pin',
-                        //         symbolSize:[0,100],
-                        //         label:{
-                        //             normal:{
-                        //                 formatter: function (param) {
-                        //                     return param.value;
-                        //                 }
-                        //             }
-                        //         }
-                        //     },
-                        //     {
-                        //         name: 'XX标点',
-                        //         coord: ['2016-06-08',18000],
-                        //         value:'asdfdf',
-                        //         itemStyle: {
-                        //             normal: {color: '#ccc'}
-                        //         },
-                        //         symbol:'pin',
-                        //         symbolSize:[0,100],
-                        //         label:{
-                        //             normal:{
-                        //                 formatter: function (param) {
-                        //                     return param.value;
-                        //                 }
-                        //             }
-                        //         }
-                        //     }
-                        // ]
+                        data: [
+                            {
+                                name: 'XX标点',
+                                coord: ['2016-06-15',17760],
+                                value:'asdfdf',
+                                itemStyle: {
+                                    normal: {color: '#ccc'}
+                                },
+								symbol:'pin',
+								symbolSize:[0,100],
+								label:{
+									normal:{
+										formatter: function (param) {
+											return param.value;
+										}
+									}
+								}
+							},
+							{
+                                name: 'XX标点',
+                                coord: ['2016-06-08',18000],
+                                value:'asdfdf',
+                                itemStyle: {
+                                    normal: {color: '#ccc'}
+                                },
+								symbol:'pin',
+								symbolSize:[0,100],
+								label:{
+									normal:{
+										formatter: function (param) {
+											return param.value;
+										}
+									}
+								}
+							}
+						]
                     },
                     tooltip: {
                         formatter: function (param) {
@@ -437,21 +473,10 @@ export default class App extends Component {
                 //     type: 'bar',
                 //     xAxisIndex: 1,
                 //     yAxisIndex: 1,
-                //     data: chartData && chartData.volumes
+                //     data: chartData.volumes
                 // }
             ]
-        }
-    }
-	
-	renderChart2=()=>{
-		// 基于准备好的dom，初始化echarts实例
-		
-        
-        
-        
-        
-        stockChart = echarts.init(document.getElementById('main'));
-        stockChart.setOption();
+        });
         
             // stockChart.on('brushSelected', renderBrushed);
         
@@ -491,20 +516,8 @@ export default class App extends Component {
 	}
 
     render() {
-
-        const {chartOption} = this.state;
-
         return (
-            <div id="main" style={{ width: 500, height: 300 }}>
-                <ReactEcharts
-                    theme='infographic'
-                    notMerge={true}
-                    option={chartOption}
-                    style={{ height: '100%', width: '100%' }}
-                    className='s-chart'
-                    ref='s-chart'
-                />
-            </div>
+            <div id="main" style={{ width: 500, height: 300 }}></div>
         );
     }
 }
