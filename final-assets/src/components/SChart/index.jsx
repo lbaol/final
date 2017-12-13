@@ -10,6 +10,7 @@ import {URL, Util} from "../../common/config.js";
 const upColor = '#00da3c';
 const downColor = '#ec0000';
 
+let pinHeigth = 100;
 
 
 
@@ -20,7 +21,7 @@ export default class App extends Component {
         super(props);
         this.state = {
 			code:'002008',
-            period:'day',
+            period:'week',
             startDate:'',
             endDate:'',
             chartData:{},
@@ -59,7 +60,7 @@ export default class App extends Component {
                 newCode = 'SZ'+code;
             }
 
-            let newStartDate = startDate ? moment(startDate) :moment().subtract(365, 'day');
+            let newStartDate = startDate ? moment(startDate) :moment().subtract(365*3, 'day');
             let newEndDate = endDate ? moment(endDate):moment()
 
             request('https://xueqiu.com/stock/forchartk/stocklist.json?type=before',
@@ -71,7 +72,7 @@ export default class App extends Component {
                 },self.fatchBaseInfo)
             },{
                 symbol:newCode,
-                period:period=='day' && '1day',
+                period:'1'+period,
                 begin:newStartDate.set('hour', 0).set('minute', 0).format('x'),
                 end:newEndDate.set('hour', 23).set('minute', 59).format('x'),
             },'jsonp')
@@ -96,8 +97,10 @@ export default class App extends Component {
 
 
     renderChart=()=>{
+        let option = this.getOption();
+        console.log('准备使用option渲染：',option,option.series[0].markPoint);
         this.setState({
-            chartOption:this.getOption()
+            chartOption:option
         })
     }
 
@@ -140,18 +143,46 @@ export default class App extends Component {
 		return result;
     }
 
-    getReportPriceByDate(date){
-        let {chartData} = this.state;
-        if(chartData){
-            let index = _.indexOf(chartData.categoryData,date);
-            //如果有日期
-            if(index>=0){
-                return {
-                    date:date,
-                    price:chartData.values[index][3] //取最高价
-                }
+    getWeekDateIndex=(dates,date)=>{
+        let i = 0;
+        for( ; i<dates.length;i++){
+            if(dates[i]>=date){
+                break;
             }
         }
+        if(i<dates.length-1){
+            return i;
+        }
+        if(i==(dates.length-1)){
+            if(dates[i]>=date){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    getReportPriceByDate=(date)=>{
+        let {chartData} = this.state;
+        if(chartData){
+            let idx1 = _.indexOf(chartData.categoryData,date);
+            
+            if(idx1==-1){
+                //如果没找到对应的日期，继续找
+                idx1 = this.getWeekDateIndex(chartData.categoryData,date)
+            }
+
+            if(idx1>=0){
+                //如果找到对应的日期
+                console.log('找到日期',chartData.categoryData[idx1],chartData.values[idx1])
+                return {
+                    date:chartData.categoryData[idx1],
+                    price:chartData.values[idx1][3] //取最高价
+                }
+            }
+            
+            
+        }
+        return null;
     }
     
     getOption=()=>{
@@ -171,37 +202,49 @@ export default class App extends Component {
             label:{
                 normal:{
                     formatter: function (param) {
+                        console.log('point',param)
                         return param.value;
                     }
                 }
             }
         }
+
+        pinHeigth = 30;
         if(baseInfo.report && _.isArray(baseInfo.report) && baseInfo.report.length>0){
             let reportList = baseInfo.report;
             for(let d of reportList){
-                let datePrice = this.getReportPriceByDate(d.reportDate)
-                let price = datePrice && datePrice.price;
-                let pointCfg = _.cloneDeep(pointCfgSource);
-                pointCfg.name = d.reportDate;
-                pointCfg.coord =  [d.reportDate,price];
-                pointCfg.value = d.profitsYoy;
-                pointList.push(pointCfg)
+                let datePrice = this.getReportPriceByDate(d.reportDate);
+                if(datePrice){
+                    let price = datePrice && datePrice.price;
+                    let pointCfg = _.cloneDeep(pointCfgSource);
+                    pointCfg.name = d.reportDate;
+                    pointCfg.coord =  [datePrice.date,price];
+                    pointCfg.value = d.profitsYoy;
+                    pointCfg.symbolSize = [1,pinHeigth=pinHeigth+10];
+                    pointList.push(pointCfg)
+                }   
+                
             }
         }
 
         if(baseInfo.forecast && _.isArray(baseInfo.forecast) && baseInfo.forecast.length>0){
             let forecastList = baseInfo.forecast;
             for(let d of forecastList){
-                let datePrice = this.getReportPriceByDate(d.reportDate)
+                let datePrice = this.getReportPriceByDate(d.reportDate);
+                if(datePrice){
+                    let pointCfg = _.cloneDeep(pointCfgSource);
+                    pointCfg.name = d.reportDate;
+                    pointCfg.coord =  [datePrice.date,datePrice.price];
+                    pointCfg.value = d.ranges;
+                    pointCfg.symbolSize = [1,pinHeigth=pinHeigth+10];
+                    pointList.push(pointCfg)
+                }
                 
-                let pointCfg = _.cloneDeep(pointCfgSource);
-                pointCfg.name = d.reportDate;
-                pointCfg.coord =  [datePrice.date,datePrice.price];
-                pointCfg.value = d.ranges;
-                pointCfg.symbolSize = [0,150];
-                pointList.push(pointCfg)
+                
             }
         }
+
+        
 
         return {
             backgroundColor: '#fff',
@@ -345,46 +388,11 @@ export default class App extends Component {
                         }
                     },
                     markPoint: {
-                        data: pointList 
-                        // [
-                        //     {
-                        //         name: 'XX标点',
-                        //         coord: ['2016-06-15',17760],
-                        //         value:'asdfdf',
-                        //         itemStyle: {
-                        //             normal: {color: '#ccc'}
-                        //         },
-                        //         symbol:'pin',
-                        //         symbolSize:[0,100],
-                        //         label:{
-                        //             normal:{
-                        //                 formatter: function (param) {
-                        //                     return param.value;
-                        //                 }
-                        //             }
-                        //         }
-                        //     },
-                        //     {
-                        //         name: 'XX标点',
-                        //         coord: ['2016-06-08',18000],
-                        //         value:'asdfdf',
-                        //         itemStyle: {
-                        //             normal: {color: '#ccc'}
-                        //         },
-                        //         symbol:'pin',
-                        //         symbolSize:[0,100],
-                        //         label:{
-                        //             normal:{
-                        //                 formatter: function (param) {
-                        //                     return param.value;
-                        //                 }
-                        //             }
-                        //         }
-                        //     }
-                        // ]
+                        data: pointList
                     },
                     tooltip: {
                         formatter: function (param) {
+                            console.log('param',param)
                             param = param[0];
                             return [
                                 'Date: ' + param.name + '<hr size=1 style="margin: 3px 0">',
