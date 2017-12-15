@@ -36,7 +36,7 @@ public class ForecastMapperTest {
     public void test1() throws Exception {
     	Map map = new HashMap();
     	map.put("code","002008");
-    	List<ForecastDO> listDB = forecastMapper.getByCodeTypeAndDate(map);
+    	List<ForecastDO> listDB = forecastMapper.getByParams(map);
     	for(ForecastDO ff : listDB) {
     		System.out.println(ff.toString());
     	}

@@ -1,4 +1,4 @@
-const domain = '127.0.0.1:8080';
+const domain = 'http://127.0.0.1:8080';
 
 
 const URL = {

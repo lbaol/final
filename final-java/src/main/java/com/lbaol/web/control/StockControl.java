@@ -45,4 +45,14 @@ public class StockControl {
 		map.put("forecast", forecastList);
         return map;  
     }
+	
+	@RequestMapping("/stock/getReports")
+    Map getReport() {  
+		Map map = new HashMap();
+		List<ForecastDO> forecastList = forecastMapper.getAll();
+		List<ReportDO> reportList = reportMapper.getAll();
+		map.put("forecastList", forecastList);
+		map.put("reportList", reportList);
+        return map;  
+    }
 }

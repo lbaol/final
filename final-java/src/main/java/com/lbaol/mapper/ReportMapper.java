@@ -13,7 +13,7 @@ import com.lbaol.dataobject.ReportDO;
 
 public interface ReportMapper {
 	
-	@Select("SELECT * FROM report")
+	@Select("SELECT * FROM report order by report_date desc")
     @Results({
         @Result(property = "epsYoy", column = "eps_yoy"),
         @Result(property = "netProfits", column = "net_profits"),

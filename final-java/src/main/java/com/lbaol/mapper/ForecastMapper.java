@@ -16,7 +16,7 @@ import com.lbaol.dataobject.ForecastDO;
 
 public interface ForecastMapper {
 	
-	@Select("SELECT * FROM forecast")
+	@Select("SELECT * FROM forecast order by report_date desc")
     @Results({
         @Result(property = "reportDate", column = "report_date"),
         @Result(property = "preEps", column = "pre_eps")
@@ -47,17 +47,17 @@ public interface ForecastMapper {
     @Delete("DELETE FROM forecast WHERE id =#{id}")
     void deleteById(Integer id);
     
-    @SelectProvider(type = ForecastProvider.class, method = "getByCodeTypeAndDate")  
+    @SelectProvider(type = ForecastProvider.class, method = "getByParams")  
 	@Results({
         @Result(property = "reportDate", column = "report_date"),
         @Result(property = "preEps", column = "pre_eps")
     })
-	public List<ForecastDO> getByCodeTypeAndDate(Map params);  
+	public List<ForecastDO> getByParams(Map params);  
     
      
     
     class ForecastProvider {  
-        public String getByCodeTypeAndDate(Map params) {  
+        public String getByParams(Map params) {  
         	return new SQL(){{      
                 SELECT("*");          
                 FROM("forecast");      

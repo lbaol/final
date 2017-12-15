@@ -20,8 +20,8 @@ export default class App extends Component {
 	constructor(props) {
         super(props);
         this.state = {
-			code:'002008',
-            period:'week',
+			code:'',
+            period:'day',
             startDate:'',
             endDate:'',
             chartData:{},
@@ -84,7 +84,7 @@ export default class App extends Component {
     fatchBaseInfo=()=>{
         const self = this;
         const {code} = this.state;
-        request('http://localhost:8080/stock/getByCode',
+        request('/stock/getByCode',
 		(res)=>{
 
 			self.setState({
