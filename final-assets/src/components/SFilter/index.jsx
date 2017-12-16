@@ -19,6 +19,8 @@ let _reportList = {
     otherList : []
 }
 
+let _allStocksMap = [];
+
 @FEvents
 export default class App extends Component {
 
@@ -28,51 +30,77 @@ export default class App extends Component {
             code: '',
             period: 'day',
             startDate: '',
-            reportList: []
+            reportList: [],
+            defaultReportList:'increaseList'
         };
     }
 
     componentDidMount() {
-        this.fatchReportList()
+        this.fatchAllStocks();
+    }
+
+    fatchAllStocks =()=>{
+        const self = this;
+        request('/stock/getAllStocks',
+            (res) => {
+                if(res){
+                    for(let st of res){
+                        _allStocksMap[st.code] = st
+                    }
+                }
+                self.fatchReportList();
+            }, {
+            }, 'jsonp')
+    }
+
+    filteStocks=(res)=>{
+        
+        let reportList = res.reportList;
+        let forecastList = res.forecastList;
+        let increaseList = [];
+        let otherList = [];
+        let allList = [];
+        let i = 0;
+        for (let d1 of reportList) {
+            let st1 = _allStocksMap[d1.code];
+            d1.key = i++;
+            allList.push(d1);
+            if (d1.profitsYoy <= 0 || (st1 && st1.timeToMarket > 20170601)) {
+                otherList.push(d1)
+            } else {
+                increaseList.push(d1)
+            }
+        }
+        for (let d2 of forecastList) {
+            let st2 = _allStocksMap[d2.code];
+            d2.key = i++;
+            allList.push(d2);
+            if (d2.ranges.indexOf('-') >= 0 || d2.ranges== 0 || (st2 && st2.timeToMarket > 20170601)) {
+                otherList.push(d2)
+            } else {
+                increaseList.push(d2)
+            }
+        }
+
+        _reportList.increaseList = _.orderBy(increaseList, ['reportDate'], ['desc']);
+        _reportList.otherList = _.orderBy(otherList, ['reportDate'], ['desc']);
+        _reportList.allList = _.orderBy(allList, ['reportDate'], ['desc']);
+
+        
+
     }
 
     fatchReportList = () => {
         const self = this;
+        const {defaultReportList} = this.state;
         request('/stock/getReports',
             (res) => {
-                let reportList = res.reportList;
-                let forecastList = res.forecastList;
-                let increaseList = [];
-                let otherList = [];
-                let allList = [];
-                let i = 0;
-                for (let d1 of reportList) {
-                    d1.key = i++;
-                    allList.push(d1);
-                    if (d1.profitsYoy > 0) {
-                        increaseList.push(d1)
-                    } else {
-                        otherList.push(d1)
-                    }
-                }
-                for (let d2 of forecastList) {
-                    d2.key = i++;
-                    allList.push(d2);
-                    if (d2.ranges.indexOf('-') >= 0) {
-                        otherList.push(d2)
-                    } else {
-                        increaseList.push(d2)
-                    }
-                }
-
-                _reportList.increaseList = _.orderBy(increaseList, ['reportDate'], ['desc']);
-                _reportList.otherList = _.orderBy(otherList, ['reportDate'], ['desc']);
-                _reportList.allList = _.orderBy(allList, ['reportDate'], ['desc']);
-
+                
+                self.filteStocks(res)
                 
                 
                 self.setState({
-                    reportList: _reportList.allList
+                    reportList: _reportList[defaultReportList]
                 })
 
             }, {
@@ -106,7 +134,7 @@ export default class App extends Component {
     fieldChange = (name, value) => {
         this.setState({
             [name]: value
-        }, this.onSearchClick)
+        })
     }
 
     onShowResultChange=(e)=>{
@@ -116,18 +144,39 @@ export default class App extends Component {
     }
 
     render() {
-        const { code, period, reportList } = this.state;
+        const { code, period, reportList,defaultReportList } = this.state;
         const pagination = {
             otal:reportList.length,
-            pageSize:5
+            pageSize:100
         }
         return (
+
             <div className="s-filter">
                 <Tabs onChange={this.onTabChange} type="card" size="small">
-                    
-                    <TabPane tab="业绩列表"  key="report-list">
+                    <TabPane tab="设置" key="1">
                         <div>
-                            <Radio.Group  onChange={this.onShowResultChange} defaultValue="allList" size="small">
+                            <Input ref="s-filter-code" onChange={this.onInputFieldChange.bind(this, 'code')} placeholder="代码" />
+                        </div>
+                        <div className="mt10">
+                            <Radio.Group  onChange={this.onFieldChange.bind(this, 'period')} defaultValue={period} size="small">
+                                <Radio.Button value="day">日</Radio.Button>
+                                <Radio.Button value="week">周</Radio.Button>
+                            </Radio.Group>
+                        </div>
+                        <div className="mt10">
+                        {/* defaultValue={moment().subtract(3, 'year')} */}
+                            <DatePicker  onChange={this.onDateFieldChange.bind(this, 'startDate')} placeholder="开始时间" />
+                        </div>
+                        <div className="mt10">
+                            <DatePicker onChange={this.onDateFieldChange.bind(this, 'endDate')} placeholder="结束时间" />
+                        </div>
+                        <div className="mt10">
+                            <Button type="primary" onClick={this.onSearchClick}>确定</Button>
+                        </div>
+                    </TabPane>
+                    <TabPane tab="报表预告"  key="report-list">
+                        <div>
+                            <Radio.Group  onChange={this.onShowResultChange} defaultValue={defaultReportList} size="small">
                                 <Radio.Button value="allList">全部</Radio.Button>
                                 <Radio.Button value="increaseList">增长</Radio.Button>
                                 <Radio.Button value="otherList">其他</Radio.Button>
@@ -163,23 +212,9 @@ export default class App extends Component {
                         </div>
                         
                     </TabPane>
-                    <TabPane tab="设置" key="set">
-                        <div>
-                            <Input ref="s-filter-code" onChange={this.onInputFieldChange.bind(this, 'code')} placeholder="代码" />
-                        </div>
-                        <div className="mt10">
-                            <Select onChange={this.onFieldChange.bind(this, 'period')} value={period}>
-                                <Select.Option value="day">日</Select.Option>
-                                <Select.Option value="week">周</Select.Option>
-                            </Select>
-                        </div>
-                        <div className="mt10">
-                            <DatePicker defaultValue={moment().subtract(3, 'year')} onChange={this.onDateFieldChange.bind(this, 'startDate')} placeholder="开始时间" />
-                        </div>
-                        <div className="mt10">
-                            <DatePicker onChange={this.onDateFieldChange.bind(this, 'endDate')} placeholder="结束时间" />
-                        </div>
-                    </TabPane>
+                    
+                    
+                    
                 </Tabs>
 
             </div>

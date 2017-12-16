@@ -5,13 +5,13 @@ import SChart from "../../components/SChart/index.jsx";
 import '../../common/base.scss';
 import './index.scss';
 
-render(<div className="hw">
-        <div className="left-nav">
-            <SFilter />
-        </div>
-        <div className="main-content">
-            <SChart />
-        </div>
+render(<div className="page-wrap">
+            <div className="left-nav">
+                <SFilter />
+            </div>
+            <div className="main-content">
+                <SChart />
+            </div>
         
     </div>, 
     document.getElementById('root')

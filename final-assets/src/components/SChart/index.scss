@@ -1,0 +1,16 @@
+.s-chart {
+    display: flex;
+}
+
+.chart-mian {
+    display: inline-block;
+    vertical-align: top;
+    flex-grow: 1;
+}
+
+.base-info {
+    margin-top: 20px;
+    width: 270px;
+    display: inline-block;
+    font-size: 12px;
+}

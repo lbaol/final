@@ -5,10 +5,10 @@ import _ from 'lodash';
 import moment from 'moment';
 import FEvents from "../FEvent/index.js";
 import {request} from "../../common/ajax.js";
-import {URL, Util} from "../../common/config.js";
-
-const upColor = '#00da3c';
-const downColor = '#ec0000';
+import {URL, Util , Config} from "../../common/config.js";
+import './index.scss';
+const upColor = Config.chart.upColor;
+const downColor = Config.chart.downColor;
 
 let pinHeigth = 100;
 
@@ -20,7 +20,7 @@ export default class App extends Component {
 	constructor(props) {
         super(props);
         this.state = {
-			code:'',
+			code:'002008',
             period:'day',
             startDate:'',
             endDate:'',
@@ -60,7 +60,8 @@ export default class App extends Component {
                 newCode = 'SZ'+code;
             }
 
-            let newStartDate = startDate ? moment(startDate) :moment().subtract(365*3, 'day');
+            let m = period=='day'?1:3;
+            let newStartDate = startDate ? moment(startDate) :moment().subtract(365*m, 'day');
             let newEndDate = endDate ? moment(endDate):moment()
 
             request('https://xueqiu.com/stock/forchartk/stocklist.json?type=before',
@@ -86,6 +87,21 @@ export default class App extends Component {
         const {code} = this.state;
         request('/stock/getByCode',
 		(res)=>{
+
+            
+            let allReport = [];
+            for(let d of res.report){
+                d.type = 'report';
+                allReport.push(d);
+            }
+
+            for(let d of res.forecast){
+                d.type = 'forecast';
+                allReport.push(d);
+            }
+
+            allReport = _.orderBy(allReport, ['reportDate'], ['desc']);
+            res.allReport = allReport;
 
 			self.setState({
                 baseInfo:res
@@ -187,8 +203,8 @@ export default class App extends Component {
     
     getOption=()=>{
 
-        let {chartData,baseInfo} = this.state;
-
+        let {chartData,baseInfo,period} = this.state;
+        
         let pointList = [];
         let pointCfgSource = {
             name: '',
@@ -244,9 +260,58 @@ export default class App extends Component {
             }
         }
 
-        
+        let daySeriesInit = [{
+            name: 'MA10',
+            type: 'line',
+            data: this.calculateMA(10, chartData),
+            smooth: true,
+            lineStyle: {
+                normal: {opacity: 0.5}
+            }
+        },
+        {
+            name: 'MA20',
+            type: 'line',
+            data: this.calculateMA(20, chartData),
+            smooth: true,
+            lineStyle: {
+                normal: {opacity: 0.5}
+            }
+        },
+        {
+            name: 'MA50',
+            type: 'line',
+            data: this.calculateMA(50, chartData),
+            smooth: true,
+            lineStyle: {
+                normal: {opacity: 0.5}
+            }
+        }]
 
-        return {
+        
+        
+        let weekSeriesInit = [{
+            name: 'MA10',
+            type: 'line',
+            data: this.calculateMA(10, chartData),
+            smooth: true,
+            lineStyle: {
+                normal: {opacity: 0.5}
+            }
+        },
+        {
+            name: 'MA30',
+            type: 'line',
+            data: this.calculateMA(30, chartData),
+            smooth: true,
+            lineStyle: {
+                normal: {opacity: 0.5}
+            }
+        }]
+
+        let seriesInit = (period=='day')?daySeriesInit:weekSeriesInit;
+
+        let option =  {
             backgroundColor: '#fff',
             animation: false,
             legend: {
@@ -381,10 +446,10 @@ export default class App extends Component {
                     data: chartData && chartData.values,
                     itemStyle: {
                         normal: {
-                            color: '#fff',
-                            color0: '#fff',
-                            borderColor: '#f5f5f5',
-                            borderColor0: '#ccc'
+                            color: upColor,
+                            color0: downColor,
+                            borderColor: null,
+                            borderColor0: null
                         }
                     },
                     markPoint: {
@@ -404,51 +469,19 @@ export default class App extends Component {
                         }
                     }
                 },
-                // {
-                //     name: 'MA5',
-                //     type: 'line',
-                //     data: this.calculateMA(5, data),
-                //     smooth: true,
-                //     lineStyle: {
-                //         normal: {opacity: 0.5}
-                //     }
-                // },
-                // {
-                //     name: 'MA10',
-                //     type: 'line',
-                //     data: this.calculateMA(10, data),
-                //     smooth: true,
-                //     lineStyle: {
-                //         normal: {opacity: 0.5}
-                //     }
-                // },
-                // {
-                //     name: 'MA20',
-                //     type: 'line',
-                //     data: this.calculateMA(20, data),
-                //     smooth: true,
-                //     lineStyle: {
-                //         normal: {opacity: 0.5}
-                //     }
-                // },
-                // {
-                //     name: 'MA30',
-                //     type: 'line',
-                //     data: this.calculateMA(30, data),
-                //     smooth: true,
-                //     lineStyle: {
-                //         normal: {opacity: 0.5}
-                //     }
-                // },
-                // {
-                //     name: 'Volume',
-                //     type: 'bar',
-                //     xAxisIndex: 1,
-                //     yAxisIndex: 1,
-                //     data: chartData && chartData.volumes
-                // }
+                
+                {
+                    name: 'Volume',
+                    type: 'bar',
+                    xAxisIndex: 1,
+                    yAxisIndex: 1,
+                    data: chartData && chartData.volumes
+                },
+                ...seriesInit
             ]
         }
+
+        return option;
     }
 	
 	renderChart2=()=>{
@@ -500,19 +533,34 @@ export default class App extends Component {
 
     render() {
 
-        const {chartOption} = this.state;
-
+        const {chartOption,baseInfo} = this.state;
+        const baisc = baseInfo.baisc;
         return (
-            <div id="main" style={{ width: 500, height: 300 }}>
-                <ReactEcharts
-                    theme='infographic'
-                    notMerge={true}
-                    option={chartOption}
-                    style={{ height: '100%', width: '100%' }}
-                    className='s-chart'
-                    ref='s-chart'
-                />
+            <div className="s-chart">
+                <div className="chart-mian" id="main" style={{ height: 500 }}>
+                    <ReactEcharts
+                        theme='infographic'
+                        notMerge={true}
+                        option={chartOption}
+                        style={{ height: '100%', width: '100%' }}
+                        className='s-chart'
+                        ref='s-chart'
+                    />
+                </div>
+                <div className="base-info">
+                    <div>
+                        {baisc && baisc.code} {baisc && baisc.name}   
+                    </div>
+                    {
+                        baseInfo.allReport && baseInfo.allReport.map((rep)=>{
+                            return <div className="mt5">
+                                {rep.reportDate} {rep.type=='report'?'业绩报告':'业绩预告'}：{rep.ranges || (rep.profitsYoy+'%')}
+                            </div>
+                        })
+                    }
+                </div>
             </div>
+            
         );
     }
 }

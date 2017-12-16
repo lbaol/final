@@ -55,4 +55,9 @@ public class StockControl {
 		map.put("reportList", reportList);
         return map;  
     }
+	
+	@RequestMapping("/stock/getAllStocks")
+    List<StockDO> getAllStocks() {  
+        return stockMapper.getAll();
+    }
 }

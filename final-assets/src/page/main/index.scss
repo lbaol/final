@@ -1,9 +1,18 @@
+
+.page-wrap {
+  display: flex;
+}
+
+
 .left-nav{
-  width: 300px;
+  min-width: 300px;
   display: inline-block;
   vertical-align: top;
 }
 
 .main-content {
+  flex-grow: 1;
   display: inline-block;
 }
+
+

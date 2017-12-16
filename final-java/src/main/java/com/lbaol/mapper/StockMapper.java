@@ -10,13 +10,11 @@ import com.lbaol.dataobject.StockDO;
 public interface StockMapper {
 	
 	@Select("SELECT * FROM stock")
-    @Results({
-    })
+    @Results()
     List<StockDO> getAll();
 	
 	@Select("SELECT * FROM stock  WHERE code = #{code}")
-    @Results({
-    })
+    @Results()
     StockDO getByCode(@Param("code") String code);
 
 
