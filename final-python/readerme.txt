@@ -1,2 +1,15 @@
-pip install tushare --upgrade
+
+##安装tushare开发包
+pip install tushare --upgrade‘
+
+##安装mysql客户端驱动
 pip install mysqlclient
+
+#获取2014年中报的业绩预告数据
+ts.forecast_data(2014,2)
+
+#获取2014年第3季度的业绩报表数据
+ts.get_report_data(2014,3)
+
+#获取所有股票列表
+ts.get_stock_basics()

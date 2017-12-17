@@ -73,9 +73,6 @@ public interface ForecastMapper {
                 if(params.get("endDate")!=null){      
                     WHERE("report_date <= #{endDate}");      
                 }
-                if(params.get("type")!=null){      
-                    WHERE("type = #{type}");      
-                }
                 ORDER_BY("report_date desc");
             }}.toString();  
         }  

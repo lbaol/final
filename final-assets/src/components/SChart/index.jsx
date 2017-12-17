@@ -60,8 +60,8 @@ export default class App extends Component {
                 newCode = 'SZ'+code;
             }
 
-            let m = period=='day'?1:3;
-            let newStartDate = startDate ? moment(startDate) :moment().subtract(365*m, 'day');
+            let m = period=='day'?365:700;
+            let newStartDate = startDate ? moment(startDate) :moment().subtract(m, 'day');
             let newEndDate = endDate ? moment(endDate):moment()
 
             request('https://xueqiu.com/stock/forchartk/stocklist.json?type=before',
@@ -89,19 +89,10 @@ export default class App extends Component {
 		(res)=>{
 
             
-            let allReport = [];
-            for(let d of res.report){
-                d.type = 'report';
-                allReport.push(d);
-            }
+            let eventList = res.eventList;
 
-            for(let d of res.forecast){
-                d.type = 'forecast';
-                allReport.push(d);
-            }
-
-            allReport = _.orderBy(allReport, ['reportDate'], ['desc']);
-            res.allReport = allReport;
+            eventList = _.orderBy(eventList, ['eventDate'], ['desc']);
+            res.eventList = eventList;
 
 			self.setState({
                 baseInfo:res
@@ -226,39 +217,44 @@ export default class App extends Component {
         }
 
         pinHeigth = 30;
-        if(baseInfo.report && _.isArray(baseInfo.report) && baseInfo.report.length>0){
-            let reportList = baseInfo.report;
-            for(let d of reportList){
-                let datePrice = this.getReportPriceByDate(d.reportDate);
+        if(baseInfo.eventList && _.isArray(baseInfo.eventList) && baseInfo.eventList.length>0){
+            let eventList = baseInfo.eventList;
+            for(let d of eventList){
+                let datePrice = this.getReportPriceByDate(d.eventDate);
                 if(datePrice){
                     let price = datePrice && datePrice.price;
                     let pointCfg = _.cloneDeep(pointCfgSource);
-                    pointCfg.name = d.reportDate;
+                    pointCfg.name = d.eventDate;
                     pointCfg.coord =  [datePrice.date,price];
-                    pointCfg.value = d.profitsYoy;
-                    pointCfg.symbolSize = [1,pinHeigth=pinHeigth+10];
+                    if(d.type == 'report'){
+                        pointCfg.value = d.profitsYoy;
+                    }
+                    if(d.type == 'forecast'){
+                        pointCfg.value = d.ranges;
+                    }
+                    pointCfg.symbolSize = [1,pinHeigth=pinHeigth+30];
                     pointList.push(pointCfg)
                 }   
                 
             }
         }
 
-        if(baseInfo.forecast && _.isArray(baseInfo.forecast) && baseInfo.forecast.length>0){
-            let forecastList = baseInfo.forecast;
-            for(let d of forecastList){
-                let datePrice = this.getReportPriceByDate(d.reportDate);
-                if(datePrice){
-                    let pointCfg = _.cloneDeep(pointCfgSource);
-                    pointCfg.name = d.reportDate;
-                    pointCfg.coord =  [datePrice.date,datePrice.price];
-                    pointCfg.value = d.ranges;
-                    pointCfg.symbolSize = [1,pinHeigth=pinHeigth+10];
-                    pointList.push(pointCfg)
-                }
+        // if(baseInfo.forecast && _.isArray(baseInfo.forecast) && baseInfo.forecast.length>0){
+        //     let forecastList = baseInfo.forecast;
+        //     for(let d of forecastList){
+        //         let datePrice = this.getReportPriceByDate(d.reportDate);
+        //         if(datePrice){
+        //             let pointCfg = _.cloneDeep(pointCfgSource);
+        //             pointCfg.name = d.reportDate;
+        //             pointCfg.coord =  [datePrice.date,datePrice.price];
+        //             pointCfg.value = d.ranges;
+        //             pointCfg.symbolSize = [1,pinHeigth=pinHeigth+10];
+        //             pointList.push(pointCfg)
+        //         }
                 
                 
-            }
-        }
+        //     }
+        // }
 
         let daySeriesInit = [{
             name: 'MA10',
@@ -552,9 +548,11 @@ export default class App extends Component {
                         {baisc && baisc.code} {baisc && baisc.name}   
                     </div>
                     {
-                        baseInfo.allReport && baseInfo.allReport.map((rep)=>{
+                        baseInfo.eventList && baseInfo.eventList.map((rep)=>{
                             return <div className="mt5">
-                                {rep.reportDate} {rep.type=='report'?'业绩报告':'业绩预告'}：{rep.ranges || (rep.profitsYoy+'%')}
+                                <span className="mr5">{rep.eventDate}</span>  
+                                    {rep.type=='report'&& <span><span className="c-blue">{rep.quarter}季度 报告</span> <span>{rep.profitsYoy}%</span></span>}
+                                    {rep.type=='forecast'&& <span><span className="c-green">{rep.quarter}季度 预告</span> <span>{_.includes(rep.ranges,'%')?rep.ranges:(rep.ranges+'%')}</span></span> }
                             </div>
                         })
                     }

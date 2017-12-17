@@ -3,7 +3,7 @@ import tushare as ts
 print(ts.__version__)
 
 year = 2017
-quarter = 1
+quarter = 4
 
 engine = create_engine('mysql://root:hello@127.0.0.1/final?charset=utf8')
 
