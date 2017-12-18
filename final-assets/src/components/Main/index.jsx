@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import FEvents from "../FEvent/index.js";
 import SFilter from "../SFilter/index.jsx";
-import SChart from "../SChart/index2.jsx";
+import SChart from "../SChart/index.jsx";
 import BaseInfo from "../BaseInfo/index.jsx";
 import '../../common/base.scss';
 import './index.scss';
