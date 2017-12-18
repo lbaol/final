@@ -116,10 +116,11 @@ export default class App extends Component {
     }
 
     onShowChartClick=(code)=>{
-        this.emit('chart:refresh', {
+        this.emit('final:main-chart-refresh',{
             ...this.state,
             code:code
         })
+        this.emit('final:base-info-refresh',{code:code})
     }
 
     fieldChange = (name, value) => {

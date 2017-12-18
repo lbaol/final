@@ -1,18 +1,10 @@
 import React from 'react';
 import ReactDOM,{ render } from 'react-dom';
-import SFilter from "../../components/SFilter/index.jsx";
-import SChart from "../../components/SChart/index2.jsx";
-import '../../common/base.scss';
-import './index.scss';
+// import SFilter from "../../components/SFilter/index.jsx";
+// import SChart from "../../components/SChart/index2.jsx";
+import Main from "../../components/Main/index.jsx";
 
-render(<div className="page-wrap">
-            <div className="left-nav">
-                {/* <SFilter /> */}
-            </div>
-            <div className="main-content">
-                <SChart />
-            </div>
-        
-    </div>, 
+
+render(<Main/>, 
     document.getElementById('root')
 );

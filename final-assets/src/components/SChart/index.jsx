@@ -31,9 +31,8 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        this.fatchChartData();
         
-        this.on('chart:refresh', (data) => {
+        this.on('final:main-chart-refresh', (data) => {
             console.log("data",data)
             const {code,period,startDate,endDate}  = this.state;
             this.setState({

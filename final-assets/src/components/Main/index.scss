@@ -1,12 +1,14 @@
 
 .page-wrap {
   display: flex;
+  margin-top: 30px;
 }
 
 
 .left-nav{
   display: inline-block;
   vertical-align: top;
+  min-width: 340px;
 }
 
 .main-content {
@@ -14,4 +16,8 @@
   display: inline-block;
 }
 
+.right-content {
+  min-width: 270px;
+  display: inline-block;
+}
 

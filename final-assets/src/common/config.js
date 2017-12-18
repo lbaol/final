@@ -21,14 +21,18 @@ const Util = {
 const dailyConfig = {
     chart:{
         upColor:'#f5f5f5',
-        downColor:'#ccc'
+        downColor:'#ccc',
+        width:'500px',
+        height:'300px'
     }
 }
 
 const productConfig = {
     chart:{
         upColor:'#ec0000',
-        downColor:'#00da3c'
+        downColor:'#00da3c',
+        width:'100%',
+        height:'600px'
     }
 }
 

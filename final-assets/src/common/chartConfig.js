@@ -50,7 +50,7 @@ const defaultConfig = {
             millisecond: '%H:%M:%S.%L',
             second: '%H:%M:%S',
             minute: '%H:%M',
-            hour: '%H:%M',
+            hour: '%Y-%m-%d',
             day: '%Y-%m-%d',
             week: '%Y-%m-%d',
             month: '%Y-%m',
