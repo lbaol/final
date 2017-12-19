@@ -195,7 +195,17 @@ export default class App extends Component {
                 type: 'candlestick',
                 name: code,
                 id: 'dataseries',
-                data: ohlc
+                data: ohlc,
+                tooltip:{
+                    pointFormatter:function(){
+                        return ''+this.series.name+'<br/>'
+                        +'开盘：'+this.open+'<br/>'
+                        +'最高：'+this.high+'<br/>'
+                        +'最低：'+this.low+'<br/>'
+                        +'收盘：'+this.close+'<br/>'
+                        +_.floor((this.close-this.open)/this.open*100,2)+'%'
+                    }
+                }
             }, {
                 type: 'column',
                 name: 'Volume',

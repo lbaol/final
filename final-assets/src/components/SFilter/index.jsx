@@ -41,22 +41,22 @@ export default class App extends Component {
 
     fatchAllStocks =()=>{
         const self = this;
-        request('/stock/getAllStocks',
+        request('/stock/getAll',
             (res) => {
                 if(res){
                     for(let st of res){
                         _allStocksMap[st.code] = st
                     }
                 }
-                self.fatchReportList();
+                self.fatchAllEventList();
             }, {
             }, 'jsonp')
     }
 
-    fatchReportList = () => {
+    fatchAllEventList = () => {
         const self = this;
         const {defaultReportList} = this.state;
-        request('/stock/getAllEvents',
+        request('/event/getAll',
             (res) => {
                 
                 let allList = res.eventList;

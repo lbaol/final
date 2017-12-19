@@ -42,39 +42,26 @@ public class StockControl {
 	@RequestMapping("/stock/getByCode")
     Map getByCode(String code) {  
 		Map map = new HashMap();
-//		List<ReportDO> reportList = reportMapper.getByCode(code);
-//		List<ForecastDO> forecastList = forecastMapper.getByCode(code);
 		StockDO stockDO = stockMapper.getByCode(code);
 		Map params = new HashMap();
 		params.put("code", code);
 		List<EventDO> eventList = eventMapper.getByParams(params);
 		map.put("baisc", stockDO);
 		map.put("eventList",eventList);
-//		map.put("report", reportList);
-//		map.put("forecast", forecastList);
         return map;  
     }
 	
-	@RequestMapping("/stock/getReports")
-    Map getReport() {  
-		Map map = new HashMap();
-		List<ForecastDO> forecastList = forecastMapper.getAll();
-		List<ReportDO> reportList = reportMapper.getAll();
-		map.put("forecastList", forecastList);
-		map.put("reportList", reportList);
-        return map;  
-    }
+//	
+//	@RequestMapping("/stock/getAllEvents")
+//    Map getAllEvents() {  
+//		Map map = new HashMap();
+//		List<EventDO>  eventList =  eventMapper.getAll();
+//		map.put("eventList", eventList);
+//        return map;  
+//    }
 	
-	@RequestMapping("/stock/getAllEvents")
-    Map getAllEvents() {  
-		Map map = new HashMap();
-		List<EventDO>  eventList =  eventMapper.getAll();
-		map.put("eventList", eventList);
-        return map;  
-    }
-	
-	@RequestMapping("/stock/getAllStocks")
-    List<StockDO> getAllStocks() {  
+	@RequestMapping("/stock/getAll")
+    List<StockDO> getAll() {  
         return stockMapper.getAll();
     }
 }
