@@ -8,7 +8,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import FEvents from "../FEvent/index.js";
 import {request} from "../../common/ajax.js";
-import {URL, Util,Config} from "../../common/config.js";
+import {URL, Util,Config,Env} from "../../common/config.js";
 import {defaultConfig} from "../../common/chartConfig.js";
 import './index.scss';
 
@@ -130,18 +130,23 @@ export default class App extends Component {
         let eventList = baseInfo.eventList;
         let flagList = [];
         for(let ev of eventList){
-            let title = ''
+            let flagObj = {};
             if(ev.type == 'report'){
-                title = ev.quarter+'季度' + ev.profitsYoy+'%'
+                let title = ev.quarter+'季度' + ev.profitsYoy+'%';
+                flagObj = {
+                    x: (new Date(moment(ev.eventDate))).getTime(),
+                    title: title
+                }
             }
             if(ev.type == 'forecast'){
-                title = ev.quarter+'季度' + (_.includes(ev.ranges,'%')?ev.ranges:(ev.ranges+'%'))
+                let title =  ev.quarter+'季度' + (_.includes(ev.ranges,'%')?ev.ranges:(ev.ranges+'%'))
+                flagObj = {
+                    x: (new Date(moment(ev.eventDate))).getTime(),
+                    title: title,
+                }
             }
-            let ds = ev.eventDate.split('-');
-            flagList.push({
-                x: (new Date(moment(ev.eventDate))).getTime(),
-                title: title,
-            })
+            flagList.push(flagObj)
+            
         }
 
         // create the chart
@@ -163,7 +168,7 @@ export default class App extends Component {
                 title: {
                     text: 'OHLC'
                 },
-                height: '60%',
+                height: '70%',
                 lineWidth: 1,
                 resize: {
                     enabled: true
@@ -176,8 +181,8 @@ export default class App extends Component {
                 title: {
                     text: 'Volume'
                 },
-                top: '65%',
-                height: '35%',
+                top: '75%',
+                height: '25%',
                 offset: 0,
                 lineWidth: 1
             }],
@@ -188,7 +193,7 @@ export default class App extends Component {
 
             series: [{
                 type: 'candlestick',
-                name: 'code',
+                name: code,
                 id: 'dataseries',
                 data: ohlc
             }, {
@@ -200,13 +205,18 @@ export default class App extends Component {
                 type: 'flags',
                 onSeries: 'dataseries',
                 shape: 'squarepin',
-                data: flagList
+                data: flagList,
+                y:-60,
+                stackDistance:20
             }, {
                 type: 'sma',
                 linkedTo: 'dataseries',
                 name: 'SMA (50)',
                 params: {
                     period: 50
+                },
+                marker: {
+                    enabled: false
                 }
             }]
         });
@@ -215,7 +225,7 @@ export default class App extends Component {
 
     render() {
         return (
-            <div className="s-chart-wrap" id="container" style={{ width: Config.chart.width, height: Config.chart.height }}></div>
+            <div className={'s-chart-wrap '+'s-chart-wrap-'+Env } id="container" style={{ width: Config.chart.width, height: Config.chart.height }}></div>
         );
     }
 }

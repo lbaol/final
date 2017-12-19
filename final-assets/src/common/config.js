@@ -1,5 +1,5 @@
 const domain = 'http://127.0.0.1:8080';
-const Env = 'product' //daily product
+const Env = 'daily' //daily product
 
 const URL = {
     forecast:{
@@ -23,7 +23,7 @@ const dailyConfig = {
         upColor:'#f5f5f5',
         downColor:'#ccc',
         width:'500px',
-        height:'300px'
+        height:'600px'
     }
 }
 

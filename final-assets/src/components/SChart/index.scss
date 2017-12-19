@@ -1,5 +1,9 @@
-.s-chart-wrap {
+.s-chart-wrap-product {
     opacity: 1;
+}
+
+.s-chart-wrap-daily {
+    opacity: 0.05
 }
 
 .s-chart {
@@ -11,3 +15,4 @@
     vertical-align: top;
     flex-grow: 1;
 }
+

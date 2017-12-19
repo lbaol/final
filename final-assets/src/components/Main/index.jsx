@@ -32,13 +32,13 @@ export default class App extends Component {
         return (
             <div className="page-wrap">
                 <div className="left-nav">
-                    <SFilter />
+                    {/* <SFilter /> */}
                 </div>
                 <div className="main-content">
                     <SChart />
                 </div>
                 <div  className="right-content">
-                    <BaseInfo/>
+                    {/* <BaseInfo/> */}
                 </div>
             </div>
         );
