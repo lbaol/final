@@ -6,6 +6,7 @@ import React, {Component} from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
+import {Radio,Checkbox} from 'antd';
 import FEvents from "../FEvent/index.js";
 import {request} from "../../common/ajax.js";
 import {URL, Util,Config,Env} from "../../common/config.js";
@@ -29,22 +30,28 @@ export default class App extends Component {
             endDate:'',
             chartData:{},
             baseInfo:{},
-            dateMapper:{}
+            dateMapper:{},
+            maOptions:[
+                { label: '10', value: 10 },
+                { label: '30', value: 30 },
+                { label: '50', value: 50 },
+              ],
+            maValue:[10,50]
         };
     }
 
     componentDidMount() {
 
         this.on('final:first-init', (data) => {
-            this.reflesh(data)
+            this.emitRefresh(data)
         });
         
         this.on('final:show-the-stock', (data) => {
-            this.reflesh(data)
+            this.emitRefresh(data)
         });
     }
 
-    reflesh=(data)=>{
+    emitRefresh=(data)=>{
         console.log("data",data)
         const {code,period,startDate,endDate}  = this.state;
         this.setState({
@@ -52,6 +59,12 @@ export default class App extends Component {
             period:data.period?data.period:period,
             startDate:data.startDate?data.startDate:startDate,
             endDate:data.endDate?data.endDate:endDate
+        },this.fatchChartData)
+    }
+
+    onPeriodChange=(e)=>{
+        this.setState({
+            period:e.target.value
         },this.fatchChartData)
     }
     
@@ -166,12 +179,16 @@ export default class App extends Component {
         return null;
     }
 
-    
+    onMaSelectChange=(checkedValues)=>{
+        this.setState({
+            maValue:checkedValues
+        },this.renderChart)
+    }
 
     renderChart=()=>{
 
         
-        let {chartData,baseInfo,code} = this.state;
+        let {chartData,baseInfo,code,maValue} = this.state;
         let ohlc = [];
         let volume = [];
         for(let d of chartData){
@@ -220,9 +237,54 @@ export default class App extends Component {
                 }
                 flagList.push(flagObj)
             }
-            
-            
         }
+
+        let maSeries = maValue.map((ma)=>{
+            return {
+                type: 'sma',
+                linkedTo: 'dataseries',
+                name: 'SMA'+ma,
+                params: {
+                    period: ma
+                },
+                marker: {
+                    enabled: false
+                }
+            }
+        })
+
+        let initSeries =  [{
+            type: 'candlestick',
+            name: code,
+            id: 'dataseries',
+            data: ohlc,
+            tooltip:{
+                pointFormatter:function(){
+                    return this.key+'<br/>'+
+                    +this.series.name+'<br/>'
+                    +'开盘：'+this.open+'<br/>'
+                    +'最高：'+this.high+'<br/>'
+                    +'最低：'+this.low+'<br/>'
+                    +'收盘：'+this.close+'<br/>'
+                    +'涨跌幅：'+_.floor((this.close-this.open)/this.open*100,2)+'%'
+                }
+            }
+        }, {
+            type: 'column',
+            name: 'Volume',
+            data: volume,
+            yAxis: 1
+        },{
+            type: 'flags',
+            onSeries: 'dataseries',
+            shape: 'squarepin',
+            data: flagList,
+            y:-60,
+            stackDistance:20
+        }]
+         
+
+        initSeries = initSeries.concat(maSeries)
 
         // create the chart
         Highcharts.stockChart('main-chart-container', {
@@ -277,59 +339,36 @@ export default class App extends Component {
                 split: true
             },
 
-            series: [{
-                type: 'candlestick',
-                name: code,
-                id: 'dataseries',
-                data: ohlc,
-                tooltip:{
-                    pointFormatter:function(){
-                        return this.key+'<br/>'+
-                        +this.series.name+'<br/>'
-                        +'开盘：'+this.open+'<br/>'
-                        +'最高：'+this.high+'<br/>'
-                        +'最低：'+this.low+'<br/>'
-                        +'收盘：'+this.close+'<br/>'
-                        +'涨跌幅：'+_.floor((this.close-this.open)/this.open*100,2)+'%'
-                    }
-                }
-            }, {
-                type: 'column',
-                name: 'Volume',
-                data: volume,
-                yAxis: 1
-            },{
-                type: 'flags',
-                onSeries: 'dataseries',
-                shape: 'squarepin',
-                data: flagList,
-                y:-60,
-                stackDistance:20
-            }, {
-                type: 'sma',
-                linkedTo: 'dataseries',
-                name: 'SMA (50)',
-                params: {
-                    period: 50
-                },
-                marker: {
-                    enabled: false
-                }
-            }]
+            series:initSeries
         });
     }
 	
 
     render() {
-        const {baseInfo} = this.state;
+        const {baseInfo,period,maOptions,maValue} = this.state;
         const basic = baseInfo.basic || {};
 
         return (
             <div className={'s-chart-wrap '+'s-chart-wrap-'+Env } style={{ width: Config.chart.width, height: Config.chart.height }}>
                 <div>
-                    {basic.code} {basic.name}
+                    <div className="o-h">
+                        {basic.code} {basic.name} 
+                        <span className="f-r">
+                            <Radio.Group  onChange={this.onPeriodChange} defaultValue={period} size="small">
+                                <Radio.Button value="day">日</Radio.Button>
+                                <Radio.Button value="week">周</Radio.Button>
+                            </Radio.Group>
+                        </span>
+                    </div>
+                    <div>
+                        <span>
+                            <Checkbox.Group options={maOptions} defaultValue={maValue} onChange={this.onMaSelectChange} />
+
+                        </span>
+                    </div>
+                    
                 </div>
-                <div id="main-chart-container">
+                <div className="mt10" id="main-chart-container">
             </div>
             </div>
         );

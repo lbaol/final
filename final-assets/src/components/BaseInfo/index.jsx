@@ -25,21 +25,21 @@ export default class App extends Component {
     componentDidMount() {
 
         this.on('final:first-init', (data) => {
-            this.refresh(data)
+            this.emitRefresh(data)
         });
 
         this.on('final:event-edit-finish', (data) => {
-            this.refresh(data)
+            this.emitRefresh(data)
         });
 
         this.on('final:show-the-stock', (data) => {
-            this.refresh(data)
+            this.emitRefresh(data)
         });
 
         
     }
 
-    refresh=(data)=>{
+    emitRefresh=(data)=>{
         const {code} = this.state;
         this.setState({
             code:data && data.code?data.code:code
