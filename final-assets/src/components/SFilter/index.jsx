@@ -115,12 +115,11 @@ export default class App extends Component {
         this.emit('chart:refresh', this.state)
     }
 
-    onShowChartClick=(code)=>{
-        this.emit('final:main-chart-refresh',{
+    onStockItemClick=(code)=>{
+        this.emit('final:show-the-stock',{
             ...this.state,
             code:code
         })
-        this.emit('final:base-info-refresh',{code:code})
     }
 
     fieldChange = (name, value) => {
@@ -163,7 +162,7 @@ export default class App extends Component {
                                     dataIndex: 'name',
                                     key:'name',
                                     render: (text, record) => (
-                                        <span className="cursor-p" onClick={this.onShowChartClick.bind(this,record.code)}>
+                                        <span className="c-p" onClick={this.onStockItemClick.bind(this,record.code)}>
                                             {text}
                                         </span>
                                     )

@@ -88,26 +88,28 @@ const defaultConfig = {
                 padding: '4px'
             }
         },
-        buttons: [{
-            type: 'month',
-            count: 1,
-            text: '月'
-        }, {
-            type: 'month',
-            count: 3,
-            text: '季度'
-        }, {
-            type: 'month',
-            count: 6,
-            text: '半年'
-        }, {
-            type: 'year',
-            count: 1,
-            text: '年'
-        }, {
-            type: 'all',
-            text: '所有'
-        }]
+        buttons: [
+            // {
+            //     type: 'month',
+            //     count: 1,
+            //     text: '月'
+            // }, {
+            //     type: 'month',
+            //     count: 3,
+            //     text: '季度'
+            // }, {
+            //     type: 'month',
+            //     count: 6,
+            //     text: '半年'
+            // },
+            {
+                type: 'year',
+                count: 1,
+                text: '年'
+            }, {
+                type: 'all',
+                text: '所有'
+            }]
     },
 
     plotOptions: {

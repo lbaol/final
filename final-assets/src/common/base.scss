@@ -1,3 +1,22 @@
+
+/* 区块显示 */
+.d-i {
+    display: inline-block;
+}
+
+.c-p {
+    cursor: pointer;
+}
+
+/* 颜色 */
+.c-blue {
+    color: blue
+}
+
+.c-green {
+    color: green;
+}
+
 /* 距离 */
 .mr5 {
     margin-right:5px;
@@ -141,22 +160,4 @@
 }
 .o-h {
   overflow: hidden;
-}
-
-/* 区块显示 */
-.d-i {
-    display: inline-block;
-}
-
-.cursor-p {
-    cursor: pointer;
-}
-
-/* 颜色 */
-.c-blue {
-    color: blue
-}
-
-.c-green {
-    color: green;
 }

@@ -22,11 +22,19 @@ module.exports = {
                 exclude: /node_modules/
             }, 
             {
-                test: /(\.scss|\.css)$/,
+                test: /(\.css)$/,
                 exclude: /^node_modules$/,
                 loader: ExtractTextPlugin.extract({
                     fallback: "style-loader",
                     use: "css-loader"
+                  })
+            }, 
+            {
+                test: /(\.scss)$/,
+                exclude: /^node_modules$/,
+                loader: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: "css-loader!sass-loader"
                   })
             }
         ]

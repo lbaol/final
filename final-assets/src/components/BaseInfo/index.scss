@@ -2,3 +2,28 @@
 .base-info {
     font-size: 12px;
 }
+
+.event-block {
+    .ant-card-head {
+        min-height: 30px;
+    }
+
+    .ant-card-head-title {
+        padding: 6px 0;
+    }
+    
+    .ant-card-extra {
+        padding: 6px 0;
+    }
+    
+    .ant-card-body {
+        padding: 10px 24px;
+    }
+    .event-item-op {
+        width: 25px;
+        float: right;
+        display: inline-block;
+        text-align: right;
+    }
+}
+

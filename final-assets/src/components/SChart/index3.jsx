@@ -32,17 +32,20 @@ export default class App extends Component {
 
     componentDidMount() {
         
-        this.on('final:main-chart-refresh', (data) => {
-            console.log("data",data)
-            const {code,period,startDate,endDate}  = this.state;
-            this.setState({
-                code:data.code?data.code:code,
-                period:data.period?data.period:period,
-                startDate:data.startDate?data.startDate:startDate,
-                endDate:data.endDate?data.endDate:endDate
-            },this.fatchChartData)
-            
+        this.on('final:first-init', (data) => {
+            this.reflesh(data)
         });
+    }
+
+    reflesh=(data)=>{
+        console.log("data",data)
+        const {code,period,startDate,endDate}  = this.state;
+        this.setState({
+            code:data.code?data.code:code,
+            period:data.period?data.period:period,
+            startDate:data.startDate?data.startDate:startDate,
+            endDate:data.endDate?data.endDate:endDate
+        },this.fatchChartData)
     }
     
 

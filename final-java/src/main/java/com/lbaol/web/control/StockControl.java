@@ -46,7 +46,7 @@ public class StockControl {
 		Map params = new HashMap();
 		params.put("code", code);
 		List<EventDO> eventList = eventMapper.getByParams(params);
-		map.put("baisc", stockDO);
+		map.put("basic", stockDO);
 		map.put("eventList",eventList);
         return map;  
     }

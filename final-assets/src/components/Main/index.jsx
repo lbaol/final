@@ -4,6 +4,9 @@ import FEvents from "../FEvent/index.js";
 import SFilter from "../SFilter/index.jsx";
 import SChart from "../SChart/index.jsx";
 import BaseInfo from "../BaseInfo/index.jsx";
+import {Env} from "../../common/config.js";
+import { LocaleProvider  } from 'antd';
+import zhCN from 'antd/lib/locale-provider/zh_CN';
 import '../../common/base.scss';
 import './index.scss';
 
@@ -21,8 +24,7 @@ export default class App extends Component {
 
     componentDidMount() {
         const {code} = this.state;
-        this.emit('final:main-chart-refresh',{code:code})
-        this.emit('final:base-info-refresh',{code:code})
+        this.emit('final:first-init',{code:code})
     }
 
     
@@ -30,17 +32,21 @@ export default class App extends Component {
     render() {
         
         return (
-            <div className="page-wrap">
-                <div className="left-nav">
-                    {/* <SFilter /> */}
+            <LocaleProvider locale={zhCN}>
+            
+                <div className={"page-wrap "+"page-wrap-"+Env}>
+                    <div className="left-nav">
+                        {/* <SFilter /> */}
+                    </div>
+                    <div className="main-content">
+                        <SChart />
+                    </div>
+                    <div  className="right-content">
+                        <BaseInfo/>
+                    </div>
                 </div>
-                <div className="main-content">
-                    <SChart />
-                </div>
-                <div  className="right-content">
-                    {/* <BaseInfo/> */}
-                </div>
-            </div>
+            </LocaleProvider>
+            
         );
     }
 }

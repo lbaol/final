@@ -28,23 +28,31 @@ export default class App extends Component {
             startDate:'',
             endDate:'',
             chartData:{},
-            baseInfo:{}
+            baseInfo:{},
+            dateMapper:{}
         };
     }
 
     componentDidMount() {
-        
-        this.on('final:main-chart-refresh', (data) => {
-            console.log("data",data)
-            const {code,period,startDate,endDate}  = this.state;
-            this.setState({
-                code:data.code?data.code:code,
-                period:data.period?data.period:period,
-                startDate:data.startDate?data.startDate:startDate,
-                endDate:data.endDate?data.endDate:endDate
-            },this.fatchChartData)
-            
+
+        this.on('final:first-init', (data) => {
+            this.reflesh(data)
         });
+        
+        this.on('final:show-the-stock', (data) => {
+            this.reflesh(data)
+        });
+    }
+
+    reflesh=(data)=>{
+        console.log("data",data)
+        const {code,period,startDate,endDate}  = this.state;
+        this.setState({
+            code:data.code?data.code:code,
+            period:data.period?data.period:period,
+            startDate:data.startDate?data.startDate:startDate,
+            endDate:data.endDate?data.endDate:endDate
+        },this.fatchChartData)
     }
     
    
@@ -60,6 +68,7 @@ export default class App extends Component {
 
             eventList = _.orderBy(eventList, ['eventDate'], ['desc']);
             res.eventList = eventList;
+            
 
 			self.setState({
                 baseInfo:res
@@ -87,9 +96,16 @@ export default class App extends Component {
             request('https://xueqiu.com/stock/forchartk/stocklist.json?type=before',
             (res)=>{
 
-                const chartData = res.chartlist
+                let chartList = res.chartlist;
+                let dateMapper =  {}
+                for(let cha of chartList){
+                    let date = moment(new Date(cha.timestamp)).format('YYYY-MM-DD');
+                    cha.date = date;
+                    dateMapper[date] = cha;
+                }
                 self.setState({
-                    chartData:chartData
+                    chartData:chartList,
+                    dateMapper:dateMapper
                 },self.fatchBaseInfo)
 
 
@@ -104,7 +120,53 @@ export default class App extends Component {
             
             },'jsonp')
         }
-	}
+    }
+
+    getReportPriceByDate=(date)=>{
+        let {chartData,dateMapper} = this.state;
+        if(chartData){
+            let cha = dateMapper[date];
+            
+            if(!cha){
+                //如果没找到对应的日期，继续找
+                cha = this.getWeekDateIndex(chartData,date)
+            }
+
+            if(cha){
+                //如果找到对应的日期
+                console.log('找到日期',cha.date,cha)
+                return {
+                    date:cha.date,
+                    price:cha.high //取最高价
+                }
+            }
+            
+            
+        }
+        return null;
+    }
+    
+    getWeekDateIndex=(chartData,date)=>{
+        let i = 0;
+        for( ; i<chartData.length;i++){
+            if(chartData[i].date>=date){
+                break;
+            }
+        }
+        //如果找到i 小于 长度，则代表已经找到
+        if(i<chartData.length-1){
+            return chartData[i];
+        }
+        //如果找到的i 是 最后一位，则需要进一步比较date
+        if(i==(chartData.length-1)){
+            if(chartData[i].date>=date){
+                return chartData[i];
+            }
+        }
+        return null;
+    }
+
+    
 
     renderChart=()=>{
 
@@ -130,30 +192,52 @@ export default class App extends Component {
         let eventList = baseInfo.eventList;
         let flagList = [];
         for(let ev of eventList){
-            let flagObj = {};
-            if(ev.type == 'report'){
-                let title = ev.quarter+'季度' + ev.profitsYoy+'%';
-                flagObj = {
-                    x: (new Date(moment(ev.eventDate))).getTime(),
-                    title: title
+            let datePrice = this.getReportPriceByDate(ev.eventDate);
+            if(datePrice){
+                let flagObj = {};
+                if(ev.type == 'fault'){
+                    let title = '断';
+                    flagObj = {
+                        x: (new Date(moment(datePrice.date))).getTime(),
+                        title: title,
+                        fillColor:'#f54545',
+                        color:'red'
+                    }
                 }
-            }
-            if(ev.type == 'forecast'){
-                let title =  ev.quarter+'季度' + (_.includes(ev.ranges,'%')?ev.ranges:(ev.ranges+'%'))
-                flagObj = {
-                    x: (new Date(moment(ev.eventDate))).getTime(),
-                    title: title,
+                if(ev.type == 'report'){
+                    let title = ev.quarter+'季度' + ev.profitsYoy+'%';
+                    flagObj = {
+                        x: (new Date(moment(datePrice.date))).getTime(),
+                        title: title
+                    }
                 }
+                if(ev.type == 'forecast'){
+                    let title =  ev.quarter+'季度' + (_.includes(ev.ranges,'%')?ev.ranges:(ev.ranges+'%'))
+                    flagObj = {
+                        x: (new Date(moment(datePrice.date))).getTime(),
+                        title: title,
+                    }
+                }
+                flagList.push(flagObj)
             }
-            flagList.push(flagObj)
+            
             
         }
 
         // create the chart
-        Highcharts.stockChart('container', {
+        Highcharts.stockChart('main-chart-container', {
             
             rangeSelector: {
-                selected: 1
+                selected: 0,
+                inputEnabled:false,
+                buttons: [{
+                    type: 'month',
+                    count: 11,
+                    text: '11m'
+                }, {
+                    type: 'all',
+                    text: 'All'
+                }]
             },
 
             title: {
@@ -186,7 +270,9 @@ export default class App extends Component {
                 offset: 0,
                 lineWidth: 1
             }],
-
+            scrollbar:{
+                
+            },
             tooltip: {
                 split: true
             },
@@ -198,12 +284,13 @@ export default class App extends Component {
                 data: ohlc,
                 tooltip:{
                     pointFormatter:function(){
-                        return ''+this.series.name+'<br/>'
+                        return this.key+'<br/>'+
+                        +this.series.name+'<br/>'
                         +'开盘：'+this.open+'<br/>'
                         +'最高：'+this.high+'<br/>'
                         +'最低：'+this.low+'<br/>'
                         +'收盘：'+this.close+'<br/>'
-                        +_.floor((this.close-this.open)/this.open*100,2)+'%'
+                        +'涨跌幅：'+_.floor((this.close-this.open)/this.open*100,2)+'%'
                     }
                 }
             }, {
@@ -234,8 +321,17 @@ export default class App extends Component {
 	
 
     render() {
+        const {baseInfo} = this.state;
+        const basic = baseInfo.basic || {};
+
         return (
-            <div className={'s-chart-wrap '+'s-chart-wrap-'+Env } id="container" style={{ width: Config.chart.width, height: Config.chart.height }}></div>
+            <div className={'s-chart-wrap '+'s-chart-wrap-'+Env } style={{ width: Config.chart.width, height: Config.chart.height }}>
+                <div>
+                    {basic.code} {basic.name}
+                </div>
+                <div id="main-chart-container">
+            </div>
+            </div>
         );
     }
 }
