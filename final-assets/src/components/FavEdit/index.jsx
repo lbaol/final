@@ -2,13 +2,12 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 import _ from 'lodash';
-import { Button, Select, Input, DatePicker, Modal,Form } from 'antd';
+import {  Checkbox,Modal} from 'antd';
 import FEvents from "../FEvent/index.js";
-
+import {favDict} from "../../common/dict.js";
 import { request } from "../../common/ajax.js";
 import { URL, Util } from "../../common/config.js";
 
-const FormItem = Form.Item;
 
 
 @FEvents
@@ -19,7 +18,9 @@ export default class App extends React.Component {
         this.state = {
             code:'',
             visible: false,
-            type:'',
+            value:[],
+            favOptions:favDict,
+            defaultValue:['default']
         };
     }
 
@@ -28,19 +29,12 @@ export default class App extends React.Component {
         this.on('final:fav-edit-show', (data) => {
             this.setState({
                 code:data && data.code,
-                type:data && data.type?data.type:type,
                 visible: true
             });
             
         });
     }
     
-    handleOk = (e) => {
-        console.log(e);
-        this.setState({
-            visible: false,
-        });
-    }
     handleCancel = (e) => {
         console.log(e);
         this.setState({
@@ -48,31 +42,29 @@ export default class App extends React.Component {
         });
     }
 
-    onTypeChange=(value)=>{
+    onFavSelectChange=(value)=>{
         this.setState({
-            type:value
+            value:value
         })
     }
 
-    onDateFieldChange=(value, valueString)=>{
-        this.setState({
-            eventDate:valueString
-        })
-    }
+   
 
     onSaveClick=()=>{
         const self = this;
-        request('/event/save',
+        const {code,value} = this.state;
+        request('/fav/update',
 		(res)=>{
             self.setState({visible:false})
-            self.emit('final:event-edit-finish')
+            self.emit('final:fav-edit-finish')
 		},{
-            ...this.state
+            code:code,
+            types:value
         },'jsonp')
     }
 
     render() {
-        const {type,eventDate} = this.state;
+        const {type,favOptions,defaultValue,value} = this.state;
         const formItemLayout = {
             labelCol: {
               sm: { span: 6 },
@@ -84,26 +76,13 @@ export default class App extends React.Component {
         return (
             <div>
                 <Modal
-                    title="增加信号"
+                    title="收藏"
                     visible={this.state.visible}
                     onOk={this.onSaveClick}
                     onCancel={this.handleCancel}
                 >
-                    <FormItem
-                        {...formItemLayout}
-                        label="日期"
-                    >
-                        <DatePicker defaultValue={eventDate && moment(eventDate, 'YYYY-MM-DD')} onChange={this.onDateFieldChange} placeholder="信号日期" />
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label="类型"
-                    >
-                        <Select defaultValue={type}  onChange={this.onTypeChange}>
-                            <Select.Option value="fault">断层</Select.Option>
-                            <Select.Option value="handle">杯柄</Select.Option>
-                        </Select>
-                    </FormItem>
+                    <Checkbox.Group options={favOptions} defaultValue={defaultValue} value={value} onChange={this.onFavSelectChange} />
+ 
                 </Modal>
             </div>
         );

@@ -6,6 +6,11 @@ export function request(
     callback,
     reqData = {},
     dataType='jsonp') {
+        for (let key in reqData) {
+            if (typeof reqData[key] === 'object') {
+                reqData[key] = JSON.stringify(reqData[key]);
+            }
+        }
         $.ajax({
             type: dataType=='jsonp'?'get':'post',
             dataType: dataType,

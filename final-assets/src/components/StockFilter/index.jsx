@@ -4,7 +4,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import { Button, Select, Input, DatePicker, Tabs, Table,Pagination ,Radio} from 'antd';
 import FEvents from "../FEvent/index.js";
-import ListFilter from "../ListFilter/index.jsx";
+import ReportFilter from "../ReportFilter/index.jsx";
 
 import { request } from "../../common/ajax.js";
 import { URL, Util } from "../../common/config.js";
@@ -72,7 +72,10 @@ export default class App extends Component {
             <div className="s-filter">
                 <Tabs onChange={this.onTabChange} type="card" size="small">
                     <TabPane tab="报表预告"  key="report-list">
-                        <ListFilter/>
+                        <ReportFilter/>
+                    </TabPane>
+                    <TabPane tab="报表预告"  key="fav-list">
+                        {/* <FavFilter/> */}
                     </TabPane>
                 </Tabs>
 

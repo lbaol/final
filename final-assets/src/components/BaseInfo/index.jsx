@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import FEvents from "../FEvent/index.js";
 import EventList from "../EventList/index.jsx";
+import FavEdit from "../FavEdit/index.jsx";
+import { Icon} from 'antd';
 import { request } from "../../common/ajax.js";
 import '../../common/base.scss';
 import './index.scss';
@@ -20,10 +22,6 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        this.on('final:first-init', (data) => {
-            this.emitRefresh(data)
-        });
-
         this.on('final:show-the-stock', (data) => {
             this.emitRefresh(data)
         });
@@ -51,6 +49,13 @@ export default class App extends Component {
         },'jsonp')
     }
 
+    onFavClick=()=>{
+        const {code} = this.state;
+        this.emit('final:fav-edit-show',{
+            code:code
+        })
+    }
+
     
 
     render() {
@@ -61,10 +66,13 @@ export default class App extends Component {
         return (
             <div className="base-info">
                 <div>
-                    {basic && basic.code} {basic && basic.name}   
+                    {basic && basic.code} {basic && basic.name}  
+                    <span className="ml10">
+                        <Icon className="c-p" type="heart-o" onClick={this.onFavClick} />
+                    </span> 
                 </div>
                 <EventList/>
-            
+                <FavEdit/>
             </div>
         );
     }

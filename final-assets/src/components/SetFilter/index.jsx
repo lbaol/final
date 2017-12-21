@@ -5,11 +5,15 @@ import _ from 'lodash';
 import { Button, Select,Icon, Input,Checkbox, DatePicker, Tabs, Table, Pagination, Radio, Form } from 'antd';
 import FEvents from "../FEvent/index.js";
 import { request } from "../../common/ajax.js";
+
 import { URL, Util } from "../../common/config.js";
 
 
 const _defaultDayMa = [10,50,120];
 const _defaultWeekMa = [10,30];
+
+const _defaultPeriodDay = 365;
+const _defaultPeriodWeek = 700;
 
 @FEvents
 export default class App extends Component {
@@ -35,7 +39,7 @@ export default class App extends Component {
 
     componentWillMount() {
         let { period } = this.state;
-        let m = period == 'day' ? 365 : 700;
+        let m = period == 'day' ? _defaultPeriodDay : _defaultPeriodWeek;
         this.setState({
             startDate: moment().subtract(m, 'day').format('YYYY-MM-DD'),
             endDate: moment().format('YYYY-MM-DD'),
@@ -57,7 +61,10 @@ export default class App extends Component {
 
     onPeriodChange=(e)=>{
         let value = e.target.value;
+        let m = (value == 'day' ? _defaultPeriodDay : _defaultPeriodWeek);
         this.setState({
+            startDate: moment().subtract(m, 'day').format('YYYY-MM-DD'),
+            endDate: moment().format('YYYY-MM-DD'),
             period:value,
             mas:(value=='day'?_defaultDayMa:_defaultWeekMa)
         },this.doShowTheStock)
@@ -116,7 +123,8 @@ export default class App extends Component {
                             <DatePicker  value={moment(endDate)} size="small" onChange={this.onDateFieldChange.bind(this, 'endDate')} placeholder="结束时间" />
                         </Form.Item>
                         <Form.Item>
-                            <Icon type="search" onClick={this.onSearchClick} />
+                                <Icon type="search" onClick={this.onSearchClick} />
+                            
                         </Form.Item>
                     </div>
                     <div>
