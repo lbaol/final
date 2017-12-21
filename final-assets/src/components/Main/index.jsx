@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import FEvents from "../FEvent/index.js";
-import SFilter from "../SFilter/index.jsx";
-import SChart from "../SChart/index.jsx";
+import StockFilter from "../StockFilter/index.jsx";
+import MainChart from "../MainChart/index.jsx";
 import BaseInfo from "../BaseInfo/index.jsx";
+import SetFilter from "../SetFilter/index.jsx";
 import {Env} from "../../common/config.js";
 import { LocaleProvider  } from 'antd';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
@@ -18,13 +19,12 @@ export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-           code:'002008'
         };
     }
 
     componentDidMount() {
         const {code} = this.state;
-        this.emit('final:first-init',{code:code})
+        this.emit('final:first-init')
     }
 
     
@@ -36,10 +36,11 @@ export default class App extends Component {
             
                 <div className={"page-wrap "+"page-wrap-"+Env}>
                     <div className="left-nav">
-                        {/* <SFilter /> */}
+                        <StockFilter />
                     </div>
                     <div className="main-content">
-                        <SChart />
+                        <SetFilter/>
+                        <MainChart />
                     </div>
                     <div  className="right-content">
                         <BaseInfo/>

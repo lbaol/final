@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lbaol.dataobject.EventDO;
+import com.lbaol.dataobject.StockDO;
 import com.lbaol.mapper.EventMapper;
+import com.lbaol.mapper.StockMapper;
 import com.lbaol.web.control.common.RpcResult;
 
 @RestController
@@ -18,11 +20,26 @@ public class EventControl {
 	@Autowired
 	private EventMapper eventMapper;
 	
+	@Autowired
+	private StockMapper stockMapper;
+	
 	@RequestMapping("/event/getAll")
     Map getAll() {  
 		Map map = new HashMap();
 		List<EventDO>  eventList =  eventMapper.getAll();
 		map.put("eventList", eventList);
+        return map;  
+    }
+	
+	@RequestMapping("/event/getByCode")
+    Map getByCode(String code) {  
+		Map map = new HashMap();
+		StockDO stockDO = stockMapper.getByCode(code);
+		Map params = new HashMap();
+		params.put("code", code);
+		List<EventDO> eventList = eventMapper.getByParams(params);
+		map.put("basic", stockDO);
+		map.put("eventList",eventList);
         return map;  
     }
 	

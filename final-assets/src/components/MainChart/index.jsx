@@ -17,7 +17,6 @@ import './index.scss';
 
 Highcharts.setOptions(defaultConfig);
 
-
 @FEvents
 export default class App extends Component {
 
@@ -31,20 +30,16 @@ export default class App extends Component {
             chartData:{},
             baseInfo:{},
             dateMapper:{},
-            maOptions:[
-                { label: '10', value: 10 },
-                { label: '30', value: 30 },
-                { label: '50', value: 50 },
-              ],
-            maValue:[10,50]
+            mas:[]
         };
+    }
+
+    componentWillMount(){
     }
 
     componentDidMount() {
 
-        this.on('final:first-init', (data) => {
-            this.emitRefresh(data)
-        });
+      
         
         this.on('final:show-the-stock', (data) => {
             this.emitRefresh(data)
@@ -53,27 +48,23 @@ export default class App extends Component {
 
     emitRefresh=(data)=>{
         console.log("data",data)
-        const {code,period,startDate,endDate}  = this.state;
+        const {code,period,startDate,endDate,mas}  = this.state;
         this.setState({
-            code:data.code?data.code:code,
-            period:data.period?data.period:period,
+            code:data && data.code?data.code:code,
+            period:data && data.period?data.period:period,
             startDate:data.startDate?data.startDate:startDate,
-            endDate:data.endDate?data.endDate:endDate
+            endDate:data.endDate?data.endDate:endDate,
+            mas: data && data.mas ? data.mas :mas
         },this.fatchChartData)
     }
 
-    onPeriodChange=(e)=>{
-        this.setState({
-            period:e.target.value
-        },this.fatchChartData)
-    }
     
    
 
-    fatchBaseInfo=()=>{
+    fatchEventList=()=>{
         const self = this;
         const {code} = this.state;
-        request('/stock/getByCode',
+        request('/event/getByCode',
 		(res)=>{
 
             
@@ -102,9 +93,9 @@ export default class App extends Component {
                 newCode = 'SZ'+code;
             }
 
-            let m = period=='day'?365:700;
-            let newStartDate = startDate ? moment(startDate) :moment().subtract(m, 'day');
-            let newEndDate = endDate ? moment(endDate):moment()
+            
+            let newStartDate = moment(startDate);
+            let newEndDate = moment(endDate)
 
             request('https://xueqiu.com/stock/forchartk/stocklist.json?type=before',
             (res)=>{
@@ -119,7 +110,7 @@ export default class App extends Component {
                 self.setState({
                     chartData:chartList,
                     dateMapper:dateMapper
-                },self.fatchBaseInfo)
+                },self.fatchEventList)
 
 
                 
@@ -179,16 +170,12 @@ export default class App extends Component {
         return null;
     }
 
-    onMaSelectChange=(checkedValues)=>{
-        this.setState({
-            maValue:checkedValues
-        },this.renderChart)
-    }
+
 
     renderChart=()=>{
 
         
-        let {chartData,baseInfo,code,maValue} = this.state;
+        let {chartData,baseInfo,code,mas} = this.state;
         let ohlc = [];
         let volume = [];
         for(let d of chartData){
@@ -239,7 +226,7 @@ export default class App extends Component {
             }
         }
 
-        let maSeries = maValue.map((ma)=>{
+        let maSeries = mas.map((ma)=>{
             return {
                 type: 'sma',
                 linkedTo: 'dataseries',
@@ -249,7 +236,8 @@ export default class App extends Component {
                 },
                 marker: {
                     enabled: false
-                }
+                },
+                lineWidth:1
             }
         })
 
@@ -349,25 +337,7 @@ export default class App extends Component {
         const basic = baseInfo.basic || {};
 
         return (
-            <div className={'s-chart-wrap '+'s-chart-wrap-'+Env } style={{ width: Config.chart.width, height: Config.chart.height }}>
-                <div>
-                    <div className="o-h">
-                        {basic.code} {basic.name} 
-                        <span className="f-r">
-                            <Radio.Group  onChange={this.onPeriodChange} defaultValue={period} size="small">
-                                <Radio.Button value="day">日</Radio.Button>
-                                <Radio.Button value="week">周</Radio.Button>
-                            </Radio.Group>
-                        </span>
-                    </div>
-                    <div>
-                        <span>
-                            <Checkbox.Group options={maOptions} defaultValue={maValue} onChange={this.onMaSelectChange} />
-
-                        </span>
-                    </div>
-                    
-                </div>
+            <div className={'s-chart-wrap' } style={{ width: Config.chart.width, height: Config.chart.height }}>
                 <div className="mt10" id="main-chart-container">
             </div>
             </div>

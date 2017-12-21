@@ -72,7 +72,7 @@ export default class App extends Component {
                 const chartData = self.parseXQStockData(res.chartlist)
                 self.setState({
                     chartData:chartData
-                },self.fatchBaseInfo)
+                },self.fatchEventList)
             },{
                 symbol:newCode,
                 period:'1'+period,
@@ -84,10 +84,10 @@ export default class App extends Component {
 		
     }
     
-    fatchBaseInfo=()=>{
+    fatchEventList=()=>{
         const self = this;
         const {code} = this.state;
-        request('/stock/getByCode',
+        request('/event/getByCode',
 		(res)=>{
 
             
