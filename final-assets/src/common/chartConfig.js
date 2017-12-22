@@ -102,6 +102,7 @@ const defaultConfig = {
             //     count: 6,
             //     text: '半年'
             // },
+            // {type:"ytd",text:"YTD"},
             {
                 type: 'year',
                 count: 1,

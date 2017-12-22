@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 // import Highcharts from 'highcharts/highstock';
 // import 'highcharts/highcharts-more.js';
 // import indicators from 'highcharts/indicators/indicators.js';
@@ -6,11 +6,11 @@ import React, {Component} from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
-import {Radio,Checkbox} from 'antd';
+import { Radio, Checkbox } from 'antd';
 import FEvents from "../FEvent/index.js";
-import {request} from "../../common/ajax.js";
-import {URL, Util,Config,Env} from "../../common/config.js";
-import {defaultConfig} from "../../common/chartConfig.js";
+import { request } from "../../common/ajax.js";
+import { URL, Util, Config, Env } from "../../common/config.js";
+import { defaultConfig } from "../../common/chartConfig.js";
 import './index.scss';
 
 
@@ -20,150 +20,150 @@ Highcharts.setOptions(defaultConfig);
 @FEvents
 export default class App extends Component {
 
-	constructor(props) {
+    constructor(props) {
         super(props);
         this.state = {
-			code:'',
-            period:'day',
-            startDate:'',
-            endDate:'',
-            chartData:{},
-            baseInfo:{},
-            dateMapper:{},
-            mas:[]
+            code: '',
+            period: 'day',
+            startDate: '',
+            endDate: '',
+            chartData: {},
+            baseInfo: {},
+            dateMapper: {},
+            mas: []
         };
     }
 
-    componentWillMount(){
+    componentWillMount() {
     }
 
     componentDidMount() {
 
-      
-        
+
+
         this.on('final:show-the-stock', (data) => {
             this.emitRefresh(data)
         });
     }
 
-    emitRefresh=(data)=>{
-        console.log("data",data)
-        const {code,period,startDate,endDate,mas}  = this.state;
+    emitRefresh = (data) => {
+        console.log("data", data)
+        const { code, period, startDate, endDate, mas } = this.state;
         this.setState({
-            code:data && data.code?data.code:code,
-            period:data && data.period?data.period:period,
-            startDate:data.startDate?data.startDate:startDate,
-            endDate:data.endDate?data.endDate:endDate,
-            mas: data && data.mas ? data.mas :mas
-        },this.fatchChartData)
+            code: data && data.code ? data.code : code,
+            period: data && data.period ? data.period : period,
+            startDate: data.startDate ? data.startDate : startDate,
+            endDate: data.endDate ? data.endDate : endDate,
+            mas: data && data.mas ? data.mas : mas
+        }, this.fatchChartData)
     }
 
-    
-   
 
-    fatchEventList=()=>{
+
+
+    fatchEventList = () => {
         const self = this;
-        const {code} = this.state;
+        const { code } = this.state;
         request('/event/getByCode',
-		(res)=>{
+            (res) => {
 
-            
-            let eventList = res.eventList;
 
-            eventList = _.orderBy(eventList, ['eventDate'], ['desc']);
-            res.eventList = eventList;
-            
+                let eventList = res.eventList;
 
-			self.setState({
-                baseInfo:res
-            },self.renderChart)
-		},{
-            code:code
-        },'jsonp')
+                eventList = _.orderBy(eventList, ['eventDate'], ['desc']);
+                res.eventList = eventList;
+
+
+                self.setState({
+                    baseInfo: res
+                }, self.renderChart)
+            }, {
+                code: code
+            }, 'jsonp')
     }
 
-	fatchChartData(){
+    fatchChartData() {
         const self = this;
-        const {code,period,startDate,endDate}  = this.state;
-        if(code){
+        const { code, period, startDate, endDate } = this.state;
+        if (code) {
             let newCode = code;
-            if(_.startsWith(code,'6')){
-                newCode = 'SH'+code;
-            }else if(_.startsWith(code,'0') || _.startsWith(code,'3')){
-                newCode = 'SZ'+code;
+            if (_.startsWith(code, '6')) {
+                newCode = 'SH' + code;
+            } else if (_.startsWith(code, '0') || _.startsWith(code, '3')) {
+                newCode = 'SZ' + code;
             }
 
-            
+
             let newStartDate = moment(startDate);
             let newEndDate = moment(endDate)
 
             request('https://xueqiu.com/stock/forchartk/stocklist.json?type=before',
-            (res)=>{
+                (res) => {
 
-                let chartList = res.chartlist;
-                let dateMapper =  {}
-                for(let cha of chartList){
-                    let date = moment(new Date(cha.timestamp)).format('YYYY-MM-DD');
-                    cha.date = date;
-                    dateMapper[date] = cha;
-                }
-                self.setState({
-                    chartData:chartList,
-                    dateMapper:dateMapper
-                },self.fatchEventList)
+                    let chartList = res.chartlist;
+                    let dateMapper = {}
+                    for (let cha of chartList) {
+                        let date = moment(new Date(cha.timestamp)).format('YYYY-MM-DD');
+                        cha.date = date;
+                        dateMapper[date] = cha;
+                    }
+                    self.setState({
+                        chartData: chartList,
+                        dateMapper: dateMapper
+                    }, self.fatchEventList)
 
 
-                
-                
-                
-            },{
-                symbol:newCode,
-                period:'1'+period,
-                begin:newStartDate.set('hour', 0).set('minute', 0).format('x'),
-                end:newEndDate.set('hour', 23).set('minute', 59).format('x'),
-            
-            },'jsonp')
+
+
+
+                }, {
+                    symbol: newCode,
+                    period: '1' + period,
+                    begin: newStartDate.set('hour', 0).set('minute', 0).format('x'),
+                    end: newEndDate.set('hour', 23).set('minute', 59).format('x'),
+
+                }, 'jsonp')
         }
     }
 
-    getReportPriceByDate=(date)=>{
-        let {chartData,dateMapper} = this.state;
-        if(chartData){
+    getReportPriceByDate = (date) => {
+        let { chartData, dateMapper } = this.state;
+        if (chartData) {
             let cha = dateMapper[date];
-            
-            if(!cha){
+
+            if (!cha) {
                 //如果没找到对应的日期，继续找
-                cha = this.getWeekDateIndex(chartData,date)
+                cha = this.getWeekDateIndex(chartData, date)
             }
 
-            if(cha){
+            if (cha) {
                 //如果找到对应的日期
-                console.log('找到日期',cha.date,cha)
+                console.log('找到日期', cha.date, cha)
                 return {
-                    date:cha.date,
-                    price:cha.high //取最高价
+                    date: cha.date,
+                    price: cha.high //取最高价
                 }
             }
-            
-            
+
+
         }
         return null;
     }
-    
-    getWeekDateIndex=(chartData,date)=>{
+
+    getWeekDateIndex = (chartData, date) => {
         let i = 0;
-        for( ; i<chartData.length;i++){
-            if(chartData[i].date>=date){
+        for (; i < chartData.length; i++) {
+            if (chartData[i].date >= date) {
                 break;
             }
         }
         //如果找到i 小于 长度，则代表已经找到
-        if(i<chartData.length-1){
+        if (i < chartData.length - 1) {
             return chartData[i];
         }
         //如果找到的i 是 最后一位，则需要进一步比较date
-        if(i==(chartData.length-1)){
-            if(chartData[i].date>=date){
+        if (i == (chartData.length - 1)) {
+            if (chartData[i].date >= date) {
                 return chartData[i];
             }
         }
@@ -172,13 +172,13 @@ export default class App extends Component {
 
 
 
-    renderChart=()=>{
+    renderChart = () => {
 
-        
-        let {chartData,baseInfo,code,mas} = this.state;
+
+        let { chartData, baseInfo, code, mas } = this.state;
         let ohlc = [];
         let volume = [];
-        for(let d of chartData){
+        for (let d of chartData) {
             ohlc.push([
                 d.timestamp, // the date
                 d.open, // open
@@ -195,28 +195,28 @@ export default class App extends Component {
 
         let eventList = baseInfo.eventList;
         let flagList = [];
-        for(let ev of eventList){
+        for (let ev of eventList) {
             let datePrice = this.getReportPriceByDate(ev.eventDate);
-            if(datePrice){
+            if (datePrice) {
                 let flagObj = {};
-                if(ev.type == 'fault'){
+                if (ev.type == 'fault') {
                     let title = '断';
                     flagObj = {
                         x: (new Date(moment(datePrice.date))).getTime(),
                         title: title,
-                        fillColor:'#f54545',
-                        color:'red'
+                        fillColor: '#f54545',
+                        color: 'red'
                     }
                 }
-                if(ev.type == 'report'){
-                    let title = ev.quarter+'季度' + ev.profitsYoy+'%';
+                if (ev.type == 'report') {
+                    let title = ev.quarter + '季度' + ev.profitsYoy + '%';
                     flagObj = {
                         x: (new Date(moment(datePrice.date))).getTime(),
                         title: title
                     }
                 }
-                if(ev.type == 'forecast'){
-                    let title =  ev.quarter+'季度' + (_.includes(ev.ranges,'%')?ev.ranges:(ev.ranges+'%'))
+                if (ev.type == 'forecast') {
+                    let title = ev.quarter + '季度' + (_.includes(ev.ranges, '%') ? ev.ranges : (ev.ranges + '%'))
                     flagObj = {
                         x: (new Date(moment(datePrice.date))).getTime(),
                         title: title,
@@ -226,7 +226,7 @@ export default class App extends Component {
             }
         }
 
-        let maSeries = mas.map((ma)=>{
+        let maSeries = mas.map((ma) => {
             return {
                 type: 'sma',
                 linkedTo: 'dataseries',
@@ -234,36 +234,44 @@ export default class App extends Component {
                 params: {
                     period: ma
                 },
-                id: 'ma'+ma,
+                id: 'ma' + ma,
                 marker: {
                     enabled: false
                 },
-                lineWidth:1,
-                marker:{
-                    radius:0,
-                    width:1,
-                    states:{
-                        hover:{
-                            enabled:false
+                lineWidth: 0.5,
+                marker: {
+                    radius: 0,
+                    width: 0.5,
+                    states: {
+                        hover: {
+                            enabled: false
                         }
                     }
                 }
             }
         })
 
-        let initSeries =  [{
+        let initSeries = [{
             type: 'candlestick',
             name: code,
             id: 'dataseries',
             data: ohlc,
-            tooltip:{
-                pointFormatter:function(){
-                    if(this.close){
-                        return '开盘：'+this.open+'<br/>'
-                        +'最高：'+this.high+'<br/>'
-                        +'最低：'+this.low+'<br/>'
-                        +'收盘：'+this.close+'<br/>'
-                        +'涨跌幅：'+_.floor((this.close-this.open)/this.open*100,2)+'%'+'<br/>'
+            upColor: 'red',
+            upLineColor: 'red',
+            lineColor: 'silver',
+            color: 'limegreen',
+            navigatorOptions: {
+                color: Highcharts.getOptions().colors[0]
+            },
+
+            tooltip: {
+                pointFormatter: function () {
+                    if (this.close) {
+                        return '开盘：' + this.open + '<br/>'
+                            + '最高：' + this.high + '<br/>'
+                            + '最低：' + this.low + '<br/>'
+                            + '收盘：' + this.close + '<br/>'
+                            + '涨跌幅：' + _.floor((this.close - this.open) / this.open * 100, 2) + '%' + '<br/>'
                     }
                 }
             },
@@ -273,57 +281,51 @@ export default class App extends Component {
             id: 'volume',
             data: volume,
             yAxis: 1,
-            tooltip:{
-                valueDecimals:0
+            tooltip: {
+                valueDecimals: 0
             }
-        },{
+        }, {
             type: 'flags',
             onSeries: 'dataseries',
             id: 'event',
-            name:'event',
-            index:10,
+            name: 'event',
+            index: 10,
             shape: 'squarepin',
             data: flagList,
-            y:-60,
-            stackDistance:20
+            y: -60,
+            stackDistance: 20
         }]
-         
+
 
         initSeries = initSeries.concat(maSeries)
 
         // create the chart
         Highcharts.stockChart('main-chart-container', {
-            
+
             rangeSelector: {
-                selected: 0,
-                inputEnabled:false,
-                buttons: [{
-                    type: 'month',
-                    count: 11,
-                    text: '11m'
-                }, {
-                    type: 'all',
-                    text: 'All'
-                }]
+                selected: 2,
+                inputEnabled: false,
+                buttons: [{ type: "ytd", text: "YTD" },
+                { type: "year", count: 1, text: "年" }, 
+                { type: 'all', text: 'All'}]
             },
 
             title: {
                 text: ''
             },
-            tooltip:{
-                shared:true,
-                animation:false,
+            tooltip: {
+                shared: true,
+                animation: false,
                 valueDecimals: 2,
-                enabled:true,
-                followTouchMove:false,
-                followPointer:false,
-                positioner: function (labelWidth,labelHeight,point) {
-                    if(point.plotX <= labelWidth){
-                        return { x: 800-labelWidth , y: 10 };
+                enabled: true,
+                followTouchMove: false,
+                followPointer: false,
+                positioner: function (labelWidth, labelHeight, point) {
+                    if (point.plotX <= labelWidth) {
+                        return { x: 800 - labelWidth, y: 10 };
                     }
                     return { x: 10, y: 10 };
                 },
-                snap:1/2,
                 shadow: false,
                 split: false,
                 backgroundColor: 'white',
@@ -356,22 +358,22 @@ export default class App extends Component {
                 offset: 0,
                 lineWidth: 1
             }],
-            scrollbar:{
-                
+            scrollbar: {
+
             },
-            series:initSeries
+            series: initSeries
         });
     }
-	
+
 
     render() {
-        const {baseInfo,period,maOptions,maValue} = this.state;
+        const { baseInfo, period, maOptions, maValue } = this.state;
         const basic = baseInfo.basic || {};
 
         return (
-            <div className={'s-chart-wrap' } style={{ width: Config.chart.width, height: Config.chart.height }}>
-                <div className="mt10" id="main-chart-container">
-            </div>
+            <div className={'s-chart-wrap'} >
+                <div className="mt10" id="main-chart-container" style={{ width: Config.chart.width, minHeight: Config.chart.height }}>
+                </div>
             </div>
         );
     }

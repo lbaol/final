@@ -16,17 +16,17 @@
 .left-nav{
   display: inline-block;
   vertical-align: top;
-  min-width: 340px;
+  min-width: 280px;
 }
 
 .main-content {
   flex-grow: 1;
-  padding: 0 20px;
+  padding: 0 10px;
   display: inline-block;
 }
 
 .right-content {
-  min-width: 270px;
+  min-width: 340px;
   display: inline-block;
 }
 

@@ -8,7 +8,7 @@ import { request } from "../../common/ajax.js";
 import { URL, Util } from "../../common/config.js";
 
 
-const _defaultDayMa = [10,50,120];
+const _defaultDayMa = [10,20,50,120];
 const _defaultWeekMa = [10,30];
 
 const _defaultPeriodDay = 365;

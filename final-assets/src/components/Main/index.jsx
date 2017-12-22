@@ -54,15 +54,16 @@ export default class App extends Component {
             <LocaleProvider locale={zhCN}>
             
                 <div className={"page-wrap "+"page-wrap-"+Env}>
-                    <div className="left-nav">
-                        <ListFilter stockDict={this.state.stockDict}/>
-                    </div>
+                    {/* <div className="left-nav">
+                        
+                    </div> */}
                     <div className="main-content">
                         <FilterSet/>
                         <MainChart />
                     </div>
                     <div  className="right-content">
                         <BaseInfo/>
+                        <ListFilter stockDict={this.state.stockDict}/>
                     </div>
                 </div>
             </LocaleProvider>
