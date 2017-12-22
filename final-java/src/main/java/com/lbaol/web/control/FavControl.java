@@ -81,5 +81,42 @@ public class FavControl {
     }
 	
 	
+	@RequestMapping("/fav/import")
+	RpcResult importByCodes(String codes,String type) {  
+		RpcResult rpcResult = new RpcResult();
+		if(StringUtils.isNotEmpty(codes)){
+			String[] codeArray = codes.split(",");
+			for(String code : codeArray) {
+				List<FavDO> favListDB = favMapper.getByCodeAndType(code, type);
+				if(favListDB.size() == 0) {
+					FavDO favDO = new FavDO();
+					favDO.setCode(code);
+					favDO.setType(type);
+					favMapper.insert(favDO);
+				}
+			}
+		}
+		rpcResult.setIsSuccess(true);
+        return rpcResult;  
+    }
+	
+	
+	@RequestMapping("/fav/deleteById")
+	RpcResult deleteById(Integer id) {  
+		RpcResult rpcResult = new RpcResult();
+		favMapper.deleteById(id);
+		rpcResult.setIsSuccess(true);
+        return rpcResult;  
+    }
+	
+	@RequestMapping("/fav/deleteByType")
+	RpcResult deleteByType(String type) {  
+		RpcResult rpcResult = new RpcResult();
+		favMapper.deleteByType(type);
+		rpcResult.setIsSuccess(true);
+        return rpcResult;  
+    }
+	
+	
     
 }

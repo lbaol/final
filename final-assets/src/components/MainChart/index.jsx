@@ -230,14 +230,24 @@ export default class App extends Component {
             return {
                 type: 'sma',
                 linkedTo: 'dataseries',
-                name: 'SMA'+ma,
+                name: ma,
                 params: {
                     period: ma
                 },
+                id: 'ma'+ma,
                 marker: {
                     enabled: false
                 },
-                lineWidth:1
+                lineWidth:1,
+                marker:{
+                    radius:0,
+                    width:1,
+                    states:{
+                        hover:{
+                            enabled:false
+                        }
+                    }
+                }
             }
         })
 
@@ -248,23 +258,30 @@ export default class App extends Component {
             data: ohlc,
             tooltip:{
                 pointFormatter:function(){
-                    return this.key+'<br/>'+
-                    +this.series.name+'<br/>'
-                    +'开盘：'+this.open+'<br/>'
-                    +'最高：'+this.high+'<br/>'
-                    +'最低：'+this.low+'<br/>'
-                    +'收盘：'+this.close+'<br/>'
-                    +'涨跌幅：'+_.floor((this.close-this.open)/this.open*100,2)+'%'
+                    if(this.close){
+                        return '开盘：'+this.open+'<br/>'
+                        +'最高：'+this.high+'<br/>'
+                        +'最低：'+this.low+'<br/>'
+                        +'收盘：'+this.close+'<br/>'
+                        +'涨跌幅：'+_.floor((this.close-this.open)/this.open*100,2)+'%'+'<br/>'
+                    }
                 }
-            }
+            },
         }, {
             type: 'column',
-            name: 'Volume',
+            name: '成交量',
+            id: 'volume',
             data: volume,
-            yAxis: 1
+            yAxis: 1,
+            tooltip:{
+                valueDecimals:0
+            }
         },{
             type: 'flags',
             onSeries: 'dataseries',
+            id: 'event',
+            name:'event',
+            index:10,
             shape: 'squarepin',
             data: flagList,
             y:-60,
@@ -293,7 +310,26 @@ export default class App extends Component {
             title: {
                 text: ''
             },
-
+            tooltip:{
+                shared:true,
+                animation:false,
+                valueDecimals: 2,
+                enabled:true,
+                followTouchMove:false,
+                followPointer:false,
+                positioner: function (labelWidth,labelHeight,point) {
+                    if(point.plotX <= labelWidth){
+                        return { x: 800-labelWidth , y: 10 };
+                    }
+                    return { x: 10, y: 10 };
+                },
+                snap:1/2,
+                shadow: false,
+                split: false,
+                backgroundColor: 'white',
+                borderWidth: 0,
+                borderRadius: 0,
+            },
             yAxis: [{
                 labels: {
                     align: 'right',
@@ -323,10 +359,6 @@ export default class App extends Component {
             scrollbar:{
                 
             },
-            tooltip: {
-                split: true
-            },
-
             series:initSeries
         });
     }

@@ -129,23 +129,24 @@ const defaultConfig = {
         },
         ohlc: {
             tooltip: {
-                split: false,
-            pointFormat: '<span style="color:{point.color}">\u25CF</span> <b> {series.name}</b><br/>' + 
-                '开盘：{point.open}<br/>' +
-                '最高：{point.high}<br/>' +
-                '最低：{point.low}<br/>' +
-                '收盘：{point.close}<br/>'
+                
+            //     split: false,
+            // pointFormat: '<span style="color:{point.color}">\u25CF</span> <b> {series.name}</b><br/>' + 
+            //     '开盘：{point.open}<br/>' +
+            //     '最高：{point.high}<br/>' +
+            //     '最低：{point.low}<br/>' +
+            //     '收盘：{point.close}<br/>'
             }
         },
         candlestick: {
-            tooltip: {
-                split: false,
-            pointFormat: '<span style="color:{point.color}">\u25CF</span> <b> {series.name}</b><br/>' + 
-                '开盘：{point.open}<br/>' +
-                '最高：{point.high}<br/>' +
-                '最低：{point.low}<br/>' +
-                '收盘：{point.close}<br/>'
-            }
+            // tooltip: {
+            //     split: false,
+            // pointFormat: '<span style="color:{point.color}">\u25CF</span> <b> {series.name}</b><br/>' + 
+            //     '开盘：{point.open}<br/>' +
+            //     '最高：{point.high}<br/>' +
+            //     '最低：{point.low}<br/>' +
+            //     '收盘：{point.close}<br/>'
+            // }
         }
     }
 };

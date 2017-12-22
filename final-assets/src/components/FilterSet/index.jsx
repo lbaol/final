@@ -134,7 +134,7 @@ export default class App extends Component {
                     </div>
                     <div>
                         <Form.Item>
-                            <Checkbox.Group options={maOptions} value={mas} onChange={this.onFieldValueChange.bind('mas')} />
+                            <Checkbox.Group options={maOptions} value={mas} onChange={this.onFieldValueChange.bind(this,'mas')} />
                         </Form.Item>
                     </div>
                     

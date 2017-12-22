@@ -35,6 +35,10 @@ public interface FavMapper {
     
 	@Delete("DELETE FROM fav WHERE id =#{id}")
     void deleteById(Integer id);
+	
+	
+	@Delete("DELETE FROM fav WHERE type =#{type}")
+    void deleteByType(String type);
 
     
     class EventProvider {  

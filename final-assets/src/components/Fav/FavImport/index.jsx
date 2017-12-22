@@ -47,8 +47,7 @@ export default class App extends React.Component {
     }
 
     onCodesChange=(e)=>{
-        let value = e.target.value;
-        console.log(value)
+        let value = e.target.value;        
         this.setState({
             codes:value
         })
@@ -58,13 +57,15 @@ export default class App extends React.Component {
 
     onSaveClick=()=>{
         const self = this;
-        const {code,value} = this.state;
+        const {codes} = this.state;
+        let newCodes = codes.replace(/[\r\n]/g, ',');
+        console.log(value)
         request('/fav/import',
 		(res)=>{
             self.setState({visible:false})
             self.emit('final:fav-import-finish')
 		},{
-            
+            codes:newCodes
         },'jsonp')
     }
 

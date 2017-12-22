@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 import _ from 'lodash';
-import { Button, Select, Input,Icon, DatePicker, Tabs, Table,Pagination ,Radio} from 'antd';
+import { Button, Select, Input,Icon, DatePicker, Tabs, Table,Pagination ,Radio,Modal} from 'antd';
 import FEvents from "../../FEvent/index.js";
 import { request } from "../../../common/ajax.js";
 import { URL, Util,Dict } from "../../../common/config.js";
@@ -69,6 +69,34 @@ export default class App extends Component {
         },this.fatchFavList)
     }
 
+    onDeleteFavByIdClick=(id)=>{
+        const self = this;
+        request('/fav/deleteById',
+        (res)=>{
+            self.fatchFavList()
+        },{
+            id:id
+        },'jsonp')
+    }
+
+    onDeleteFavByTypeClick=()=>{
+        const self = this;
+        const {type} = this.state;
+        Modal.confirm({
+            title: '确定不是手抖点的清空收藏夹?',
+            content: '',
+            onOk() {
+                request('/fav/deleteByType',
+                    (res)=>{
+                        self.fatchFavList()
+                    },{
+                        type:type
+                    },'jsonp')
+            },
+            onCancel() {},
+          })
+    }
+
     render() {
         const {favList, type,typeDS } = this.state;
         const {stockDict} = this.props;
@@ -88,8 +116,11 @@ export default class App extends Component {
                     </Radio.Group>
                     <span className="ml10">
                         <Icon className="c-p" type="plus-circle-o" onClick={this.onFavImportClick} />
-                        <FavImport/>
                     </span>
+                    <span className="ml10">
+                        <Icon type="delete" className="c-p" onClick={this.onDeleteFavByTypeClick} />
+                    </span>
+                    <FavImport/>
                 </div>
                 <div className="mt10">
                     <Table size="small" className="report-list-table"
@@ -112,7 +143,19 @@ export default class App extends Component {
                             title: '代码',
                             dataIndex: 'code',
                             key:'code'
-                        }]}  />
+                        },
+                        {
+                            title: '操作',
+                            dataIndex: 'action',
+                            key:'action',
+                            render: (text, record) => {
+                                
+                                return (<div>
+                                    <Icon type="delete" className="c-p" onClick={this.onDeleteFavByIdClick.bind(this,record.id)} />
+                                </div>)
+                            }
+                        }
+                        ]}  />
                 </div>
                         
 
