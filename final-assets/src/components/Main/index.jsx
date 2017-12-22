@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import FEvents from "../FEvent/index.js";
-import StockFilter from "../StockFilter/index.jsx";
+import ListFilter from "../ListFilter/ListFilter/index.jsx";
 import MainChart from "../MainChart/index.jsx";
 import BaseInfo from "../BaseInfo/index.jsx";
-import SetFilter from "../SetFilter/index.jsx";
+import FilterSet from "../FilterSet/index.jsx";
 import {Env} from "../../common/config.js";
+import { request } from "../../common/ajax.js";
 import { LocaleProvider  } from 'antd';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import '../../common/base.scss';
@@ -19,12 +20,30 @@ export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            stockDict:{}
         };
     }
 
     componentDidMount() {
-        const {code} = this.state;
+        
+        this.fatchAllStock();
         this.emit('final:first-init')
+        
+    }
+
+    fatchAllStock=()=>{
+        const self = this;
+        request('/stock/getAll',
+        (res)=>{
+            let stockDict = {}
+            for(let st of res){
+                stockDict[st.code] = st
+            }
+            this.setState({
+                stockDict:stockDict
+            })
+        },{
+        },'jsonp')
     }
 
     
@@ -36,10 +55,10 @@ export default class App extends Component {
             
                 <div className={"page-wrap "+"page-wrap-"+Env}>
                     <div className="left-nav">
-                        <StockFilter />
+                        <ListFilter stockDict={this.state.stockDict}/>
                     </div>
                     <div className="main-content">
-                        <SetFilter/>
+                        <FilterSet/>
                         <MainChart />
                     </div>
                     <div  className="right-content">

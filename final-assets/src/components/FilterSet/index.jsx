@@ -5,7 +5,6 @@ import _ from 'lodash';
 import { Button, Select,Icon, Input,Checkbox, DatePicker, Tabs, Table, Pagination, Radio, Form } from 'antd';
 import FEvents from "../FEvent/index.js";
 import { request } from "../../common/ajax.js";
-
 import { URL, Util } from "../../common/config.js";
 
 
@@ -51,6 +50,12 @@ export default class App extends Component {
         this.on('final:first-init',()=>{
             this.doShowTheStock();
         })
+
+        this.on('final:show-the-stock', (data) => {
+            this.setState({
+                code:data && data.code
+            })
+        });
     }
 
 

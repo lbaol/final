@@ -32,9 +32,7 @@ export default class App extends Component {
 
     componentDidMount() {
         
-        this.on('final:first-init', (data) => {
-            this.reflesh(data)
-        });
+        
     }
 
     reflesh=(data)=>{

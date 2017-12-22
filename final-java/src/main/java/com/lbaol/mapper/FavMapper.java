@@ -21,13 +21,10 @@ public interface FavMapper {
     @Results({})
     List<FavDO> getByCodeAndType(@Param("code") String code,@Param("type") String type);
 	
+	@Select("SELECT * FROM fav where code=#{code}  order by id desc")
+    @Results({})
+    List<FavDO> getByCode(@Param("code") String code);
 	
-	
-	
-	@Delete("DELETE FROM fav WHERE code =#{code}")
-    void deleteByCode(String code);
-	
-
 	@InsertProvider(type = EventProvider.class, method = "insert")  
 	@Options(useGeneratedKeys=true, keyProperty="id")
 	Integer insert(FavDO favDO);
@@ -36,15 +33,15 @@ public interface FavMapper {
 	@Results()
 	public List<FavDO> getByParams(Map params);  
     
-	@Delete("DELETE FROM fav WHERE code=#{code} type not in (#{types})")
-	public void deleteNotExistsTypes(String code,List<String> types);  
+	@Delete("DELETE FROM fav WHERE id =#{id}")
+    void deleteById(Integer id);
 
     
     class EventProvider {  
         public String getByParams(Map params) {  
         	return new SQL(){{      
                 SELECT("*");          
-                FROM("event");      
+                FROM("fav");      
                 if(params.get("code")!=null){      
                     WHERE("code = #{code}");      
                 } 
@@ -64,6 +61,13 @@ public interface FavMapper {
     	        }else {
     	        	VALUES("type", "#{type}"); 
     	        }
+            }}.toString();  
+        }  
+        
+        public String deleteNotExistsTypes(String code,List<String> typeList) {  
+        	return new SQL(){{      
+        		DELETE_FROM("fav");  
+        		WHERE("code = #{code}");  
             }}.toString();  
         }  
         

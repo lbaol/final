@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 import _ from 'lodash';
 import { Button, Select, Input, DatePicker, Tabs, Table,Pagination ,Radio} from 'antd';
-import FEvents from "../FEvent/index.js";
+import FEvents from "../../FEvent/index.js";
 
-import { request } from "../../common/ajax.js";
-import { URL, Util } from "../../common/config.js";
+import { request } from "../../../common/ajax.js";
+import { URL, Util } from "../../../common/config.js";
 import './index.scss';
 
 

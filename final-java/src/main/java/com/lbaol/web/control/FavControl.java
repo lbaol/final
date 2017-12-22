@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,23 +45,33 @@ public class FavControl {
 		RpcResult rpcResult = new RpcResult();
 		if(StringUtils.isNotEmpty(types)){
 			JSONArray typeJsonArray = JSONArray.fromObject(types);
-			List<FavDO> addList = new ArrayList<FavDO>();
-			List<String> typeList = new ArrayList<String>();
-			for(Object tempType : typeJsonArray) {
-				String type = (String)tempType;
-				typeList.add(type);
-				List<FavDO> codeFavList = favMapper.getByCodeAndType(code,(String) type);
-				if(codeFavList.size() < 1) {
-					FavDO favDO = new FavDO();
-					favDO.setCode(code);
-					favDO.setType(type);
-					addList.add(favDO);
-				}
-			}
-			for(FavDO favDO : addList) {
-				favMapper.insert(favDO);
+			List<FavDO> deleteList = new ArrayList<FavDO>();
+			List<FavDO> codeFavListDB = favMapper.getByCode(code);
+			Map<String,Integer> userSelectedMap = new HashMap<String,Integer>();
+			for(Object type : typeJsonArray) {
+				userSelectedMap.put((String)type, 0);
 			}
 			
+			for(FavDO favDO : codeFavListDB) {
+				if(userSelectedMap.get(favDO.getCode())==null) {
+					deleteList.add(favDO);
+				}else {
+					userSelectedMap.put(favDO.getCode(), 1);
+				}
+			}
+			
+			for(FavDO favDO : deleteList) {
+				favMapper.deleteById(favDO.getId());
+			}
+			
+			for(Entry<String,Integer> entry : userSelectedMap.entrySet()) {
+				if(entry.getValue() == 0) {
+					FavDO favDO = new FavDO();
+					favDO.setCode(code);
+					favDO.setType(entry.getKey());
+					favMapper.insert(favDO);
+				}
+			}
 			
 		}
 		

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import FEvents from "../FEvent/index.js";
 import EventList from "../EventList/index.jsx";
-import FavEdit from "../FavEdit/index.jsx";
+import FavEdit from "../Fav/FavEdit/index.jsx";
 import { Icon} from 'antd';
 import { request } from "../../common/ajax.js";
 import '../../common/base.scss';

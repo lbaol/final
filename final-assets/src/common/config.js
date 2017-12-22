@@ -38,7 +38,13 @@ const productConfig = {
 
 const Config = (Env=='daily')?dailyConfig:productConfig
 
+const Dict = {
+    favTypeDict : [
+        { label: '默认', value: 'default' },
+        { label: '断层', value: 'fault' }
+    ]
+}
 
 export {
-    URL,Util,Config,Env
+    URL,Util,Config,Env,Dict
 }
