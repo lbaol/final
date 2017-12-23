@@ -38,11 +38,29 @@ const productConfig = {
 
 const Config = (Env=='daily')?dailyConfig:productConfig
 
-const Dict = {
-    favTypeDict : [
-        { label: '默认', value: 'default' },
-        { label: '断层', value: 'fault' }
+let Dict = {
+    favType : [
+        { label: '备选', value: 'prepare' },
+        { label: '股票池', value: 'pool' },
+        { label: '持仓', value: 'position' },
+        { label: '杯柄', value: 'handle' },
+        { label: '断层', value: 'fault' },
+        { label: '领先新高', value: 'leadNewHigh' },
+        { label: '默认', value: 'default' }
+    ],
+    eventType: [
+        { label: '断层', value: 'fault' },
+        { label: '杯柄', value: 'handle' },
+        { label: '领先新高', value: 'leadNewHigh' }
     ]
+}
+
+for(let key in Dict){
+    let mapperKey = key+'Mapper';
+    Dict[mapperKey] = {}
+    for(let d of Dict[key]){
+        Dict[mapperKey][d.value] = d.label
+    }
 }
 
 export {

@@ -9,7 +9,7 @@ import moment from 'moment';
 import { Radio, Checkbox } from 'antd';
 import FEvents from "../FEvent/index.js";
 import { request } from "../../common/ajax.js";
-import { URL, Util, Config, Env } from "../../common/config.js";
+import { URL, Util, Config, Env,Dict } from "../../common/config.js";
 import { defaultConfig } from "../../common/chartConfig.js";
 import './index.scss';
 
@@ -103,10 +103,11 @@ export default class App extends Component {
                     let chartList = res.chartlist;
                     let dateMapper = {}
                     for (let cha of chartList) {
-                        let date = moment(new Date(cha.timestamp)).format('YYYY-MM-DD');
+                        let date = moment(cha.timestamp).format('YYYY-MM-DD');
                         cha.date = date;
                         dateMapper[date] = cha;
                     }
+                    console.log('dateMapper',dateMapper)
                     self.setState({
                         chartData: chartList,
                         dateMapper: dateMapper
@@ -184,7 +185,7 @@ export default class App extends Component {
                 d.open, // open
                 d.high, // high
                 d.low, // low
-                d.close // close
+                d.close, // close
             ]);
 
             volume.push([
@@ -199,27 +200,25 @@ export default class App extends Component {
             let datePrice = this.getReportPriceByDate(ev.eventDate);
             if (datePrice) {
                 let flagObj = {};
-                if (ev.type == 'fault') {
-                    let title = '断';
-                    flagObj = {
-                        x: (new Date(moment(datePrice.date))).getTime(),
-                        title: title,
-                        fillColor: '#f54545',
-                        color: 'red'
-                    }
-                }
                 if (ev.type == 'report') {
                     let title = ev.quarter + '季度' + ev.profitsYoy + '%';
                     flagObj = {
                         x: (new Date(moment(datePrice.date))).getTime(),
                         title: title
                     }
-                }
-                if (ev.type == 'forecast') {
+                }else if (ev.type == 'forecast') {
                     let title = ev.quarter + '季度' + (_.includes(ev.ranges, '%') ? ev.ranges : (ev.ranges + '%'))
                     flagObj = {
                         x: (new Date(moment(datePrice.date))).getTime(),
                         title: title,
+                    }
+                }else {
+                    let title = Dict.eventTypeMapper[ev.type];
+                    flagObj = {
+                        x: (new Date(moment(datePrice.date))).getTime(),
+                        title: title,
+                        fillColor: '#f54545',
+                        color: 'red'
                     }
                 }
                 flagList.push(flagObj)
@@ -265,13 +264,20 @@ export default class App extends Component {
             },
 
             tooltip: {
-                pointFormatter: function () {
+                pointFormatter: function () { 
+                    console.log(this)                  
                     if (this.close) {
+                        let percent  ;
+                        if(this.index>=1){
+                            let preData = this.series.data[this.index-1];
+                            percent = _.floor((this.close - preData.close) / preData.close * 100, 2)
+                        }
+                        
                         return '开盘：' + this.open + '<br/>'
                             + '最高：' + this.high + '<br/>'
                             + '最低：' + this.low + '<br/>'
                             + '收盘：' + this.close + '<br/>'
-                            + '涨跌幅：' + _.floor((this.close - this.open) / this.open * 100, 2) + '%' + '<br/>'
+                            + (_.isNumber(percent)?('涨跌幅：' + percent + '%' + '<br/>'):'')
                     }
                 }
             },
@@ -342,6 +348,9 @@ export default class App extends Component {
                 },
                 height: '70%',
                 lineWidth: 1,
+                crosshair: {
+                    snap: false
+                },
                 resize: {
                     enabled: true
                 }

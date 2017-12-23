@@ -18,7 +18,7 @@ export default class App extends React.Component {
             code:'',
             visible: false,
             value:[],
-            favOptions:Dict.favTypeDict,
+            favOptions:Dict.favType,
             defaultValue:['']
         };
     }

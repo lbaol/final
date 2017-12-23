@@ -8,12 +8,13 @@ import { request } from "../../../common/ajax.js";
 import { URL, Util } from "../../../common/config.js";
 import ReportList from "../ReportList/index.jsx";
 import FavList from "../FavList/index.jsx";
+import EventList from "../EventList/index.jsx";
+
 
 
 const TabPane = Tabs.TabPane;
 
 
-let _allStocksMap = [];
 
 @FEvents
 export default class App extends Component {
@@ -45,6 +46,9 @@ export default class App extends Component {
                     </TabPane>
                     <TabPane tab="业绩"  key="report-list">
                         <ReportList  stockDict={this.props.stockDict}/>
+                    </TabPane>
+                    <TabPane tab="信号"  key="event-list">
+                        <EventList stockDict={this.props.stockDict} />
                     </TabPane>
                     
                 </Tabs>

@@ -10,16 +10,8 @@ import FavImport from "../../Fav/FavImport/index.jsx";
 import './index.scss';
 
 
-const TabPane = Tabs.TabPane;
 
 
-let _eventList = {
-    allList : [],
-    increaseList : [],
-    otherList : []
-}
-
-let _allStocksMap = [];
 
 @FEvents
 export default class App extends Component {
@@ -28,8 +20,8 @@ export default class App extends Component {
         super(props);
         this.state = {
             favList: [],
-            type:'default',
-            typeDS:Dict.favTypeDict
+            type:'prepare',
+            typeDS:Dict.favType
         };
     }
 

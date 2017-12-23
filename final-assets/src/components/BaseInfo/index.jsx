@@ -49,7 +49,7 @@ export default class App extends Component {
         },'jsonp')
     }
 
-    onFavClick=()=>{
+    onAddFavClick=()=>{
         const {code} = this.state;
         this.emit('final:fav-edit-show',{
             code:code
@@ -68,7 +68,7 @@ export default class App extends Component {
                 <div>
                     {basic && basic.code} {basic && basic.name}  
                     <span className="ml10">
-                        <Icon className="c-p" type="heart-o" onClick={this.onFavClick} />
+                        <Icon className="c-p" type="heart-o" onClick={this.onAddFavClick} />
                     </span> 
                 </div>
                 <EventList/>

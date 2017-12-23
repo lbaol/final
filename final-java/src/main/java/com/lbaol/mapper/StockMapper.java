@@ -16,6 +16,6 @@ public interface StockMapper {
 	@Select("SELECT * FROM stock  WHERE code = #{code}")
     @Results()
     StockDO getByCode(@Param("code") String code);
-
+	
 
 }

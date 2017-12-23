@@ -43,6 +43,16 @@ public class EventControl {
         return map;  
     }
 	
+	@RequestMapping("/event/getByType")
+    Map getByType(String type) {  
+		Map map = new HashMap();
+		Map params = new HashMap();
+		params.put("type", type);
+		List<EventDO> eventList = eventMapper.getByParams(params);
+		map.put("eventList",eventList);
+        return map;  
+    }
+	
 	@RequestMapping("/event/save")
 	RpcResult save(String code,String eventDate,String type) { 
 		RpcResult result = new RpcResult();

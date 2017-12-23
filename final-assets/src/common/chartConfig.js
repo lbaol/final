@@ -36,7 +36,7 @@ const defaultConfig = {
     global: {
         // 不使用 UTC时间
         // useUTC: false,
-        //timezoneOffset: -8 * 60,
+        timezoneOffset: -8 * 60,
         canvasToolsURL: '//cdn.hcharts.cn/highcharts/modules/canvas-tools.js',
         VMLRadialGradientURL: '//cdn.hcharts.cn/highcharts/gfx/vml-radial-gradient.png'
     },

@@ -10,9 +10,6 @@ import { URL, Util } from "../../../common/config.js";
 import './index.scss';
 
 
-const TabPane = Tabs.TabPane;
-
-
 let _eventList = {
     allList : [],
     increaseList : [],

@@ -6,7 +6,7 @@ import {  Modal,Select, Icon,Card} from 'antd';
 import FEvents from "../FEvent/index.js";
 import EventEdit from "../EventEdit/index.jsx";
 import { request } from "../../common/ajax.js";
-import { URL, Util } from "../../common/config.js";
+import { URL, Util ,Dict} from "../../common/config.js";
 import './index.scss';
 
 
@@ -18,8 +18,19 @@ export default class App extends Component {
         super(props);
         this.state = {
            code:'',
-           baseInfo:{}
+           baseInfo:{},
+           eventMapper:{}
         };
+    }
+
+    componentWillMount(){
+        const eventMapper = {};
+        for(let e of Dict.eventType){
+            eventMapper[e.value] = e.label
+        }
+        this.setState({
+            eventMapper:eventMapper
+        })
     }
 
     componentDidMount() {
@@ -64,7 +75,7 @@ export default class App extends Component {
     
     onAddEventClick=(eventDate)=>{
         const {code} = this.state;
-        this.emit('final:event-edit-show',{code:code,eventDate:eventDate})
+        this.emit('final:event-edit-show',{code:code,eventDate:eventDate?eventDate:''})
     }
 
     onDeleteEventClick=(id)=>{
@@ -85,58 +96,51 @@ export default class App extends Component {
     }
 
     render() {
-        const {baseInfo} = this.state;
+        const {baseInfo,eventMapper} = this.state;
         const baisc = baseInfo.baisc;
+        
 
         return (
             <div className="event-block">
-                <Card title="信号" bordered={false}  extra={<Icon className="c-p" onClick={this.onAddEventClick} type="plus" />} >
+                <Card title="信号" bordered={false}  extra={<Icon className="c-p" onClick={this.onAddEventClick.bind(this,'')} type="plus" />} >
                     {
                         baseInfo.eventList && baseInfo.eventList.map((ev)=>{
+                            let content ;
+                            if(ev.type=='report'){
+                                content = (<span>
+                                    <span>
+                                        <span className="c-blue">{ev.quarter}季度 报告</span> 
+                                        <span>{ev.profitsYoy}%</span>
+                                    </span>
+                                    <span className="event-item-op">
+                                        <Icon className="c-p" onClick={this.onAddEventClick.bind(this,ev.eventDate)} type="plus" />
+                                    </span>
+                                </span>)
+                            }else if (ev.type=='forecast'){
+                                content = (
+                                    <span>
+                                        <span>
+                                            <span className="c-blue">{ev.quarter}季度 报告</span> 
+                                            <span>{ev.profitsYoy}%</span>
+                                        </span>
+                                        <span className="event-item-op">
+                                            <Icon className="c-p" onClick={this.onAddEventClick.bind(this,ev.eventDate)} type="plus" />
+                                        </span>
+                                    </span>
+                                )
+                            }else{
+                                content = (<span>
+                                            <span>{eventMapper[ev.type]}</span> 
+                                            <span className="event-item-op">
+                                                <Icon type="delete" onClick={this.onDeleteEventClick.bind(this,ev.id)} />
+                                            </span>
+                                        </span>)
+                            }
+
+
                             return <div className="mt5">
                                 <span className="mr5">{ev.eventDate}</span>  
-                                    {
-                                        ev.type=='report'&& 
-                                        <span>
-                                            <span>
-                                                <span className="c-blue">{ev.quarter}季度 报告</span> 
-                                                <span>{ev.profitsYoy}%</span>
-                                            </span>
-                                            <span className="event-item-op">
-                                                <Icon className="c-p" onClick={this.onAddEventClick.bind(this,ev.eventDate)} type="plus" />
-                                            </span>
-                                        </span>
-                                    }
-                                    {
-                                        ev.type=='forecast'&& 
-                                        <span>
-                                            <span>
-                                                <span className="c-green">{ev.quarter}季度 预告</span>
-                                                <span>{_.includes(ev.ranges,'%')?ev.ranges:(ev.ranges+'%')}</span>
-                                            </span>
-                                            <span className="event-item-op">
-                                                <Icon className="c-p" onClick={this.onAddEventClick.bind(this,ev.eventDate)} type="plus" />
-                                            </span>
-                                        </span>
-                                    }
-                                    {
-                                        ev.type=='fault'&& 
-                                        <span>
-                                            <span>利润断层</span> 
-                                            <span className="event-item-op">
-                                                <Icon type="delete" onClick={this.onDeleteEventClick.bind(this,ev.id)} />
-                                            </span>
-                                        </span>
-                                    }
-                                    {
-                                        ev.type=='handle'&& 
-                                        <span>
-                                            <span>杯柄</span> 
-                                            <span className="event-item-op">
-                                                <Icon type="delete" onClick={this.onDeleteEventClick.bind(this,ev.id)} />
-                                            </span> 
-                                        </span> 
-                                    }
+                                {content}
                             </div>
                         })
                     }

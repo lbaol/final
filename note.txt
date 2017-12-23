@@ -1,0 +1,9 @@
+#mysql备份
+mysqldump -u root -p final > D:\final.sql
+
+#mysql还原
+mysql -u root -p  final < d:\final.sql
+
+mysql workbench 设置可删除模式：
+SET SQL_SAFE_UPDATES = 0;
+

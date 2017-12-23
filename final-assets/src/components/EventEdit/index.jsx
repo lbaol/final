@@ -6,7 +6,7 @@ import { Button, Select, Input, DatePicker, Modal,Form } from 'antd';
 import FEvents from "../FEvent/index.js";
 
 import { request } from "../../common/ajax.js";
-import { URL, Util } from "../../common/config.js";
+import { URL, Util,Dict } from "../../common/config.js";
 
 const FormItem = Form.Item;
 
@@ -76,6 +76,7 @@ export default class App extends React.Component {
               sm: { span: 18 },
             },
           };
+        console.log(type,eventDate)
         return (
             <div>
                 <Modal
@@ -88,15 +89,18 @@ export default class App extends React.Component {
                         {...formItemLayout}
                         label="日期"
                     >
-                        <DatePicker defaultValue={eventDate && moment(eventDate, 'YYYY-MM-DD')} onChange={this.onDateFieldChange} placeholder="信号日期" />
+                        <DatePicker value={eventDate ? moment(eventDate, 'YYYY-MM-DD'):moment()} onChange={this.onDateFieldChange} placeholder="信号日期" />
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
                         label="类型"
                     >
-                        <Select defaultValue={type}  onChange={this.onTypeChange}>
-                            <Select.Option value="fault">断层</Select.Option>
-                            <Select.Option value="handle">杯柄</Select.Option>
+                        <Select style={{width:'150px'}} value={type}  onChange={this.onTypeChange}>
+                            {
+                                Dict.eventType.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
                         </Select>
                     </FormItem>
                 </Modal>

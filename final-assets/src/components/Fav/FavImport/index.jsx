@@ -16,8 +16,8 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             visible: false,
-            typeValue:[],
-            typeDS:Dict.favTypeDict,
+            typeValue:'',
+            typeDS:Dict.favType,
             codes:''
         };
     }
@@ -57,15 +57,21 @@ export default class App extends React.Component {
 
     onSaveClick=()=>{
         const self = this;
-        const {codes} = this.state;
-        let newCodes = codes.replace(/[\r\n]/g, ',');
-        console.log(value)
+        const {codes,typeValue} = this.state;
+        let newCodesString = codes.replace(/[\r\n]/g, ',');
+        let newCodesArray = [];
+        for(let c of newCodesString.split(',')){
+            newCodesArray.push(_.toString(c).trim())
+        }
+        newCodesString = newCodesArray.join(',')
+        console.log(newCodesString)
         request('/fav/import',
 		(res)=>{
             self.setState({visible:false})
             self.emit('final:fav-import-finish')
 		},{
-            codes:newCodes
+            codes:newCodesString,
+            type:typeValue
         },'jsonp')
     }
 
