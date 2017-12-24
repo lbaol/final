@@ -120,8 +120,8 @@ export default class App extends Component {
                                 content = (
                                     <span>
                                         <span>
-                                            <span className="c-blue">{ev.quarter}季度 报告</span> 
-                                            <span>{ev.profitsYoy}%</span>
+                                            <span className="c-green">{ev.quarter}季度 预告</span>
+                                            <span>{_.includes(ev.ranges,'%')?ev.ranges:(ev.ranges+'%')}</span>
                                         </span>
                                         <span className="event-item-op">
                                             <Icon className="c-p" onClick={this.onAddEventClick.bind(this,ev.eventDate)} type="plus" />

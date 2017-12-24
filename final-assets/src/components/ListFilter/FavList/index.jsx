@@ -144,6 +144,12 @@ export default class App extends Component {
                                 
                                 return (<div>
                                     <Icon type="delete" className="c-p" onClick={this.onDeleteFavByIdClick.bind(this,record.id)} />
+                                    <span className="ml5">
+                                        <a target="_blank" href={'https://xueqiu.com/S/'+Util.getFullCode(record.code)}>雪</a>
+                                    </span>
+                                    <span className="ml5">
+                                        <a target="_blank" href={'http://emweb.securities.eastmoney.com/f10_v2/OperationsRequired.aspx?type=web&code='+Util.getFullCode(record.code)}>东</a>
+                                    </span>
                                 </div>)
                             }
                         }

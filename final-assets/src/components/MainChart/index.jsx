@@ -86,14 +86,7 @@ export default class App extends Component {
         const self = this;
         const { code, period, startDate, endDate } = this.state;
         if (code) {
-            let newCode = code;
-            if (_.startsWith(code, '6')) {
-                newCode = 'SH' + code;
-            } else if (_.startsWith(code, '0') || _.startsWith(code, '3')) {
-                newCode = 'SZ' + code;
-            }
-
-
+            let newCode = Util.getFullCode(code);
             let newStartDate = moment(startDate);
             let newEndDate = moment(endDate)
 
@@ -298,7 +291,9 @@ export default class App extends Component {
             index: 10,
             shape: 'squarepin',
             data: flagList,
+            dashStyle:'ShortDot',
             y: -60,
+            lineWidth:1,
             stackDistance: 20
         }]
 

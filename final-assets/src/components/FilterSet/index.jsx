@@ -5,14 +5,14 @@ import _ from 'lodash';
 import { Button, Select,Icon, Input,Checkbox, DatePicker, Tabs, Table, Pagination, Radio, Form } from 'antd';
 import FEvents from "../FEvent/index.js";
 import { request } from "../../common/ajax.js";
-import { URL, Util } from "../../common/config.js";
+import { URL, Util,Config } from "../../common/config.js";
 
 
-const _defaultDayMa = [10,20,50,120];
-const _defaultWeekMa = [10,30];
+const _defaultDayMa = Config.defalutMas.day;
+const _defaultWeekMa = Config.defalutMas.week;
 
-const _defaultPeriodDay = 365;
-const _defaultPeriodWeek = 700;
+const _defaultPeriodDay = Config.defaultPeriod.day;
+const _defaultPeriodWeek = Config.defaultPeriod.week;
 
 @FEvents
 export default class App extends Component {

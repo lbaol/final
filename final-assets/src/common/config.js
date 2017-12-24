@@ -15,11 +15,39 @@ const Util = {
       if (path.startsWith("http"))
         return path;
       return domain + path;
+    },
+    getFullCode:function(code){
+        let newCode = code;
+        if (_.startsWith(code, '6')) {
+            newCode = 'SH' + code;
+        } else if (_.startsWith(code, '0') || _.startsWith(code, '3')) {
+            newCode = 'SZ' + code;
+        }
+        return newCode;
     }
 }
 
-const dailyConfig = {
-    chart:{
+let Config = {
+    defalutMas:{
+        day : [10,20,50,120],
+        week: [10,30,50]
+    },
+    defaultPeriod:{
+        day:365,
+        week:700
+    }
+}
+
+if(Env=='product'){
+    Config.chart = {
+        upColor:'#ec0000',
+        downColor:'#00da3c',
+        width:'100%',
+        height:'600px'
+    }
+}
+if(Env=='daily'){
+    Config.chart = {
         upColor:'#f5f5f5',
         downColor:'#ccc',
         width:'500px',
@@ -27,16 +55,7 @@ const dailyConfig = {
     }
 }
 
-const productConfig = {
-    chart:{
-        upColor:'#ec0000',
-        downColor:'#00da3c',
-        width:'100%',
-        height:'600px'
-    }
-}
 
-const Config = (Env=='daily')?dailyConfig:productConfig
 
 let Dict = {
     favType : [
@@ -54,6 +73,8 @@ let Dict = {
         { label: '领先新高', value: 'leadNewHigh' }
     ]
 }
+
+
 
 for(let key in Dict){
     let mapperKey = key+'Mapper';
