@@ -243,15 +243,16 @@ export default class App extends Component {
             }
         })
 
+
         let initSeries = [{
             type: 'candlestick',
             name: code,
             id: 'dataseries',
             data: ohlc,
-            upColor: 'red',
-            upLineColor: 'red',
+            upColor: Config.chart.upColor,
+            upLineColor: Config.chart.upColor,
             lineColor: 'silver',
-            color: 'limegreen',
+            color: Config.chart.downColor,
             navigatorOptions: {
                 color: Highcharts.getOptions().colors[0]
             },
