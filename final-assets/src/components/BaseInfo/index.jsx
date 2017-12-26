@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import FEvents from "../FEvent/index.js";
 import EventList from "../EventList/index.jsx";
 import FavEdit from "../Fav/FavEdit/index.jsx";
+import NoteEdit from "../note/NoteEdit/index.jsx";
 import { Icon} from 'antd';
 import { request } from "../../common/ajax.js";
 import '../../common/base.scss';
@@ -56,6 +57,13 @@ export default class App extends Component {
         })
     }
 
+    onEditFaultNoteClick=()=>{
+        const {code} = this.state;
+        this.emit('final:note-default-edit-show',{
+            code:code
+        })
+    }
+
     
 
     render() {
@@ -70,9 +78,13 @@ export default class App extends Component {
                     <span className="ml10">
                         <Icon className="c-p" type="heart-o" onClick={this.onAddFavClick} />
                     </span> 
+                    <span className="ml10">
+                        <Icon className="c-p" type="file-text" onClick={this.onEditFaultNoteClick} />
+                    </span> 
                 </div>
                 <EventList/>
                 <FavEdit/>
+                <NoteEdit/>
             </div>
         );
     }

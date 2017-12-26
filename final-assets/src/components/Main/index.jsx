@@ -54,12 +54,9 @@ export default class App extends Component {
             <LocaleProvider locale={zhCN}>
             
                 <div className={"page-wrap "+"page-wrap-"+Env}>
-                    {/* <div className="left-nav">
-                        
-                    </div> */}
                     <div className="main-content">
                         <FilterSet/>
-                        <MainChart />
+                        {/* <MainChart /> */}
                     </div>
                     <div  className="right-content">
                         <BaseInfo/>
