@@ -35,26 +35,28 @@ public class NoteControl {
         return map;  
     }
 	
-	@RequestMapping("/note/updateDefaultContent")
-	RpcResult getByCode(String code,String content) {  
+	@RequestMapping("/note/addOrUpdateContent")
+	RpcResult getByCode(String code,String content,String type) { 
 		RpcResult rpcResult = new RpcResult();
-		String defaultType = "default";
-		Map params = new HashMap();
-		params.put("code",code);
-		params.put("type",defaultType);
-		List<NoteDO> noteList = noteMapper.getByParams(params);
-		if(noteList.size() == 1) {
-			NoteDO noteDO = noteList.get(0);
-			noteDO.setContent(content);
-			noteMapper.update(noteDO);
-		}else{
-			noteMapper.deleteByCodeAndType(code, defaultType);
-			NoteDO noteDO = new NoteDO();
-			noteDO.setCode(code);
-			noteDO.setContent(content);
-			noteDO.setType(defaultType);
-			noteMapper.insert(noteDO);
+		if(type == "summary") {
+			List<NoteDO> noteList = noteMapper.getByCodeAndType(code,type);
+			if(noteList.size() == 1) {
+				NoteDO noteDO = noteList.get(0);
+				noteDO.setContent(content);
+				noteMapper.update(noteDO);
+			}else{
+				noteMapper.deleteByCodeAndType(code, type);
+				NoteDO noteDO = new NoteDO();
+				noteDO.setCode(code);
+				noteDO.setContent(content);
+				noteMapper.insert(noteDO);
+			}
+		}else {
+			
 		}
+		
+		
+		
 		
 		rpcResult.setIsSuccess(true);
         return rpcResult;  

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 import _ from 'lodash';
-import {  Input,Modal,Form} from 'antd';
+import {  Input,Modal,Form,Select,DatePicker} from 'antd';
 import FEvents from "../../FEvent/index.js";
 import { request } from "../../../common/ajax.js";
 import { URL, Util,Dict } from "../../../common/config.js";
@@ -17,7 +17,9 @@ export default class App extends React.Component {
         this.state = {
             code:'',
             visible: false,
-            content:''
+            content:'',
+            type:'summary',
+            date:''
         };
     }
 
@@ -68,23 +70,37 @@ export default class App extends React.Component {
         })
     }
 
+    onTypeChange=(value)=>{
+        this.setState({
+            type:value
+        })
+    }
+
+    onDateChange=(date, dateString) =>{
+        this.setState({
+            date:dateString
+        })
+    }
+
    
 
     onSaveClick=()=>{
         const self = this;
-        const {code,content} = this.state;
-        request('/note/updateDefaultContent',
+        const {code,content,type,date} = this.state;
+        request('/note/addOrUpdateDefaultContent',
 		(res)=>{
             self.setState({visible:false})
             self.emit('final:fav-edit-finish')
 		},{
             code:code,
-            content:content
+            content:content,
+            type:type,
+            date:date
         },'jsonp')
     }
 
     render() {
-        const {content,code} = this.state;
+        const {content,code,type,date} = this.state;
         const formItemLayout = {
             labelCol: {
               xs: { span: 24 },
@@ -107,6 +123,22 @@ export default class App extends React.Component {
                     <Form >
                         <FormItem label="代码"  {...formItemLayout}>
                             {code}
+                        </FormItem>
+                        <FormItem label="类型"  {...formItemLayout}>
+                            <Select style={{width:'150px'}} value={type}  onChange={this.onTypeChange}>
+                                {
+                                    Dict.noteType.map(e=>{
+                                        return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                    })
+                                }
+                            </Select>
+                            {
+                                type == 'date' && 
+                                <span className="ml10">
+                                    <DatePicker value={date ? moment(date):moment()} onChange={this.onDateChange} />
+                                </span>
+                            }
+                            
                         </FormItem>
                         <FormItem label="内容"  {...formItemLayout}>
                             <Input.TextArea rows={20} value={content} onChange={this.onInputChange.bind(this,'content')}/>

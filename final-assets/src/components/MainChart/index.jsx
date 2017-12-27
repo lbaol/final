@@ -259,7 +259,7 @@ export default class App extends Component {
 
             tooltip: {
                 pointFormatter: function () { 
-                    console.log(this)                  
+                    // console.log(this)                  
                     if (this.close) {
                         let percent  ;
                         if(this.index>=1){

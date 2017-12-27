@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.jdbc.SQL;
@@ -28,6 +29,11 @@ public interface NoteMapper {
 	@SelectProvider(type = NoteProvider.class, method = "getByParams")  
 	@Results()
 	public List<NoteDO> getByParams(Map params);  
+	
+	
+	@Select("SELECT * FROM note where code=#{code} and type=#{type}")
+    @Results({})
+	public List<NoteDO> getByCodeAndType(@Param("code") String code,@Param("type") String type);  
     
 	
 	@UpdateProvider(type = NoteProvider.class,  
@@ -51,14 +57,15 @@ public interface NoteMapper {
         }  
         
         public String insert(NoteDO noteDO) { 
+        	if(noteDO.getType()==null || noteDO.getType()=="") {
+        		noteDO.setType("default");
+        	}
         	
         	return new SQL(){{      
         		INSERT_INTO("note");  
         			VALUES("code", "#{code}");  
         			VALUES("content", "#{content}"); 
-    	        if(noteDO.getType()==null || noteDO.getType()==""){   
-    	        	VALUES("type", "default"); 
-    	        }else {
+    			if(noteDO.getType()!=null){   
     	        	VALUES("type", "#{type}"); 
     	        }
     	        if(noteDO.getDate()!=null){   

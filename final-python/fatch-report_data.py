@@ -3,14 +3,14 @@ import tushare as ts
 print(ts.__version__)
 
 year = 2017
-quarter = 3
+quarter = 1
 
 
     
 df = ts.get_report_data(year,quarter)
 engine = create_engine('mysql://root:hello@127.0.0.1/final?charset=utf8')
-df.to_sql(('report_'+str(year)+'_'+str(quarter)),engine,if_exists='replace')
-#df.to_excel('c:/report1.xlsx')
+df.to_sql(('report_'+str(year)+'_'+str(quarter)),engine,if_exists='replace',index=False,flavor='mysql')
+df.to_excel('c:/report1.xlsx')
 
 #with engine.connect() as con:
 #    con.execute(('delete from report_'+str(year)))

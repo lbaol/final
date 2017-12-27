@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +38,7 @@ public class ConverterTest {
     private EventMapper eventMapper;
     
     private Integer year = 2017;
-	private Integer quarter = 4;
+	private Integer quarter = 1;
 
     /**
      * 从外部导入的数据没有年份，从年份表中取出合并到report表
@@ -67,41 +70,64 @@ public class ConverterTest {
     	return eventDO;
     }
     
-//    @Test
-//    public void convertReport() throws Exception {
-//    	
-//        List<ReportDO> reportYearList = convertMapper.getReportByYearAndQuarter(year,quarter);
-//        for(ReportDO reportDO : reportYearList) {
-//        	reportDO.setReportDate(year+"-"+reportDO.getReportDate());
-//        	
-//        	Map params = new HashMap();
-//        	params.put("code", reportDO.getCode());
-//        	params.put("eventDate", reportDO.getReportDate());
-//        	params.put("type", "report");
-//        	List<EventDO> eventListDB = eventMapper.getByParams(params);
-//        	
-//        	if(eventListDB != null && eventListDB.size()>=1) {
-//
-//        		if(eventListDB.size()>1) {
-//            		System.out.println("找到 "+reportDO.getCode()+ " "+reportDO.getName()+  " "+reportDO.getReportDate()+" "+eventListDB.size()+"条，准备删除后，重新插入");
-//
-//        			for(EventDO eventDB : eventListDB) {
-//        				eventMapper.deleteById(eventDB.getId());
-//            		}
-//        			EventDO eventDO = convertReportToEvent(reportDO);
-//            		eventMapper.insert(eventDO);
-//        		}else if(eventListDB.size() == 1) {
-//            		System.out.println("找到 "+reportDO.getCode()+ " "+reportDO.getName()+  " "+reportDO.getReportDate()+" "+eventListDB.size()+"条，准备更新");
-//            		EventDO eventDO = convertReportToEvent(reportDO);
-//            		eventDO.setId(eventListDB.get(0).getId());
-//            		eventMapper.update(eventDO);
-//        		}
-//        	}else {
-//        		EventDO eventDO = convertReportToEvent(reportDO);
-//        		eventMapper.insert(eventDO);
-//        	}
-//        }
-//    }
+    private boolean checkEventAndReportNeedUpdate(EventDO eventDO,ReportDO report) {
+    	if(StringUtils.equals(eventDO.getEventDate(),report.getReportDate()) &&
+    			ObjectUtils.compare(eventDO.getProfitsYoy(), report.getProfitsYoy()) == 0 && 
+    					ObjectUtils.compare(eventDO.getNetProfits(), report.getNetProfits())==0) {
+    		return false;
+    	}
+    	return true;
+    }
+    
+    private boolean checkEventAndForecastNeedUpdate(EventDO eventDO,ForecastDO forecastDO) {
+    	if(StringUtils.equals(eventDO.getEventDate(),forecastDO.getReportDate()) &&
+    			ObjectUtils.compare(eventDO.getRanges(), forecastDO.getRange()) == 0 ) {
+    		return false;
+    	}
+    	return true;
+    }
+   
+    
+    @Test
+    public void convertReport() throws Exception {
+    	
+        List<ReportDO> reportYearList = convertMapper.getReportByYearAndQuarter(year,quarter);
+        for(ReportDO reportDO : reportYearList) {
+        	reportDO.setReportDate(year+"-"+reportDO.getReportDate());
+        	
+        	Map params = new HashMap();
+        	params.put("code", reportDO.getCode());
+        	params.put("eventDate", reportDO.getReportDate());
+        	params.put("type", "report");
+        	List<EventDO> eventListDB = eventMapper.getByParams(params);
+        	
+        	if(eventListDB != null && eventListDB.size()>=1) {
+
+        		if(eventListDB.size()>1) {
+            		System.out.println("找到 "+reportDO.getCode()+ " "+reportDO.getName()+  " "+reportDO.getReportDate()+" "+eventListDB.size()+"条，准备删除后，重新插入");
+
+        			for(EventDO eventDB : eventListDB) {
+        				eventMapper.deleteById(eventDB.getId());
+            		}
+        			EventDO eventDO = convertReportToEvent(reportDO);
+            		eventMapper.insert(eventDO);
+        		}else if(eventListDB.size() == 1) {
+            		
+            		if(checkEventAndReportNeedUpdate(eventListDB.get(0),reportDO) == true) {
+                		System.out.println("找到 "+reportDO.getCode()+ " "+reportDO.getName()+  " "+reportDO.getReportDate()+" "+eventListDB.size()+"条，准备更新");
+
+            			EventDO eventDO = convertReportToEvent(reportDO);
+                		eventDO.setId(eventListDB.get(0).getId());
+                		eventMapper.update(eventDO);
+            		}
+            		
+        		}
+        	}else {
+        		EventDO eventDO = convertReportToEvent(reportDO);
+        		eventMapper.insert(eventDO);
+        	}
+        }
+    }
     
     
     
@@ -126,10 +152,14 @@ public class ConverterTest {
         			EventDO eventDO = convertForecastToEvent(forecastDO);
         			eventMapper.insert(eventDO);
         		}else if(eventListDB.size() == 1) {
-                	System.out.println("找到  "+forecastDO.getCode()+ " "+forecastDO.getName()+ " "+forecastDO.getReportDate()+" "+eventListDB.size()+"条，准备更新");
-                	EventDO eventDO = convertForecastToEvent(forecastDO);
-            		eventDO.setId(eventListDB.get(0).getId());
-            		eventMapper.update(eventDO);
+                	if(checkEventAndForecastNeedUpdate(eventListDB.get(0),forecastDO) == true) {
+                    	System.out.println("找到  "+forecastDO.getCode()+ " "+forecastDO.getName()+ " "+forecastDO.getReportDate()+" "+eventListDB.size()+"条，准备更新");
+
+                		EventDO eventDO = convertForecastToEvent(forecastDO);
+                		eventDO.setId(eventListDB.get(0).getId());
+                		eventMapper.update(eventDO);
+                	}
+                	
         		}
         		
         	}else {

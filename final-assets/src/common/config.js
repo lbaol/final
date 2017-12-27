@@ -71,6 +71,24 @@ let Dict = {
         { label: '断层', value: 'fault' },
         { label: '杯柄', value: 'handle' },
         { label: '领先新高', value: 'leadNewHigh' }
+    ],
+    noteType: [
+        { label: '概要', value: 'summary' },
+        { label: '按日期', value: 'date' }
+    ],
+    yearType: [
+        { label: '2017', value: '2017' },
+        { label: '2016', value: '2016' }
+    ],
+    quarterType: [
+        { label: '1', value: '1' },
+        { label: '2', value: '2' },
+        { label: '3', value: '3' },
+        { label: '4', value: '4' }
+    ],
+    reportType: [
+        { label: '报告', value: 'report' },
+        { label: '预告', value: 'forecast' }
     ]
 }
 

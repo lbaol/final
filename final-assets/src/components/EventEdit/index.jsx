@@ -76,7 +76,7 @@ export default class App extends React.Component {
               sm: { span: 18 },
             },
           };
-        console.log(type,eventDate)
+        // console.log(type,eventDate)
         return (
             <div>
                 <Modal

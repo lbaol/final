@@ -56,7 +56,7 @@ export default class App extends Component {
                 <div className={"page-wrap "+"page-wrap-"+Env}>
                     <div className="main-content">
                         <FilterSet/>
-                        {/* <MainChart /> */}
+                        <MainChart />
                     </div>
                     <div  className="right-content">
                         <BaseInfo/>

@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import FEvents from "../FEvent/index.js";
 import EventList from "../EventList/index.jsx";
 import FavEdit from "../Fav/FavEdit/index.jsx";
-import NoteEdit from "../note/NoteEdit/index.jsx";
+import NoteEdit from "../Note/NoteEdit/index.jsx";
+import DataSetting from "../Data/Setting/index.jsx";
 import { Icon} from 'antd';
 import { request } from "../../common/ajax.js";
 import '../../common/base.scss';
@@ -64,6 +65,11 @@ export default class App extends Component {
         })
     }
 
+
+    onDataSettingClick=()=>{
+        const {code} = this.state;
+        this.emit('final:data-setting-show')
+    }
     
 
     render() {
@@ -81,10 +87,14 @@ export default class App extends Component {
                     <span className="ml10">
                         <Icon className="c-p" type="file-text" onClick={this.onEditFaultNoteClick} />
                     </span> 
+                    <span className="ml10">
+                        <Icon className="c-p" type="setting" onClick={this.onDataSettingClick} />
+                    </span> 
                 </div>
                 <EventList/>
                 <FavEdit/>
                 <NoteEdit/>
+                <DataSetting/>
             </div>
         );
     }
