@@ -1,5 +1,6 @@
 const domain = 'http://127.0.0.1:8080';
 const Env = 'daily' //daily product
+const pythonDomain = 'http://127.0.0.1:8001';
 
 const URL = {
     forecast:{
@@ -102,6 +103,11 @@ for(let key in Dict){
     }
 }
 
+const Domain = {
+    domain:domain,
+    python:pythonDomain
+}
+
 export {
-    URL,Util,Config,Env,Dict
+    URL,Util,Config,Env,Dict,Domain
 }

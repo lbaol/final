@@ -1,0 +1,1 @@
+cd final-java & mvn install & mvn spring-boot:run

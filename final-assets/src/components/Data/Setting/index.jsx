@@ -5,7 +5,7 @@ import _ from 'lodash';
 import {  Input,Modal,Form,Select,Button,DatePicker,Tabs,Icon} from 'antd';
 import FEvents from "../../FEvent/index.js";
 import { request } from "../../../common/ajax.js";
-import { URL, Util,Dict } from "../../../common/config.js";
+import { URL, Util,Dict,Domain } from "../../../common/config.js";
 const FormItem = Form.Item;
 
 
@@ -53,8 +53,15 @@ export default class App extends React.Component {
 
     }
    
-    onFatchBasicClick=()=>{
-
+    onFatchBasicsClick=()=>{
+        const self = this;
+        request('http://127.0.0.1:8001/helloworld/qqq',
+		(res)=>{
+            
+            console.log(res)
+            
+		},{
+        },'json')
     }
 
    
@@ -126,7 +133,7 @@ export default class App extends React.Component {
                         基础信息 
                     </span>
                     <span className="ml10">
-                        <Button type="primary" shape="circle" size="small" onClick={this.onFatchBasicClick}  >go</Button>
+                        <Button type="primary" shape="circle" size="small" onClick={this.onFatchBasicsClick}  >go</Button>
                     </span>
                 </div>
                 </Modal>

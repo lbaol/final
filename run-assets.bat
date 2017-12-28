@@ -1,0 +1,1 @@
+cd final-assets & npm run server
