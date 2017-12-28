@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Select;
 
 import com.lbaol.dataobject.ForecastDO;
 import com.lbaol.dataobject.ReportDO;
+import com.lbaol.dataobject.StockDO;
 
 public interface ConvertMapper {
 	
@@ -29,6 +30,11 @@ public interface ConvertMapper {
         @Result(property = "preEps", column = "pre_eps")
     })
     List<ForecastDO> getForecastByYearAndQuarter(@Param("year") Integer year,@Param("quarter") Integer quarter);
+	
+	
+	@Select("SELECT * FROM stock_temp")
+	@Results()
+    List<StockDO> getAllTempStocks();
 
 
 }

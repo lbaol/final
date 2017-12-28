@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 import _ from 'lodash';
-import {  Input,Modal,Form,Select,Button,DatePicker,Tabs,Icon} from 'antd';
+import { message,Input,Modal,Form,Select,Button,DatePicker,Tabs,Icon} from 'antd';
 import FEvents from "../../FEvent/index.js";
 import { request } from "../../../common/ajax.js";
 import { URL, Util,Dict } from "../../../common/config.js";
@@ -16,10 +16,10 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             visible: false,
-            type:'convert',
+            type:'fatch', //fatch convert
             year:'2017',
-            quarter:'1',
-            reportType:'report',
+            quarter:'4',
+            reportType:'forecast', //report forecast
         };
     }
 
@@ -49,12 +49,69 @@ export default class App extends React.Component {
     }
 
     
-    onFatchReportClick=()=>{
-
+    onProcessReportClick=()=>{
+        const {type}= this.state;
+        if(type=='fatch'){
+            this.fatchReport()
+        }
+        if(type=='convert'){
+            this.convertReport()
+        }
     }
    
-    onFatchBasicClick=()=>{
+    onProcessBasicsClick=()=>{
+        const {type}= this.state;
+        if(type=='fatch'){
+            this.fatchBasic()
+        }
+        if(type=='convert'){
+            this.convertBasic()
+        }
+    }
 
+    fatchReport=()=>{
+        const self = this;
+        let hide = message.loading('start fatch '+this.state.reportType +' '+this.state.year+ ' ' +this.state.quarter,0)
+        request('/python/fatch/report',(res)=>{
+            console.log('fatch report finish',res);
+            hide();
+            if(res.isSuccess == true){
+                self.setState({
+                    type:'convert'
+                },self.convertReport)
+                
+            }
+		},{
+            ...this.state
+        },'json')
+    }
+
+    convertReport=()=>{
+        const self = this;
+        let hide = message.loading('start convert '+this.state.reportType +' '+this.state.year+ ' ' +this.state.quarter,0)
+
+        request('/convert/report',(res)=>{
+            console.log('convert report finish',res);
+            hide();
+		},{
+            ...this.state
+        },'jsonp')
+    }
+
+    fatchBasic=()=>{
+        const self = this;
+        request('/python/fatch/basic',(res)=>{
+            console.log('fatch basic finish',res);
+		},{
+        },'json')
+    }
+
+    convertBasic=()=>{
+        const self = this;
+        request('/convert/basic',(res)=>{
+            console.log('convert basic finish',res);
+		},{
+        },'json')
     }
 
    
@@ -117,7 +174,7 @@ export default class App extends React.Component {
                         </Select>
                     </span>
                     <span className="ml10">
-                        <Button type="primary" shape="circle" size="small" onClick={this.onFatchReportClick} >go</Button>
+                        <Button type="primary" shape="circle" size="small" onClick={this.onProcessReportClick} >go</Button>
                     </span>
                 </div>
                 <div className="mt10">
@@ -126,7 +183,7 @@ export default class App extends React.Component {
                         基础信息 
                     </span>
                     <span className="ml10">
-                        <Button type="primary" shape="circle" size="small" onClick={this.onFatchBasicClick}  >go</Button>
+                        <Button type="primary" shape="circle" size="small" onClick={this.onProcessBasicsClick}  >go</Button>
                     </span>
                 </div>
                 </Modal>

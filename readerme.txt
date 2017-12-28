@@ -4,10 +4,12 @@ npm run server
 
 final-python
 ##安装tushare开发包
-pip install tushare --upgrade‘
+pip install tushare --upgrade
 
 ##安装mysql客户端驱动
 pip install mysqlclient
+
+pip install bottle --trusted-host pypi.douban.com
 
 #获取2014年中报的业绩预告数据
 ts.forecast_data(2014,2)

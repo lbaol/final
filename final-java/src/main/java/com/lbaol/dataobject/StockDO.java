@@ -4,6 +4,14 @@ public class StockDO {
 	private String code;
 	private String name;
 	private String timeToMarket;
+	private Integer id;
+	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
 	public String getCode() {
 		return code;
 	}

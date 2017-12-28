@@ -1,5 +1,6 @@
 const domain = 'http://127.0.0.1:8080';
 const Env = 'product' //daily product
+const pythonDomain = 'http://127.0.0.1:8001';
 
 const URL = {
     forecast:{
@@ -14,6 +15,10 @@ const Util = {
     getUrl:function(path){
       if (path.startsWith("http"))
         return path;
+
+        if(path.indexOf('/python/') >=0){
+            return pythonDomain + path;
+        }
       return domain + path;
     },
     getFullCode:function(code){
@@ -100,6 +105,11 @@ for(let key in Dict){
     for(let d of Dict[key]){
         Dict[mapperKey][d.value] = d.label
     }
+}
+
+const Domain = {
+    domain:domain,
+    python:pythonDomain
 }
 
 export {

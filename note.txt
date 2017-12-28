@@ -7,3 +7,12 @@ mysql -u root -p  final < d:\final.sql
 mysql workbench 设置可删除模式：
 SET SQL_SAFE_UPDATES = 0;
 
+#java工程启动
+cd final-java
+mvn install
+mvn spring-boot:run
+
+#前端工程启动
+cd final-assets
+npm run server
+
