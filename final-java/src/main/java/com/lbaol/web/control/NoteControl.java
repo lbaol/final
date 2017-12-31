@@ -35,10 +35,18 @@ public class NoteControl {
         return map;  
     }
 	
+	
+	@RequestMapping("/note/getOverall")
+	NoteDO getOverall() {  
+		NoteDO note =   noteMapper.getOverall();
+        return note;  
+    }
+	
+	
 	@RequestMapping("/note/addOrUpdateContent")
 	RpcResult getByCode(String code,String content,String type) { 
 		RpcResult rpcResult = new RpcResult();
-		if(type == "summary") {
+		if("summary".equals(type)) {
 			List<NoteDO> noteList = noteMapper.getByCodeAndType(code,type);
 			if(noteList.size() == 1) {
 				NoteDO noteDO = noteList.get(0);
@@ -51,12 +59,19 @@ public class NoteControl {
 				noteDO.setContent(content);
 				noteMapper.insert(noteDO);
 			}
-		}else {
-			
 		}
-		
-		
-		
+		if("overall".equals(type)) {
+			NoteDO noteDO  =   noteMapper.getOverall();
+			if(noteDO != null) {
+				noteDO.setContent(content);
+				noteMapper.update(noteDO);
+			}else{
+				noteDO = new NoteDO();
+				noteDO.setContent(content);
+				noteDO.setType(type);
+				noteMapper.insert(noteDO);
+			}
+		}
 		
 		rpcResult.setIsSuccess(true);
         return rpcResult;  

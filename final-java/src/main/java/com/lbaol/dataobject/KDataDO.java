@@ -4,41 +4,42 @@ public class KDataDO {
 	
 	private Integer id;
 	private String code;
-	private Long open;
-	private Long close;
-	private Long high;
-	private Long low;
-	private Long volume;
+	private Double open;
+	private Double close;
+	private Double high;
+	private Double low;
+	private Double volume;
 	private String date;
-	 
-	public Long getOpen() {
+	
+	
+	public Double getOpen() {
 		return open;
 	}
-	public void setOpen(Long open) {
+	public void setOpen(Double open) {
 		this.open = open;
 	}
-	public Long getClose() {
+	public Double getClose() {
 		return close;
 	}
-	public void setClose(Long close) {
+	public void setClose(Double close) {
 		this.close = close;
 	}
-	public Long getHigh() {
+	public Double getHigh() {
 		return high;
 	}
-	public void setHigh(Long high) {
+	public void setHigh(Double high) {
 		this.high = high;
 	}
-	public Long getLow() {
+	public Double getLow() {
 		return low;
 	}
-	public void setLow(Long low) {
+	public void setLow(Double low) {
 		this.low = low;
 	}
-	public Long getVolume() {
+	public Double getVolume() {
 		return volume;
 	}
-	public void setVolume(Long volume) {
+	public void setVolume(Double volume) {
 		this.volume = volume;
 	}
 	public String getDate() {

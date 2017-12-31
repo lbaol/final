@@ -7,6 +7,7 @@ import NoteEdit from "../Note/NoteEdit/index.jsx";
 import DataSetting from "../Data/Setting/index.jsx";
 import { Icon} from 'antd';
 import { request } from "../../common/ajax.js";
+import { Dict } from "../../common/config.js";
 import '../../common/base.scss';
 import './index.scss';
 
@@ -19,7 +20,8 @@ export default class App extends Component {
         super(props);
         this.state = {
             code:'',
-            baseInfo:{}
+            baseInfo:{},
+            selectedFav:[]
          };
     }
 
@@ -49,6 +51,19 @@ export default class App extends Component {
 		},{
             code:code
         },'jsonp')
+
+        request('/fav/getByParam',
+		(res)=>{
+            let selected = [];
+            if(res.favList){
+                self.setState({
+                    selectedFav:res.favList
+                })
+            }
+            
+		},{
+            code:code
+        },'jsonp')
     }
 
     onAddFavClick=()=>{
@@ -65,6 +80,10 @@ export default class App extends Component {
         })
     }
 
+    onEditOverallNoteClick=()=>{
+        this.emit('final:note-overall-edit-show')
+    }
+
 
     onDataSettingClick=()=>{
         const {code} = this.state;
@@ -74,22 +93,36 @@ export default class App extends Component {
 
     render() {
 
-        const {baseInfo} = this.state;
+        const {baseInfo,selectedFav} = this.state;
         const basic = baseInfo.basic;
         
         return (
             <div className="base-info">
                 <div>
                     {basic && basic.code} {basic && basic.name}  
+                    
                     <span className="ml10">
                         <Icon className="c-p" type="heart-o" onClick={this.onAddFavClick} />
                     </span> 
                     <span className="ml10">
                         <Icon className="c-p" type="file-text" onClick={this.onEditFaultNoteClick} />
                     </span> 
-                    <span className="ml10">
-                        <Icon className="c-p" type="setting" onClick={this.onDataSettingClick} />
-                    </span> 
+                    <div className="f-r">
+                        <span className="ml10">
+                            <Icon className="c-p" type="file-text" onClick={this.onEditOverallNoteClick} />
+                        </span>
+                        <span className="ml10">
+                            <Icon className="c-p" type="setting" onClick={this.onDataSettingClick} />
+                        </span>
+                    </div>
+                     
+                </div>
+                <div>
+                    {
+                        selectedFav && selectedFav.map((d)=>{
+                            return <span className="mr10">{Dict.favTypeMapper[d.type]}</span>
+                        })
+                    }
                 </div>
                 <EventList/>
                 <FavEdit/>

@@ -11,14 +11,25 @@ import com.lbaol.dataobject.KDataDO;
 public interface KDataMapper {
 	
 
-	@Select("SELECT * FROM kdata_temp  WHERE code = #{code} order by date desc")
+	@Select("SELECT * FROM k_data  WHERE code = #{code} order by date desc")
     @Results()
-    List<KDataDO> getByCodeOrderByDateDesc(@Param("code") String code);
+    List<KDataDO> getByCode(@Param("code") String code);
 	
 	
-	@Select("SELECT * FROM kdata_temp  WHERE code = #{code} order by date asc")
+	@Select("SELECT * FROM k_data  WHERE code = #{code} and date >= #{date} order by date asc limit 1")
     @Results()
-    List<KDataDO> getByCodeOrderByDateAsc(@Param("code") String code);
+    KDataDO getCurrentDataByCodeAndDateContain(@Param("code") String code,@Param("date") String date);
+	
+	@Select("SELECT * FROM k_data  WHERE code = #{code} and date > #{date} order by date asc limit 1")
+    @Results()
+    KDataDO getCurrentDataByCodeAndDateNotContain(@Param("code") String code,@Param("date") String date);
+	
+	@Select("SELECT * FROM k_data  WHERE code = #{code} and date < #{date} order by date desc limit 1")
+    @Results()
+    KDataDO getPreDataByCodeAndDateNotContain(@Param("code") String code,@Param("date") String date);
 	
 	
+	@Select("SELECT * FROM k_data  WHERE code = #{code} and date <= #{date} order by date desc limit 1")
+    @Results()
+    KDataDO getPreDataByCodeAndDateContain(@Param("code") String code,@Param("date") String date);
 }

@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.jdbc.SQL;
 
+import com.lbaol.dataobject.FavDO;
 import com.lbaol.dataobject.NoteDO;
 
 public interface NoteMapper {
@@ -29,6 +30,11 @@ public interface NoteMapper {
 	@SelectProvider(type = NoteProvider.class, method = "getByParams")  
 	@Results()
 	public List<NoteDO> getByParams(Map params);  
+	
+	
+	@Select("SELECT * FROM note where  type='overall' limit 1")
+    @Results({})
+	NoteDO getOverall();
 	
 	
 	@Select("SELECT * FROM note where code=#{code} and type=#{type}")

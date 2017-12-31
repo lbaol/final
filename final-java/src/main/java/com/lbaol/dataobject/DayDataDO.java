@@ -4,20 +4,21 @@ public class DayDataDO {
 	
 	private Integer id;
 	private String code;
-	private Long yearRise;
-	private Long yearHalfRise;
+	private Double yearRise;
+	private Double yearHalfRise;
 	private String date;
 	 
-	public Long getYearRise() {
+	
+	public Double getYearRise() {
 		return yearRise;
 	}
-	public void setYearRise(Long yearRise) {
+	public void setYearRise(Double yearRise) {
 		this.yearRise = yearRise;
 	}
-	public Long getYearHalfRise() {
+	public Double getYearHalfRise() {
 		return yearHalfRise;
 	}
-	public void setYearHalfRise(Long yearHalfRise) {
+	public void setYearHalfRise(Double yearHalfRise) {
 		this.yearHalfRise = yearHalfRise;
 	}
 	public String getDate() {

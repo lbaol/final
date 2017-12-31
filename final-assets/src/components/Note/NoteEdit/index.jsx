@@ -27,10 +27,31 @@ export default class App extends React.Component {
         const {code,type} = this.state;
         this.on('final:note-default-edit-show', (data) => {
             this.setState({
-                code:data && data.code
+                code:data && data.code,
+                type:'summary'
             },this.fatchDefaultByCode);
-            
         });
+
+        this.on('final:note-overall-edit-show', (data) => {
+            this.setState({
+                type:'overall'
+            },this.fatchOverall);
+        });
+    }
+
+
+    fatchOverall=()=>{
+        const self = this;
+        request('/note/getOverall',
+		(res)=>{
+            
+            self.setState({
+                content:res && res.content,
+                visible:true
+            })
+            
+		},{
+        },'jsonp')
     }
 
     fatchDefaultByCode=()=>{
@@ -87,10 +108,9 @@ export default class App extends React.Component {
     onSaveClick=()=>{
         const self = this;
         const {code,content,type,date} = this.state;
-        request('/note/addOrUpdateDefaultContent',
+        request('/note/addOrUpdateContent',
 		(res)=>{
             self.setState({visible:false})
-            self.emit('final:fav-edit-finish')
 		},{
             code:code,
             content:content,
@@ -121,11 +141,15 @@ export default class App extends React.Component {
                     onCancel={this.handleCancel}
                 >
                     <Form >
-                        <FormItem label="代码"  {...formItemLayout}>
-                            {code}
-                        </FormItem>
+                        {
+                            type!='overall' && 
+                            <FormItem label="代码"  {...formItemLayout}>
+                                {code}
+                            </FormItem>
+                        }
+                        
                         <FormItem label="类型"  {...formItemLayout}>
-                            <Select style={{width:'150px'}} value={type}  onChange={this.onTypeChange}>
+                            <Select style={{width:'150px'}} value={type} disabled={type=='overall'?true:false}  onChange={this.onTypeChange}>
                                 {
                                     Dict.noteType.map(e=>{
                                         return <Select.Option value={e.value}>{e.label}</Select.Option>

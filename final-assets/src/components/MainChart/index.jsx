@@ -44,6 +44,11 @@ export default class App extends Component {
         this.on('final:show-the-stock', (data) => {
             this.emitRefresh(data)
         });
+
+
+        this.on('final:event-edit-finish', (data) => {
+            this.emitRefresh(data)
+        });
     }
 
     emitRefresh = (data) => {
@@ -52,8 +57,8 @@ export default class App extends Component {
         this.setState({
             code: data && data.code ? data.code : code,
             period: data && data.period ? data.period : period,
-            startDate: data.startDate ? data.startDate : startDate,
-            endDate: data.endDate ? data.endDate : endDate,
+            startDate:data && data.startDate ? data.startDate : startDate,
+            endDate: data && data.endDate ? data.endDate : endDate,
             mas: data && data.mas ? data.mas : mas
         }, this.fatchChartData)
     }

@@ -70,7 +70,8 @@ let Dict = {
         { label: '杯柄', value: 'handle' },
         { label: '断层', value: 'fault' },
         { label: '领先新高', value: 'leadNewHigh' },
-        { label: '默认', value: 'default' }
+        { label: '默认', value: 'default' },
+        { label: '临时', value: 'temp' }
     ],
     eventType: [
         { label: '断层', value: 'fault' },
@@ -79,7 +80,8 @@ let Dict = {
     ],
     noteType: [
         { label: '概要', value: 'summary' },
-        { label: '按日期', value: 'date' }
+        { label: '按日期', value: 'date' },
+        { label: '总体', value: 'overall' }
     ],
     yearType: [
         { label: '2017', value: '2017' },

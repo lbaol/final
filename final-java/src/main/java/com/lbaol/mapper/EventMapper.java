@@ -26,6 +26,26 @@ public interface EventMapper {
     List<EventDO> getAll();
 	
 	
+	@Select("SELECT * FROM event where type='report' or type='forecast' order by event_date desc")
+    @Results({
+    	@Result(property = "eventDate", column = "event_date"),
+        @Result(property = "subType", column = "sub_type"),
+        @Result(property = "netProfits", column = "net_profits"),
+        @Result(property = "profitsYoy", column = "profits_yoy")
+    })
+    List<EventDO> getAllReport();
+	
+	
+	@Select("SELECT * FROM event where code=#{code}  order by event_date desc")
+    @Results({
+    	@Result(property = "eventDate", column = "event_date"),
+        @Result(property = "subType", column = "sub_type"),
+        @Result(property = "netProfits", column = "net_profits"),
+        @Result(property = "profitsYoy", column = "profits_yoy")
+    })
+    List<EventDO> getByCode(String code);
+	
+	
 	
 	
 	@Delete("DELETE FROM event WHERE id =#{id}")
