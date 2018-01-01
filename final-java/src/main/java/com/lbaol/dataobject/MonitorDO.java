@@ -1,26 +1,34 @@
 package com.lbaol.dataobject;
 
-public class FavDO {
-	
+public class MonitorDO {
 	private Integer id;
 	private String code;
 	private String type;
-	private String name;
+	private String time;
+	private String date;
+
+	private Double timePrice;
 	private Double alertPrice;
+	public String getDate() {
+		return date;
+	}
+	public void setDate(String date) {
+		this.date = date;
+	}
+	private Integer count;
 	
 	
-	
+	public Double getTimePrice() {
+		return timePrice;
+	}
+	public void setTimePrice(Double timePrice) {
+		this.timePrice = timePrice;
+	}
 	public Double getAlertPrice() {
 		return alertPrice;
 	}
 	public void setAlertPrice(Double alertPrice) {
 		this.alertPrice = alertPrice;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
 	}
 	public Integer getId() {
 		return id;
@@ -40,10 +48,18 @@ public class FavDO {
 	public void setType(String type) {
 		this.type = type;
 	}
+	public String getTime() {
+		return time;
+	}
+	public void setTime(String time) {
+		this.time = time;
+	}
+	public Integer getCount() {
+		return count;
+	}
+	public void setCount(Integer count) {
+		this.count = count;
+	}
 	
 	
-	
-	
-	
-
 }

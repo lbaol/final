@@ -42,8 +42,8 @@ public class FavControl {
         return map;  
     }
 	
-	@RequestMapping("/fav/update")
-	RpcResult getByCode(String code,String types) {  
+	@RequestMapping("/fav/updateByCodeAndTypes")
+	RpcResult updateByTypes(String code,String types) {  
 		RpcResult rpcResult = new RpcResult();
 		if(StringUtils.isNotEmpty(types)){
 			JSONArray typeJsonArray = JSON.parseArray(types);
@@ -78,6 +78,18 @@ public class FavControl {
 		}
 		
 		
+		rpcResult.setIsSuccess(true);
+        return rpcResult;  
+    }
+	
+	
+	@RequestMapping("/fav/updateById")
+	RpcResult updateById(Integer id,Double alertPrice) {  
+		RpcResult rpcResult = new RpcResult();
+		FavDO favDO = new FavDO();
+		favDO.setId(id);
+		favDO.setAlertPrice(alertPrice);
+		favMapper.update(favDO);
 		rpcResult.setIsSuccess(true);
         return rpcResult;  
     }

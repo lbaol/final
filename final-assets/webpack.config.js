@@ -1,10 +1,20 @@
+const path = require('path');
 const webpack = require('webpack');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 module.exports = {
-    entry: __dirname + "/src/page/main/index.js",//已多次提及的唯一入口文件
+    entry: {
+        'index' :__dirname + "/src/page/index/enter.js",
+        'test':__dirname + "/src/page/test/enter.js"
+    },
     output: {
         path: __dirname + "/build",//打包后的文件存放的地方
         filename: "[name].js"//打包后输出文件的文件名
+    },
+    resolve: {
+        modules: [
+            path.resolve('./src'),
+            path.resolve('./node_modules')
+        ]
     },
     devtool: 'source-map',
     devServer: {

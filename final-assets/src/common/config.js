@@ -1,3 +1,5 @@
+import React from 'react';
+import _ from 'lodash';
 const domain = 'http://127.0.0.1:8080';
 const Env = 'product' //daily product
 const pythonDomain = 'http://127.0.0.1:8001';
@@ -29,6 +31,24 @@ const Util = {
             newCode = 'SZ' + code;
         }
         return newCode;
+    },
+    getLastMa:function(datas,count){
+        if(_.isArray(datas)){
+            if(datas.length >= count){
+                let total = 0 ;
+                for(let i = datas.length-1;i>=(datas.length-count);i--){
+                    total = datas[i].close + total;
+                }
+                return _.round(total/count,2);
+            }
+        }
+        return null;
+    },
+    getXueQiuStockLink:function(code){
+        return <a target="_blank" href={'https://xueqiu.com/S/'+Util.getFullCode(code)}>雪</a>
+    },
+    getDongCaiStockLink:function(code){
+        return <a target="_blank" href={'http://emweb.securities.eastmoney.com/f10_v2/OperationsRequired.aspx?type=web&code='+Util.getFullCode(code)}>东</a>
     }
 }
 
@@ -64,14 +84,16 @@ if(Env=='daily'){
 
 let Dict = {
     favType : [
-        { label: '备选', value: 'prepare' },
-        { label: '股票池', value: 'pool' },
+        { label: '关注', value: 'follow' },
+        { label: '备选池', value: 'prepare' },
         { label: '持仓', value: 'position' },
         { label: '杯柄', value: 'handle' },
         { label: '断层', value: 'fault' },
         { label: '领先新高', value: 'leadNewHigh' },
         { label: '默认', value: 'default' },
-        { label: '临时', value: 'temp' }
+        { label: '临时', value: 'temp' },
+        { label: '监控', value: 'monitor' },
+        { label: '金股18', value: 'gold18' }
     ],
     eventType: [
         { label: '断层', value: 'fault' },

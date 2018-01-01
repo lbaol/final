@@ -11,8 +11,6 @@ import { URL, Util,Config } from "../../common/config.js";
 const _defaultDayMa = Config.defalutMas.day;
 const _defaultWeekMa = Config.defalutMas.week;
 
-const _defaultPeriodDay = Config.defaultPeriod.day;
-const _defaultPeriodWeek = Config.defaultPeriod.week;
 
 @FEvents
 export default class App extends Component {
@@ -38,7 +36,7 @@ export default class App extends Component {
 
     componentWillMount() {
         let { period } = this.state;
-        let m = period == 'day' ? _defaultPeriodDay : _defaultPeriodWeek;
+        let m = period == 'day' ? Config.defaultPeriod.day : Config.defaultPeriod.week;
         this.setState({
             startDate: moment().subtract(m, 'day').format('YYYY-MM-DD'),
             endDate: moment().format('YYYY-MM-DD'),
@@ -66,7 +64,7 @@ export default class App extends Component {
 
     onPeriodChange=(e)=>{
         let value = e.target.value;
-        let m = (value == 'day' ? _defaultPeriodDay : _defaultPeriodWeek);
+        let m = (value == 'day' ? Config.defaultPeriod.day : Config.defaultPeriod.week);
         this.setState({
             startDate: moment().subtract(m, 'day').format('YYYY-MM-DD'),
             endDate: moment().format('YYYY-MM-DD'),

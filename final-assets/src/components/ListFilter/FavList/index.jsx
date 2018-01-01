@@ -55,9 +55,9 @@ export default class App extends Component {
     }
 
 
-    onTypeChange=(e)=>{
+    onTypeChange=(value)=>{
         this.setState({
-            type:e.target.value
+            type:value
         },this.fatchFavList)
     }
 
@@ -75,7 +75,7 @@ export default class App extends Component {
         const self = this;
         const {type} = this.state;
         Modal.confirm({
-            title: '确定不是手抖点的清空收藏夹?',
+            title: '确定清空该收藏夹吗?',
             content: '',
             onOk() {
                 request('/fav/deleteByType',
@@ -99,13 +99,13 @@ export default class App extends Component {
         return (
             <div>
                 <div>
-                    <Radio.Group  onChange={this.onTypeChange} value={type} size="small">
+                    <Select style={{width:'100px'}} value={type} size="small"  onChange={this.onTypeChange}>
                         {
-                            typeDS.map((t)=>{
-                                return <Radio.Button value={t.value}>{t.label}</Radio.Button>
+                            typeDS.map((d)=>{
+                                return <Select.Option value={d.value}>{d.label}</Select.Option>
                             })
                         }
-                    </Radio.Group>
+                    </Select>
                     <span className="ml10">
                         <Icon className="c-p" type="plus-circle-o" onClick={this.onFavImportClick} />
                     </span>
@@ -145,10 +145,10 @@ export default class App extends Component {
                                 return (<div>
                                     <Icon type="delete" className="c-p" onClick={this.onDeleteFavByIdClick.bind(this,record.id)} />
                                     <span className="ml5">
-                                        <a target="_blank" href={'https://xueqiu.com/S/'+Util.getFullCode(record.code)}>雪</a>
+                                        {Util.getXueQiuStockLink(record.code)}
                                     </span>
                                     <span className="ml5">
-                                        <a target="_blank" href={'http://emweb.securities.eastmoney.com/f10_v2/OperationsRequired.aspx?type=web&code='+Util.getFullCode(record.code)}>东</a>
+                                        {Util.getDongCaiStockLink(record.code)}
                                     </span>
                                 </div>)
                             }

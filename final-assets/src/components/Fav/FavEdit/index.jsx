@@ -69,7 +69,7 @@ export default class App extends React.Component {
     onSaveClick=()=>{
         const self = this;
         const {code,value} = this.state;
-        request('/fav/update',
+        request('/fav/updateByCodeAndTypes',
 		(res)=>{
             self.setState({visible:false})
             self.emit('final:fav-edit-finish')
@@ -90,7 +90,6 @@ export default class App extends React.Component {
                     onCancel={this.handleCancel}
                 >
                     <Checkbox.Group options={favOptions} defaultValue={defaultValue} value={value} onChange={this.onFavSelectChange} />
- 
                 </Modal>
             </div>
         );
