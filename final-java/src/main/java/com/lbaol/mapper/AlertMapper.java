@@ -11,36 +11,36 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.jdbc.SQL;
 
-import com.lbaol.dataobject.MonitorDO;
+import com.lbaol.dataobject.AlertDO;
 
-public interface MonitorMapper {
+public interface AlertMapper {
 	
 	
 	
-	@Insert("INSERT INTO monitor(code,type,count,time,date,time_price,alert_price) "
+	@Insert("INSERT INTO alert(code,type,count,time,date,time_price,alert_price) "
 			+ "VALUES(#{code}, #{type}, #{count}, #{time},#{date}, #{timePrice}, #{alertPrice})")
-    void insert(MonitorDO monitorDO);
+    void insert(AlertDO alertDO);
 	
-	@SelectProvider(type = MonitorProvider.class, method = "getByParams")  
+	@SelectProvider(type = AlertProvider.class, method = "getByParams")  
 	@Results({
         @Result(property = "timePrice", column = "time_price"),
         @Result(property = "alertPrice", column = "alert_price")
     })
-	public List<MonitorDO> getByParams(Map params);  
+	public List<AlertDO> getByParams(Map params);  
 	
-	@DeleteProvider(type = MonitorProvider.class,  
+	@DeleteProvider(type = AlertProvider.class,  
             method = "deleteByParams")  
 			int deleteByParams(Map params);  
 
-	@UpdateProvider(type = MonitorProvider.class,  
+	@UpdateProvider(type = AlertProvider.class,  
             method = "update")  
-			int update(MonitorDO monitorDO);  
+			int update(AlertDO alertDO);  
     
-    class MonitorProvider {  
+    class AlertProvider {  
         public String getByParams(Map params) {  
         	return new SQL(){{      
                 SELECT("*");          
-                FROM("monitor");      
+                FROM("alert");      
                 if(params.get("code")!=null){      
                     WHERE("code = #{code}");      
                 } 
@@ -59,7 +59,7 @@ public interface MonitorMapper {
         
         public String deleteByParams(Map params) {  
         	return new SQL(){{      
-        		DELETE_FROM("monitor");  
+        		DELETE_FROM("alert");  
         		if(params.get("code")!=null){      
                     WHERE("code = #{code}");      
                 } 
@@ -75,19 +75,18 @@ public interface MonitorMapper {
             }}.toString();  
         } 
         
-        public String update(MonitorDO monitorDO) {  
+        public String update(AlertDO alertDO) {  
         	return new SQL()  
             {  
                 {  
-                    UPDATE("monitor");  
-                    if (monitorDO.getTime() != null){  
+                    UPDATE("alert");  
+                    if (alertDO.getTime() != null){  
                         SET("time = #{time}");  
                     }
-                    if(monitorDO.getAlertPrice()!=null) {
+                    if(alertDO.getAlertPrice()!=null) {
                     	SET("alert_price = #{alertPrice}"); 
                     }
-                    
-                    if(monitorDO.getTimePrice()!=null) {
+                    if(alertDO.getTimePrice()!=null) {
                     	SET("time_price = #{timePrice}"); 
                     }
                     WHERE("id = #{id}");  

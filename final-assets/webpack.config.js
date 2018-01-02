@@ -4,6 +4,8 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 module.exports = {
     entry: {
         'index' :__dirname + "/src/page/index/enter.js",
+        'detail' :__dirname + "/src/page/detail/enter.js",
+        'alert':__dirname + "/src/page/alert/enter.js",
         'test':__dirname + "/src/page/test/enter.js"
     },
     output: {

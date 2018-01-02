@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lbaol.dataobject.MonitorDO;
+import com.lbaol.dataobject.AlertDO;
 import com.lbaol.dataobject.NoteDO;
-import com.lbaol.mapper.MonitorMapper;
+import com.lbaol.mapper.AlertMapper;
 import com.lbaol.web.control.common.RpcResult;
 
 
@@ -18,10 +18,10 @@ import com.lbaol.web.control.common.RpcResult;
 
 
 @RestController
-public class MonitorControl {
+public class AlertControl {
 	
 	@Autowired
-	private MonitorMapper monitorMapper;
+	private AlertMapper alertMapper;
 	
 	
 	 
@@ -29,23 +29,24 @@ public class MonitorControl {
 	 
 	
 	
-	@RequestMapping("/monitor/addOrUpdate")
-	RpcResult getByCode(String code,String type,Integer count,String date,String time,Double alertPrice,Double timePrice) { 
+	@RequestMapping("/alert/addOrUpdate")
+	RpcResult addOrUpdate(String code,String type,Integer count,String date,String time,Double alertPrice,Double timePrice) { 
 		RpcResult rpcResult = new RpcResult();
 		Map params = new HashMap();
 		params.put("code", code);
 		params.put("type", type);
 		params.put("count", count);
 		params.put("date", date);
-		List<MonitorDO> monitorList = monitorMapper.getByParams(params);
+		List<AlertDO> monitorList = alertMapper.getByParams(params);
 		if(monitorList.size() == 1) {
-			MonitorDO monitorDO = monitorList.get(0);
+			AlertDO monitorDO = monitorList.get(0);
 			monitorDO.setTime(time);
 			monitorDO.setAlertPrice(alertPrice);
 			monitorDO.setTimePrice(timePrice);
+			alertMapper.update(monitorDO);
 		}else{
-			monitorMapper.deleteByParams(params);
-			MonitorDO monitorDO = new MonitorDO();
+			alertMapper.deleteByParams(params);
+			AlertDO monitorDO = new AlertDO();
 			monitorDO.setCode(code);
 			monitorDO.setType(type);
 			monitorDO.setCount(count);
@@ -53,7 +54,7 @@ public class MonitorControl {
 			monitorDO.setTime(time);
 			monitorDO.setAlertPrice(alertPrice);
 			monitorDO.setTimePrice(timePrice);
-			monitorMapper.insert(monitorDO);
+			alertMapper.insert(monitorDO);
 		}
 		
 		rpcResult.setIsSuccess(true);
@@ -62,7 +63,20 @@ public class MonitorControl {
 	
 	
 	
-	
+	@RequestMapping("/alert/getByParams")
+	Map getByParams(String code,String date) { 
+		
+		Map params = new HashMap();
+		params.put("code", code);
+		params.put("date", date);
+		List<AlertDO> monitorList = alertMapper.getByParams(params);
+		
+		
+		Map resultMap = new HashMap();
+		resultMap.put("monitorList", monitorList);
+		return resultMap;
+		 
+    }
 	
 	
     

@@ -1,6 +1,6 @@
 package com.lbaol.dataobject;
 
-public class MonitorDO {
+public class AlertDO {
 	private Integer id;
 	private String code;
 	private String type;

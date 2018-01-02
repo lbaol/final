@@ -1,11 +1,16 @@
 #mysql备份
 mysqldump -u root -p final > D:\final.sql
+mysqldump -u root -p final k_data > D:\k_data.sql  
 
 #mysql还原
 mysql -u root -p  final < d:\final.sql
 
 mysql workbench 设置可删除模式：
 SET SQL_SAFE_UPDATES = 0;
+
+#报错解决 Access denied for user 'root'@'localhost' (using password: YES)
+use mysql;
+update user set authentication_string=Password('hello') where User='root';
 
 #java工程启动
 cd final-java
@@ -16,3 +21,5 @@ mvn spring-boot:run
 cd final-assets
 npm run server
 
+chrome 支持跨域设置
+ --disable-web-security --user-data-dir
