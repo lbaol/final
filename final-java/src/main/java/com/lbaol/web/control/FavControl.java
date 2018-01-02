@@ -84,11 +84,12 @@ public class FavControl {
 	
 	
 	@RequestMapping("/fav/updateById")
-	RpcResult updateById(Integer id,Double alertPrice) {  
+	RpcResult updateById(Integer id,Double alertPrice,Double number) {  
 		RpcResult rpcResult = new RpcResult();
 		FavDO favDO = new FavDO();
 		favDO.setId(id);
 		favDO.setAlertPrice(alertPrice);
+		favDO.setNumber(number);
 		favMapper.update(favDO);
 		rpcResult.setIsSuccess(true);
         return rpcResult;  

@@ -35,37 +35,62 @@ export default class App extends Component {
             stockDataSource: [],
             alertDataSource:[],
             alertMapper:{},
-            type:'position',
-            typeDS:Dict.favType
+            positionDataSource:[],
+            typeDS:Dict.favType,
+            quoteMapper:{},
+            codes:[]
         };
     }
 
     componentDidMount() {
-        this.fatchFavList();
-
-        setTimeout(this.getAlertList,5000);
+        this.fatctMonitorList();
+        this.fatctPositionList();
+        this.getAlertList();
     }
 
-    fatchFavList =()=>{
+    fatctMonitorList =()=>{
         const self = this;
-        const {type} = this.state;
         request('/fav/getByParam',
             (res) => {
 
                 let stockDataSource = res.favList;
+                for(let d of stockDataSource){
+                    this.state.codes.push(d.code);
+                }
+                
                 self.setState({
-                    stockDataSource:stockDataSource
+                    stockDataSource:stockDataSource,
+                    codes:_.sortedUniq(this.state.codes)
                 },()=>{
                     for(let d of stockDataSource){
                         this.fatchLastMas(d.code)
                     }
                     setTimeout(()=>{
-                        self.getLastPriceAndAlert()
-                    },5000)
-                    // self.getLastPriceAndAlert()
+                        self.getLastQuote(self.checkAlert)
+                    },3000)
                 })
             }, {
                 type:'monitor'
+            }, 'jsonp')
+    }
+
+    
+
+    fatctPositionList =()=>{
+        const self = this;
+        request('/fav/getByParam',
+            (res) => {
+
+                for(let d of res.favList){
+                    this.state.codes.push(d.code);
+                }
+
+                self.setState({
+                    positionDataSource:res.favList,
+                    codes:_.sortedUniq(this.state.codes)
+                },this.getLastQuote)
+            }, {
+                type:'position'
             }, 'jsonp')
     }
 
@@ -86,57 +111,75 @@ export default class App extends Component {
                 })
             }
         }, {
-            date:moment().format('YYYY-MM-DD')
+            startDate:moment().add('day',-2).format('YYYY-MM-DD')
+        }, 'jsonp')
+    }
+
+
+    getLastQuote = (callback)=>{
+        let {codes} = this.state;
+        let reqCodes = codes.map(d=>Util.getFullCode(d))
+        const self = this;
+        request('https://xueqiu.com/v4/stock/quote.json',
+        (res) => {
+
+            let quoteMapper = {};
+            for(let k in res){
+                quoteMapper[k.substring(2)] = res[k]
+            }
+
+            if(callback){
+                self.setState({
+                    quoteMapper:quoteMapper
+                },callback)
+            }else{
+                self.setState({
+                    quoteMapper:res
+                })
+            }
+            
+            
+        }, {
+            code: reqCodes.join(',')
         }, 'jsonp')
     }
 
     
 
-    getLastPriceAndAlert=()=>{
-        const self = this;
-        
-        let codes = this.state.stockDataSource.map(d=>{
-            return Util.getFullCode(d.code)
-        })
-
-
-        request('https://xueqiu.com/v4/stock/quotec.json',
-            (res) => {
-                console.log('get last price',res)
-                let {stockDataSource} = this.state;
-                for(let stock of stockDataSource){
-                    let curQuotation = res[Util.getFullCode(stock.code)];
-                    if(curQuotation && curQuotation[0]){
-                        let curPrice = curQuotation[0];
-                        stock.curPrice = curPrice;
-                        for(let d of _maDayCounts){
-                            let prePrice = stock.preClose;
-                            let priceBetween = stock[d.type+d.count];
-                            if(prePrice > curPrice ){
-                                if(prePrice>=priceBetween && priceBetween>=curPrice){
-                                    let time = moment(curQuotation[3]).format('YYYY-MM-DD HH:mm:ss');
-                                    self.addOrUpdateAlert(stock.code,d.type,d.count,priceBetween,curPrice,time)
-                                }
-                            }
-                        }
-                        if(stock.alertPrice){
-                            let prePrice = stock.preClose;
-                            let priceBetween = stock.alertPrice;
-                            if(prePrice > curPrice ){
-                                if(prePrice>=priceBetween && priceBetween>=curPrice){
-                                    self.addOrUpdateAlert(stock.code,'alert','',priceBetween,curPrice)
-                                }
-                            }
+    checkAlert=()=>{
+        let {stockDataSource,quoteMapper} = this.state;
+                
+        for(let stock of stockDataSource){
+            let curQuota = quoteMapper[stock.code];
+            if(curQuota && curQuota.current){
+                let curPrice = curQuota.current;
+                stock.curPrice = curPrice;
+                for(let d of _maDayCounts){
+                    let prePrice = stock.preClose;
+                    let priceBetween = stock[d.type+d.count];
+                    let priceBetween2 = priceBetween*1.01;  //接近目标价格1个点时就提醒
+                    if(prePrice > curPrice ){
+                        if(prePrice>=priceBetween && priceBetween2>=curPrice){
+                            let time = moment(curQuota.time).format('YYYY-MM-DD HH:mm:ss');
+                            this.addOrUpdateAlert(stock.code,d.type,d.count,priceBetween,curPrice,time)
                         }
                     }
-                    
                 }
-                self.setState({
-                    stockDataSource:stockDataSource
-                })
-            }, {
-                code: codes.join(',')
-            }, 'json')
+                if(stock.alertPrice){
+                    let prePrice = stock.preClose;
+                    let priceBetween = stock.alertPrice;
+                    if(prePrice > curPrice ){
+                        if(prePrice>=priceBetween && priceBetween>=curPrice){
+                            this.addOrUpdateAlert(stock.code,'alert','',priceBetween,curPrice)
+                        }
+                    }
+                }
+            }
+            
+        }
+        this.setState({
+            stockDataSource:stockDataSource
+        })
     }
 
     addOrUpdateAlert=(code,type,count,alertPrice,timePrice,time)=>{
@@ -200,7 +243,6 @@ export default class App extends Component {
 
     onTargetInputChange=(index,record,e)=>{
         const self = this;
-        const {type} = this.state;
         const alertPrice = e.target.value;
         request('/fav/updateById',
             (res) => {
@@ -215,6 +257,23 @@ export default class App extends Component {
             }, 'jsonp')
     }
 
+
+    onNumberInputChange=(index,record,e)=>{
+        const self = this;
+        const number = e.target.value;
+        request('/fav/updateById',
+            (res) => {
+                let {positionDataSource} = this.state;
+                positionDataSource[index].number = number;
+                self.setState({
+                    positionDataSource:positionDataSource
+                })
+            }, {
+                id:record.id,
+                number:number
+            }, 'jsonp')
+    }
+
     getAlertMapperKey(code,type,count){
         return code+'-'+type+'-'+count;
     }
@@ -222,8 +281,8 @@ export default class App extends Component {
     renderTypeCountCell=(type,count,text,record)=>{
         let {alertMapper} = this.state;
         let alertDetail = alertMapper[this.getAlertMapperKey(record.code,type,count)];
-        console.log(alertMapper)
-        console.log(record.code,type,count,alertDetail)
+        // console.log(alertMapper)
+        // console.log(record.code,type,count,alertDetail)
         if(alertDetail){
             return <span className="alert-bg">{text}</span>
         }
@@ -232,15 +291,16 @@ export default class App extends Component {
     
 
     render() {
-        const {stockDataSource,alertDataSource} = this.state;
+        const {stockDataSource,alertDataSource,positionDataSource,quoteMapper} = this.state;
         const {stockDict} = this.props;
         return (
-            <div>
+            <div class="alert-list-container">
                 <div>
                     <FavImport/>
                 </div>
                 <div className="mt10">
-                    <Table size="small" className="monitor-stock-table"
+                    <Table size="small"
+                        title={()=>'监控列表'}
                         pagination={false}
                         dataSource={stockDataSource}
                         columns={[{
@@ -334,8 +394,9 @@ export default class App extends Component {
                         }
                         ]}  />
                 </div>
-                <div className="mt10">
-                    <Table size="small" className="monitor-alert-table"
+                <div className="mt30">
+                    <Table size="small" 
+                        title={()=>'报警列表'}
                         pagination={false}
                         dataSource={alertDataSource}
                         columns={[{
@@ -373,6 +434,57 @@ export default class App extends Component {
                             dataIndex: 'time',
                             key:'time'
                         },
+                        
+                        ]}  />
+                </div>
+                <div className="mt30">
+                    <Table size="small"
+                        pagination={false}
+                        dataSource={positionDataSource}
+                        columns={[{
+                            title: '名称',
+                            dataIndex: 'name',
+                            key:'name',
+                            render: (text, record) => {
+                                let stock = stockDict[record.code];
+                                return (<div>
+                                    {stock && stock.name}
+                                </div>)
+                            }
+                        },{
+                            title: '代码',
+                            dataIndex: 'code',
+                            key:'code'
+                        },{
+                            title: '数量',
+                            dataIndex: 'number',
+                            key:'number'
+                        },
+                        {
+                            title: '市值',
+                            dataIndex: 'number',
+                            key:'marketValue',
+                            render: (text, record, index) => {
+                                let marketValue;
+                                let quote = quoteMapper[record.code];
+                                // console.log(text, record, index,record.number,quoteMapper[record.code])
+                                if(record.number && quote){
+                                    marketValue=_.round(record.number * quote.current);
+                                }
+                                return (<div>{marketValue}</div>)
+                            }
+                        },
+                        {
+                            title: '数量设置',
+                            dataIndex: 'number',
+                            key:'numberSet',
+                            render: (text, record, index) => {
+                                
+                                return (<div>
+                                    <Input size="small" style={{width:'50px'}} defaultValue={text} onChange={this.onNumberInputChange.bind(this,index,record)}/>
+                                </div>)
+                            }
+                        }
                         
                         ]}  />
                 </div>

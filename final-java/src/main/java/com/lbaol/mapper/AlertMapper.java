@@ -53,6 +53,9 @@ public interface AlertMapper {
                 if(params.get("date")!=null){      
                     WHERE("date = #{date}");      
                 }
+                if(params.get("startDate")!=null){      
+                    WHERE("date >= #{startDate}");      
+                }
                 ORDER_BY("time desc");
             }}.toString();  
         }  

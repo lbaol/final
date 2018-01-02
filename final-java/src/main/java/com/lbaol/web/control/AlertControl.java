@@ -38,24 +38,37 @@ public class AlertControl {
 		params.put("count", count);
 		params.put("date", date);
 		List<AlertDO> monitorList = alertMapper.getByParams(params);
-		if(monitorList.size() == 1) {
-			AlertDO monitorDO = monitorList.get(0);
-			monitorDO.setTime(time);
-			monitorDO.setAlertPrice(alertPrice);
-			monitorDO.setTimePrice(timePrice);
-			alertMapper.update(monitorDO);
-		}else{
-			alertMapper.deleteByParams(params);
-			AlertDO monitorDO = new AlertDO();
-			monitorDO.setCode(code);
-			monitorDO.setType(type);
-			monitorDO.setCount(count);
-			monitorDO.setDate(date);
-			monitorDO.setTime(time);
-			monitorDO.setAlertPrice(alertPrice);
-			monitorDO.setTimePrice(timePrice);
-			alertMapper.insert(monitorDO);
+		
+		Map params2 = new HashMap();
+		params.put("code", code);
+		params.put("type", type);
+		params.put("count", count);
+		params.put("time", time);
+		params.put("time_price", timePrice);
+		List<AlertDO> monitorList2 = alertMapper.getByParams(params2);
+		
+		if(monitorList2.size()<1) {
+			if(monitorList.size() == 1) {
+				AlertDO monitorDO = monitorList.get(0);
+				monitorDO.setTime(time);
+				monitorDO.setAlertPrice(alertPrice);
+				monitorDO.setTimePrice(timePrice);
+				alertMapper.update(monitorDO);
+			}else{
+				alertMapper.deleteByParams(params);
+				AlertDO monitorDO = new AlertDO();
+				monitorDO.setCode(code);
+				monitorDO.setType(type);
+				monitorDO.setCount(count);
+				monitorDO.setDate(date);
+				monitorDO.setTime(time);
+				monitorDO.setAlertPrice(alertPrice);
+				monitorDO.setTimePrice(timePrice);
+				alertMapper.insert(monitorDO);
+			}
 		}
+		
+		
 		
 		rpcResult.setIsSuccess(true);
         return rpcResult;  
@@ -64,11 +77,11 @@ public class AlertControl {
 	
 	
 	@RequestMapping("/alert/getByParams")
-	Map getByParams(String code,String date) { 
-		
+	Map getByParams(String code,String startDate,String date) { 
 		Map params = new HashMap();
 		params.put("code", code);
 		params.put("date", date);
+		params.put("startDate", startDate);
 		List<AlertDO> monitorList = alertMapper.getByParams(params);
 		
 		

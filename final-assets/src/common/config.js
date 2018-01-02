@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 const domain = 'http://127.0.0.1:8080';
-const Env = 'daily' //daily product
+const Env = 'product' //daily product
 const pythonDomain = 'http://127.0.0.1:8001';
 
 const URL = {

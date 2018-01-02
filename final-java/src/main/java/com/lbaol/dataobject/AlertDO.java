@@ -6,7 +6,14 @@ public class AlertDO {
 	private String type;
 	private String time;
 	private String date;
+	private String dates;
 
+	public String getDates() {
+		return dates;
+	}
+	public void setDates(String dates) {
+		this.dates = dates;
+	}
 	private Double timePrice;
 	private Double alertPrice;
 	public String getDate() {

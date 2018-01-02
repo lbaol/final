@@ -7,9 +7,18 @@ public class FavDO {
 	private String type;
 	private String name;
 	private Double alertPrice;
+	private Double number;
 	
 	
 	
+	
+	
+	public Double getNumber() {
+		return number;
+	}
+	public void setNumber(Double number) {
+		this.number = number;
+	}
 	public Double getAlertPrice() {
 		return alertPrice;
 	}

@@ -12,7 +12,7 @@ export function request(
                 reqData[key] = JSON.stringify(reqData[key]);
             }
         } 
-        $.ajax({
+        return $.ajax({
             type: type,
             dataType: dataType,
             url: Util.getUrl(url),

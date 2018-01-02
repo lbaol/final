@@ -99,7 +99,12 @@ public interface FavMapper {
             {  
                 {  
                     UPDATE("fav");  
-                    SET("alert_price = #{alertPrice}");
+                    if(favDO.getAlertPrice()!=null){  
+                    	SET("alert_price = #{alertPrice}");
+                    }
+                    if(favDO.getNumber()!=null){  
+                    	SET("number = #{number}");
+                    }
                     WHERE("id = #{id}");  
                 }  
             } .toString();  
