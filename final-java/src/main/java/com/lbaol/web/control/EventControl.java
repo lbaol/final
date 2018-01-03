@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,11 +44,16 @@ public class EventControl {
         return map;  
     }
 	
-	@RequestMapping("/event/getByType")
-    Map getByType(String type) {  
+	@RequestMapping("/event/getByParams")
+    Map getByParams(String code,String type) {  
 		Map map = new HashMap();
 		Map params = new HashMap();
-		params.put("type", type);
+		if(StringUtils.isNotEmpty(code)) {
+			params.put("code", code);
+		}
+		if(StringUtils.isNotEmpty(type)) {
+			params.put("type", type);
+		}
 		List<EventDO> eventList = eventMapper.getByParams(params);
 		map.put("eventList",eventList);
         return map;  

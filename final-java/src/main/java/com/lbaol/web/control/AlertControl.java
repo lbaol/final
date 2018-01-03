@@ -40,11 +40,11 @@ public class AlertControl {
 		List<AlertDO> monitorList = alertMapper.getByParams(params);
 		
 		Map params2 = new HashMap();
-		params.put("code", code);
-		params.put("type", type);
-		params.put("count", count);
-		params.put("time", time);
-		params.put("time_price", timePrice);
+		params2.put("code", code);
+		params2.put("type", type);
+		params2.put("count", count);
+		params2.put("time", time);
+		params2.put("time_price", timePrice);
 		List<AlertDO> monitorList2 = alertMapper.getByParams(params2);
 		
 		if(monitorList2.size()<1) {

@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import FEvents from "../FEvent/index.js";
-import ListFilter from "../ListFilter/ListFilter/index.jsx";
-import MainChart from "../MainChart/index.jsx";
-import BaseInfo from "../BaseInfo/index.jsx";
-import FilterSet from "../FilterSet/index.jsx";
-import {Env} from "../../common/config.js";
-import { request } from "../../common/ajax.js";
+import FEvents from "components/Common/FEvent/index.js";
+import ListFilter from "components/Filter/ListFilter/index.jsx";
+import MainChart from "components/Chart/MainChart/index.jsx";
+import BaseInfo from "components/BaseInfo/index.jsx";
+import FilterSetting from "components/Filter/FilterSetting/index.jsx";
+import {Env} from "common/config.js";
+import { request } from "common/ajax.js";
 import { LocaleProvider  } from 'antd';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-import '../../common/base.scss';
+import 'common/base.scss';
 import './index.scss';
 
 
@@ -27,7 +27,7 @@ export default class App extends Component {
     componentDidMount() {
         
         this.fatchAllStock();
-        this.emit('final:first-init')
+        this.emit('final:detail-init')
         
     }
 
@@ -55,8 +55,8 @@ export default class App extends Component {
             
                 <div className={"page-wrap "+"page-wrap-"+Env}>
                     <div className="main-content">
-                        <FilterSet/>
-                        <MainChart />
+                        <FilterSetting/>
+                        {/* <MainChart /> */}
                     </div>
                     <div  className="right-content">
                         <BaseInfo/>

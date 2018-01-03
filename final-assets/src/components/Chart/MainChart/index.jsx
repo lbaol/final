@@ -7,10 +7,10 @@ import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
 import { Radio, Checkbox } from 'antd';
-import FEvents from "../FEvent/index.js";
-import { request } from "../../common/ajax.js";
-import { URL, Util, Config, Env,Dict } from "../../common/config.js";
-import { defaultConfig } from "../../common/chartConfig.js";
+import FEvents from "components/Common/FEvent/index.js";
+import { request } from "common/ajax.js";
+import { URL, Util, Config, Env,Dict } from "common/config.js";
+import { defaultConfig } from "common/chartConfig.js";
 import './index.scss';
 
 
@@ -41,7 +41,7 @@ export default class App extends Component {
 
 
 
-        this.on('final:show-the-stock', (data) => {
+        this.on('final:main-chart-refresh', (data) => {
             this.emitRefresh(data)
         });
 

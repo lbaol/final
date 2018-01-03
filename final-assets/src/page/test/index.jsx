@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import FEvents from "components/FEvent/index.js";
+import FEvents from "components/Common/FEvent/index.js";
 import AlertList from "components/Alert/AlertList/index.jsx";
 import {Env} from "common/config.js";
 import { request } from "common/ajax.js";

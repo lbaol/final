@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 import _ from 'lodash';
 import {  Checkbox,Modal} from 'antd';
-import FEvents from "../../FEvent/index.js";
-import { request } from "../../../common/ajax.js";
-import { URL, Util,Dict } from "../../../common/config.js";
+import FEvents from "components/Common/FEvent/index.js";
+import { request } from "common/ajax.js";
+import { URL, Util,Dict } from "common/config.js";
 
 
 

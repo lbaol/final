@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import FEvents from "../FEvent/index.js";
-import EventList from "../EventList/index.jsx";
-import FavEdit from "../Fav/FavEdit/index.jsx";
-import NoteEdit from "../Note/NoteEdit/index.jsx";
-import DataSetting from "../Data/Setting/index.jsx";
+import FEvents from "components/Common/FEvent/index.js";
+import EventList from "components/Event/EventList/index.jsx";
+import FavEdit from "components/Fav/FavEdit/index.jsx";
+import NoteEdit from "components/Note/NoteEdit/index.jsx";
+import DataSetting from "components/Data/Setting/index.jsx";
 import { Icon} from 'antd';
-import { request } from "../../common/ajax.js";
-import { Dict } from "../../common/config.js";
-import '../../common/base.scss';
+import { request } from "common/ajax.js";
+import { Dict } from "common/config.js";
+import 'common/base.scss';
 import './index.scss';
 
 
@@ -26,7 +26,9 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        this.on('final:show-the-stock', (data) => {
+        
+
+        this.on('final:base-info-refresh', (data) => {
             this.emitRefresh(data)
         });
     }

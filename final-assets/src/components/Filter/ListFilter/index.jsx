@@ -3,12 +3,12 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 import _ from 'lodash';
 import { Button, Select, Input, DatePicker, Tabs, Table,Pagination ,Radio} from 'antd';
-import FEvents from "../../FEvent/index.js";
-import { request } from "../../../common/ajax.js";
-import { URL, Util } from "../../../common/config.js";
-import ReportList from "../ReportList/index.jsx";
-import FavList from "../FavList/index.jsx";
-import EventList from "../EventList/index.jsx";
+import FEvents from "components/Common/FEvent/index.js";
+import { request } from "common/ajax.js";
+import { URL, Util } from "common/config.js";
+import ReportList from "components/Event/ReportList/index.jsx";
+import FavList from "components/Fav/FavList/index.jsx";
+import EventList from "components/Event/EventList/index.jsx";
 
 
 
@@ -46,9 +46,6 @@ export default class App extends Component {
                     </TabPane>
                     <TabPane tab="业绩"  key="report-list">
                         <ReportList  stockDict={this.props.stockDict}/>
-                    </TabPane>
-                    <TabPane tab="信号"  key="event-list">
-                        <EventList stockDict={this.props.stockDict} />
                     </TabPane>
                     
                 </Tabs>

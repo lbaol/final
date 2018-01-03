@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 import _ from 'lodash';
 import { Button, Select, Input, DatePicker, Tabs, Table,Pagination ,Radio} from 'antd';
-import FEvents from "../../FEvent/index.js";
+import FEvents from "components/Common/FEvent/index.js";
 
-import { request } from "../../../common/ajax.js";
-import { URL, Util } from "../../../common/config.js";
+import { request } from "common/ajax.js";
+import { URL, Util } from "common/config.js";
 import './index.scss';
 
 
@@ -16,7 +16,6 @@ let _eventList = {
     otherList : []
 }
 
-let _allStocksMap = [];
 
 @FEvents
 export default class App extends Component {
@@ -31,22 +30,14 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        this.fatchAllStocks();
+        this.fatchAllEventList();
+
+        this.on('final:report-list-refresh',()=>{
+            this.fatchAllEventList();
+        })
     }
 
-    fatchAllStocks =()=>{
-        const self = this;
-        request('/stock/getAll',
-            (res) => {
-                if(res){
-                    for(let st of res){
-                        _allStocksMap[st.code] = st
-                    }
-                }
-                self.fatchAllEventList();
-            }, {
-            }, 'jsonp')
-    }
+    
 
     fatchAllEventList = () => {
         const self = this;
@@ -61,7 +52,7 @@ export default class App extends Component {
                 
                 let i = 0;
                 for (let d of allList) {
-                    let st = _allStocksMap[d.code];
+                    let st = self.props.stockDict[d.code];
                     d.key = i++;
                     if(d.type == 'report'){
                         if (d.profitsYoy <= 0 || (st && st.timeToMarket > afterDate)) {
@@ -96,7 +87,6 @@ export default class App extends Component {
 
     onStockItemClick=(code)=>{
         this.emit('final:show-the-stock',{
-            ...this.state,
             code:code
         })
     }

@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 import _ from 'lodash';
 import { Button, Select, Input, DatePicker, Modal,Form } from 'antd';
-import FEvents from "../FEvent/index.js";
+import FEvents from "components/Common/FEvent/index.js";
 
-import { request } from "../../common/ajax.js";
-import { URL, Util,Dict } from "../../common/config.js";
+import { request } from "common/ajax.js";
+import { URL, Util,Dict } from "common/config.js";
 
 const FormItem = Form.Item;
 

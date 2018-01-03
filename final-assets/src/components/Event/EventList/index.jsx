@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 import _ from 'lodash';
-import {  Modal,Select, Icon,Card} from 'antd';
-import FEvents from "../FEvent/index.js";
-import EventEdit from "../EventEdit/index.jsx";
-import { request } from "../../common/ajax.js";
-import { URL, Util ,Dict} from "../../common/config.js";
+import { Radio , Modal,Select, Icon,Card} from 'antd';
+import FEvents from "components/Common/FEvent/index.js";
+import EventEditMin from "components/Event/EventEditMin/index.jsx";
+import { request } from "common/ajax.js";
+import { URL, Util ,Dict} from "common/config.js";
 import './index.scss';
 
 
@@ -18,19 +18,12 @@ export default class App extends Component {
         super(props);
         this.state = {
            code:'',
-           baseInfo:{},
-           eventMapper:{}
+           eventList:[],
+           type:''
         };
     }
 
     componentWillMount(){
-        const eventMapper = {};
-        for(let e of Dict.eventType){
-            eventMapper[e.value] = e.label
-        }
-        this.setState({
-            eventMapper:eventMapper
-        })
     }
 
     componentDidMount() {
@@ -39,7 +32,7 @@ export default class App extends Component {
             this.emitRefresh(data)
         });
 
-        this.on('final:show-the-stock', (data) => {
+        this.on('final:event-list-refresh', (data) => {
             this.emitRefresh(data)
         });
 
@@ -50,32 +43,39 @@ export default class App extends Component {
         const {code} = this.state;
         this.setState({
             code:data && data.code?data.code:code
-        },this.fatchBaseInfo)
+        },this.fatchEventList)
     }
 
-    fatchBaseInfo=()=>{
+    fatchEventList=()=>{
         const self = this;
-        const {code} = this.state;
-        request('/event/getByCode',
+        const {code,type} = this.state;
+        request('/event/getByParams',
 		(res)=>{
 
             
             let eventList = res.eventList;
 
             eventList = _.orderBy(eventList, ['eventDate'], ['desc']);
-            res.eventList = eventList;
+            
 
 			self.setState({
-                baseInfo:res
+                eventList:eventList
             })
 		},{
-            code:code
+            code:code,
+            type:type
         },'jsonp')
     }
     
     onAddEventClick=(eventDate)=>{
         const {code} = this.state;
         this.emit('final:event-edit-show',{code:code,eventDate:eventDate?eventDate:''})
+    }
+
+    onTypeChange=(e)=>{
+        this.setState({
+            type:e.target.value
+        },this.fatchEventList)
     }
 
     onDeleteEventClick=(id)=>{
@@ -86,7 +86,7 @@ export default class App extends Component {
             onOk() {
                 request('/event/deleteById',
                     (res)=>{
-                        self.fatchBaseInfo()
+                        self.fatchEventList()
                     },{
                         id:id
                     },'jsonp')
@@ -96,24 +96,29 @@ export default class App extends Component {
     }
 
     render() {
-        const {baseInfo,eventMapper} = this.state;
-        const baisc = baseInfo.baisc;
+        const {eventList,code,type} = this.state;
+        
         
 
         return (
             <div className="event-block">
-                <Card title="信号" bordered={false}  extra={<Icon className="c-p" onClick={this.onAddEventClick.bind(this,'')} type="plus" />} >
+                <Card title="信号" bordered={false}  extra={<EventEditMin code={code}/>} >
+                    <Radio.Group  value={type} onChange={this.onTypeChange}  size="small">
+                        <Radio.Button value="">全部</Radio.Button>
+                        {
+                            Dict.eventType.map(d=>{
+                                return <Radio.Button value={d.value}>{d.label}</Radio.Button>
+                            })
+                        }
+                    </Radio.Group>
                     {
-                        baseInfo.eventList && baseInfo.eventList.map((ev)=>{
+                        eventList && eventList.map((ev)=>{
                             let content ;
                             if(ev.type=='report'){
                                 content = (<span>
                                     <span>
                                         <span className="c-blue">{ev.quarter}季度 报告</span> 
                                         <span>{ev.profitsYoy}%</span>
-                                    </span>
-                                    <span className="event-item-op">
-                                        <Icon className="c-p" onClick={this.onAddEventClick.bind(this,ev.eventDate)} type="plus" />
                                     </span>
                                 </span>)
                             }else if (ev.type=='forecast'){
@@ -123,14 +128,11 @@ export default class App extends Component {
                                             <span className="c-green">{ev.quarter}季度 预告</span>
                                             <span>{_.includes(ev.ranges,'%')?ev.ranges:(ev.ranges+'%')}</span>
                                         </span>
-                                        <span className="event-item-op">
-                                            <Icon className="c-p" onClick={this.onAddEventClick.bind(this,ev.eventDate)} type="plus" />
-                                        </span>
                                     </span>
                                 )
                             }else{
                                 content = (<span>
-                                            <span>{eventMapper[ev.type]}</span> 
+                                            <span>{Dict.eventTypeMapper[ev.type]}</span> 
                                             <span className="event-item-op">
                                                 <Icon type="delete" onClick={this.onDeleteEventClick.bind(this,ev.id)} />
                                             </span>
@@ -145,7 +147,6 @@ export default class App extends Component {
                         })
                     }
                 </Card>
-                <EventEdit/>
             </div>
         );
     }

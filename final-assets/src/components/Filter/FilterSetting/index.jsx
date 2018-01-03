@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 import _ from 'lodash';
 import { Button, Select,Icon, Input,Checkbox, DatePicker, Tabs, Table, Pagination, Radio, Form } from 'antd';
-import FEvents from "../FEvent/index.js";
-import { request } from "../../common/ajax.js";
-import { URL, Util,Config } from "../../common/config.js";
+import FEvents from "components/Common/FEvent/index.js";
+import { request } from "common/ajax.js";
+import { URL, Util,Config } from "common/config.js";
 
 
 const _defaultDayMa = Config.defalutMas.day;
@@ -45,14 +45,15 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        this.on('final:first-init',()=>{
-            this.doShowTheStock();
-        })
+
+        this.on('final:detail-init', (data) => {
+            this.refreshAllComponent();
+        });
 
         this.on('final:show-the-stock', (data) => {
             this.setState({
                 code:data && data.code
-            })
+            },this.refreshAllComponent)
         });
     }
 
@@ -70,7 +71,7 @@ export default class App extends Component {
             endDate: moment().format('YYYY-MM-DD'),
             period:value,
             mas:(value=='day'?_defaultDayMa:_defaultWeekMa)
-        },this.doShowTheStock)
+        },this.refreshAllComponent)
     }
 
 
@@ -83,11 +84,14 @@ export default class App extends Component {
     }
 
     onSearchClick = () => {
-        this.doShowTheStock();
+        this.refreshAllComponent();
     }
 
-    doShowTheStock = () => {
-        this.emit('final:show-the-stock', this.state)
+    refreshAllComponent = () => {
+        let data = this.state;
+        this.emit('final:base-info-refresh', data);
+        this.emit('final:main-chart-refresh', data);
+        this.emit('final:event-list-refresh', data);
     }
 
 
@@ -98,7 +102,7 @@ export default class App extends Component {
             if (name == 'code' && _.toString(value).length != 6) {
                 return;
             }
-            this.doShowTheStock()
+            this.refreshAllComponent()
         })
     }
 
