@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import FEvents from "components/Common/FEvent/index.js";
 import ListFilter from "components/Filter/ListFilter/index.jsx";
 import MainChart from "components/Chart/MainChart/index.jsx";
+import StockChart from "components/Chart/StockChart/index.jsx";
 import BaseInfo from "components/BaseInfo/index.jsx";
 import FilterSetting from "components/Filter/FilterSetting/index.jsx";
 import {Env} from "common/config.js";
@@ -56,7 +57,7 @@ export default class App extends Component {
                 <div className={"page-wrap "+"page-wrap-"+Env}>
                     <div className="main-content">
                         <FilterSetting/>
-                        {/* <MainChart /> */}
+                        <StockChart />
                     </div>
                     <div  className="right-content">
                         <BaseInfo/>

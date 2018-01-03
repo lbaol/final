@@ -90,7 +90,7 @@ export default class App extends Component {
     refreshAllComponent = () => {
         let data = this.state;
         this.emit('final:base-info-refresh', data);
-        this.emit('final:main-chart-refresh', data);
+        this.emit('final:stock-chart-refresh', data);
         this.emit('final:event-list-refresh', data);
     }
 

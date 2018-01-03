@@ -22,14 +22,11 @@ export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            code: '',
-            period: 'day',
-            startDate: '',
-            endDate: '',
-            chartData: {},
-            baseInfo: {},
-            dateMapper: {},
-            mas: []
+            mas:props.mas,
+            chartData:props.chartData,
+            code:props.code,
+            eventList:[],
+            dateMapper: {}
         };
     }
 
@@ -37,31 +34,32 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-
-
-
-        this.on('final:main-chart-refresh', (data) => {
-            this.emitRefresh(data)
-        });
-
-
-        this.on('final:event-edit-finish', (data) => {
-            this.emitRefresh(data)
-        });
+        this.initData();
     }
 
-    emitRefresh = (data) => {
-        console.log("data", data)
-        const { code, period, startDate, endDate, mas } = this.state;
+
+    initData=()=>{
+        let {code,chartData} = this.state;
+        if(!code || !_.isArray(chartData) || chartData.length<=0){
+            return;
+        }
+        let dateMapper = {}
+        for (let cha of chartData) {
+            dateMapper[cha.date] = cha;
+        }
         this.setState({
-            code: data && data.code ? data.code : code,
-            period: data && data.period ? data.period : period,
-            startDate:data && data.startDate ? data.startDate : startDate,
-            endDate: data && data.endDate ? data.endDate : endDate,
-            mas: data && data.mas ? data.mas : mas
-        }, this.fatchChartData)
+            dateMapper:dateMapper
+        },this.fatchEventList)
     }
 
+    componentWillReceiveProps(nextProps) {
+        if(!_.isEqual(nextProps, this.props)){
+            this.setState({
+                ...nextProps
+            },this.initData)
+            
+        }
+    }
 
 
 
@@ -75,57 +73,21 @@ export default class App extends Component {
                 let eventList = res.eventList;
 
                 eventList = _.orderBy(eventList, ['eventDate'], ['desc']);
-                res.eventList = eventList;
+                
 
 
                 self.setState({
-                    baseInfo: res
+                    eventList: eventList
                 }, self.renderChart)
             }, {
                 code: code
             }, 'jsonp')
     }
 
-    fatchChartData() {
-        const self = this;
-        const { code, period, startDate, endDate } = this.state;
-        if (code) {
-            let newCode = Util.getFullCode(code);
-            let newStartDate = moment(startDate);
-            let newEndDate = moment(endDate)
-
-            request('https://xueqiu.com/stock/forchartk/stocklist.json?type=before',
-                (res) => {
-
-                    let chartList = res.chartlist;
-                    let dateMapper = {}
-                    for (let cha of chartList) {
-                        let date = moment(cha.timestamp).format('YYYY-MM-DD');
-                        cha.date = date;
-                        dateMapper[date] = cha;
-                    }
-                    console.log('dateMapper',dateMapper)
-                    self.setState({
-                        chartData: chartList,
-                        dateMapper: dateMapper
-                    }, self.fatchEventList)
-
-
-
-
-
-                }, {
-                    symbol: newCode,
-                    period: '1' + period,
-                    begin: newStartDate.set('hour', 0).set('minute', 0).format('x'),
-                    end: newEndDate.set('hour', 23).set('minute', 59).format('x'),
-
-                }, 'jsonp')
-        }
-    }
+   
 
     getReportPriceByDate = (date) => {
-        let { chartData, dateMapper } = this.state;
+        let {dateMapper,chartData} = this.state;
         if (chartData) {
             let cha = dateMapper[date];
 
@@ -173,7 +135,8 @@ export default class App extends Component {
     renderChart = () => {
 
 
-        let { chartData, baseInfo, code, mas } = this.state;
+        let { chartData, code, mas } = this.state;
+        let {eventList} = this.state;
         let ohlc = [];
         let volume = [];
         for (let d of chartData) {
@@ -191,7 +154,6 @@ export default class App extends Component {
             ]);
         }
 
-        let eventList = baseInfo.eventList;
         let flagList = [];
         for (let ev of eventList) {
             let datePrice = this.getReportPriceByDate(ev.eventDate);
@@ -222,30 +184,9 @@ export default class App extends Component {
             }
         }
 
-        let maSeries = mas.map((ma) => {
-            return {
-                type: 'sma',
-                linkedTo: 'dataseries',
-                name: ma,
-                params: {
-                    period: ma
-                },
-                id: 'ma' + ma,
-                marker: {
-                    enabled: false
-                },
-                lineWidth: 0.5,
-                marker: {
-                    radius: 0,
-                    width: 0.5,
-                    states: {
-                        hover: {
-                            enabled: false
-                        }
-                    }
-                }
-            }
-        })
+
+
+        
 
 
         let initSeries = [{
@@ -302,8 +243,37 @@ export default class App extends Component {
             stackDistance: 20
         }]
 
+        if(_.isArray(mas) && mas.length>0){
+            let maSeries = mas.map((ma) => {
+                return {
+                    type: 'sma',
+                    linkedTo: 'dataseries',
+                    name: ma,
+                    params: {
+                        period: ma
+                    },
+                    id: 'ma' + ma,
+                    marker: {
+                        enabled: false
+                    },
+                    lineWidth: 0.5,
+                    marker: {
+                        radius: 0,
+                        width: 0.5,
+                        states: {
+                            hover: {
+                                enabled: false
+                            }
+                        }
+                    }
+                }
+            })
+    
+    
+            initSeries = initSeries.concat(maSeries)
+        }
 
-        initSeries = initSeries.concat(maSeries)
+        
 
         // create the chart
         Highcharts.stockChart('main-chart-container', {
@@ -376,8 +346,7 @@ export default class App extends Component {
 
 
     render() {
-        const { baseInfo, period, maOptions, maValue } = this.state;
-        const basic = baseInfo.basic || {};
+       
 
         return (
             <div className={'s-chart-wrap'} >
