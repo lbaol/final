@@ -44,15 +44,17 @@ export default class App extends Component {
     }
 
     emitRefresh = (data) => {
-        console.log("data", data)
         const { code, period, startDate, endDate, mas } = this.state;
-        this.setState({
-            code: data && data.code ? data.code : code,
-            period: data && data.period ? data.period : period,
-            startDate:data && data.startDate ? data.startDate : startDate,
-            endDate: data && data.endDate ? data.endDate : endDate,
-            mas: data && data.mas ? data.mas : mas
-        }, this.fatchChartData)
+        if(data){
+            this.setState({
+                ...this.state,
+                ...data,
+                code:data.code?data.code:this.state.code
+            }, this.fatchChartData)
+        }else{
+            this.fatchChartData()
+        }
+        
     }
 
 
@@ -101,10 +103,10 @@ export default class App extends Component {
 
 
     render() {
-       const {code,chartData} = this.state;
+       const {code,chartData,mas} = this.state;
 
         return (
-            <KChart code={code} chartData={chartData}  />
+            <KChart code={code} chartData={chartData} mas={mas} />
         );
     }
 }

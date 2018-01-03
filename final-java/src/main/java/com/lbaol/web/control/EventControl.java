@@ -44,6 +44,26 @@ public class EventControl {
         return map;  
     }
 	
+	@RequestMapping("/event/addOrUpdateByTypeAndDate")
+	RpcResult addOrUpdateByTypeAndDate(String code,String type,String eventDate) {  
+		RpcResult rpcResult = new RpcResult();
+		Map params = new HashMap();
+		params.put("code", code);
+		params.put("type", type);
+		params.put("eventDate", eventDate);
+		List<EventDO> eventList = eventMapper.getByParams(params);
+		if(eventList.size() < 1) {
+			EventDO eventDO = new EventDO();
+			eventDO.setCode(code);
+			eventDO.setEventDate(eventDate);
+			eventDO.setType(type);
+			eventMapper.insert(eventDO);
+		}
+		
+		rpcResult.setIsSuccess(true);
+        return rpcResult;  
+    }
+	
 	@RequestMapping("/event/getByParams")
     Map getByParams(String code,String type) {  
 		Map map = new HashMap();

@@ -26,7 +26,9 @@ export default class App extends Component {
             chartData:props.chartData,
             code:props.code,
             eventList:[],
-            dateMapper: {}
+            noEvent:props.noEvent == true ? true:false,
+            dateMapper: {},
+            hasEventChecked:false
         };
     }
 
@@ -44,16 +46,19 @@ export default class App extends Component {
             return;
         }
         let dateMapper = {}
-        for (let cha of chartData) {
-            dateMapper[cha.date] = cha;
+        for (let i in chartData) {
+            chartData[i].index = _.toNumber(i);
+            dateMapper[chartData[i].date] = chartData[i];
         }
         this.setState({
-            dateMapper:dateMapper
+            dateMapper:dateMapper,
+            chartData:chartData,
+            hasEventChecked:false
         },this.fatchEventList)
     }
 
     componentWillReceiveProps(nextProps) {
-        if(!_.isEqual(nextProps, this.props)){
+        if(!_.isEqual(nextProps.chartData, this.props.chartData)){
             this.setState({
                 ...nextProps
             },this.initData)
@@ -65,7 +70,7 @@ export default class App extends Component {
 
     fatchEventList = () => {
         const self = this;
-        const { code } = this.state;
+        const { code,hasEventChecked } = this.state;
         request('/event/getByCode',
             (res) => {
 
@@ -78,15 +83,23 @@ export default class App extends Component {
 
                 self.setState({
                     eventList: eventList
-                }, self.renderChart)
+                }, ()=>{
+                    this.renderChart();
+                    if(hasEventChecked == false){
+                        this.checkEvents();
+                    }
+                    
+                })
             }, {
                 code: code
             }, 'jsonp')
     }
 
-   
+  
 
-    getReportPriceByDate = (date) => {
+   
+    //根据日期找K线上对应的日期
+    getKDateByEventDate = (date) => {
         let {dateMapper,chartData} = this.state;
         if (chartData) {
             let cha = dateMapper[date];
@@ -98,10 +111,11 @@ export default class App extends Component {
 
             if (cha) {
                 //如果找到对应的日期
-                console.log('找到日期', cha.date, cha)
+                // console.log('找到日期', cha.date, cha)
                 return {
                     date: cha.date,
-                    price: cha.high //取最高价
+                    price: cha.high, //取最高价
+                    index: cha.index
                 }
             }
 
@@ -130,13 +144,141 @@ export default class App extends Component {
         return null;
     }
 
+    checkEvents=()=>{
+        let {noEvent} = this.state;
+        if(noEvent == true){
+            return;
+        }
+        
+        this.checkFaultEvents()
+        this.checkLeadNewHighEvents();
+        this.setState({
+            hasEventChecked:true
+        },this.fatchEventList)
+        
+        
+    }
+
+    //检查是否有利润断层
+    checkFaultEvents=()=>{
+        let {eventList,chartData,dateMapper} = this.state;
+        let eventDateList = [];
+        for(let event of eventList){
+            if(event.type == 'report' || event.type == 'forecast'){
+                let kData = this.getKDateByEventDate(event.eventDate);
+                if(kData){
+                    if(chartData[kData.index-1] && chartData[kData.index]){
+                        let before = chartData[kData.index-1];
+                        let after = chartData[kData.index];
+                        if((after.close/before.close)>1.07 && (after.open > before.close) && kData.index!=0){
+                            console.log('找到利润断层：',kData.date,'后一天收盘：',after.close,'前一天收盘：',before.close,'涨幅：',(after.close/before.close-1)*100)
+                            if(_.findIndex(eventList,{eventDate:kData.date,type:'fault'})==-1){
+                                eventDateList.push(kData.date);
+                            }
+                            
+                            continue;
+                        }
+                    }
+                    if(chartData[kData.index] && chartData[kData.index+1]){
+                        let before = chartData[kData.index];
+                        let after = chartData[kData.index+1];
+                        if((after.close/before.close)>1.07 && (after.open > before.close) && kData.index!=0){
+                            console.log('找到利润断层：',kData.date,'后一天收盘：',after.close,'前一天收盘：',before.close,'涨幅：',(after.close/before.close-1)*100)
+                            if(_.findIndex(eventList,{eventDate:kData.date,type:'fault'})==-1){
+                                eventDateList.push(kData.date);
+                            }
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+        if(eventDateList.length > 0 ){
+            eventDateList = _.sortedUniq(eventDateList);
+            for(let date of eventDateList){
+                this.addOrUpdateEventByDateAndType(date,'fault');
+            }
+            
+        }
+    }
+
+    //检查是否有提前大盘新高
+    checkLeadNewHighEvents=()=>{
+        let {chartData,dateMapper,eventList} = this.state;
+        let startDate = '2017-11-29';
+        let endDate = '2018-01-03';
+       
+        let dayCount = 250;
+        if(chartData.length<120){
+            return
+        }
+        if(chartData.length<250){
+            dayCount = 120;
+        }
+        //计算历史新高从startDate开始
+        let newStartKData = this.getKDateByEventDate(startDate);
+        let newEndKData = this.getKDateByEventDate(endDate);
+        if(newStartKData && newEndKData){
+            let indexStart = dateMapper[newStartKData.date].index;
+            let indexEnd = dateMapper[newEndKData.date].index;
+            let eventDateList = [];
+            for(let i = indexStart;i<=indexEnd;i++){
+                let high = this.getHigh(i,dayCount);
+                let currentKData = chartData[i];
+                if(high== currentKData.high){
+                    console.log('找到提前大盘新高：',currentKData.date,dayCount,'天最高价：',high)
+                    if(_.findIndex(eventList,{eventDate:currentKData.date,type:'leadNewHigh'})==-1){
+                        eventDateList.push(currentKData.date);
+                    }
+                    break;
+                }
+            }
+            if(eventDateList.length > 0 ){
+                eventDateList = _.sortedUniq(eventDateList);
+                for(let date of eventDateList){
+                    this.addOrUpdateEventByDateAndType(date,'leadNewHigh');
+                }
+                
+            }
+        }
+        
+
+        
+
+    }
+
+    getHigh=(index,dayCount)=>{
+        let {chartData} = this.state;
+        let high = chartData[index].high;
+        for(let i = 1;i<=dayCount;i++){
+            if(chartData[index-i].high>high){
+                high = chartData[index-i].high;
+            }
+        }
+        return high;
+    }
+
+    addOrUpdateEventByDateAndType=(date,type)=>{
+        let {code} = this.state;
+        request('/event/addOrUpdateByTypeAndDate',
+            (res) => {
+
+                console.log(code,date,'fault','add or update finish!');
+                slef.emit('final:event-list-refresh')
+                
+            }, {
+                code:code,
+                eventDate:date,
+                type:type
+            }, 'jsonp')
+    }
+
 
 
     renderChart = () => {
 
 
-        let { chartData, code, mas } = this.state;
-        let {eventList} = this.state;
+        let { chartData, code, mas,dateMapper,eventList } = this.state;
         let ohlc = [];
         let volume = [];
         for (let d of chartData) {
@@ -156,25 +298,25 @@ export default class App extends Component {
 
         let flagList = [];
         for (let ev of eventList) {
-            let datePrice = this.getReportPriceByDate(ev.eventDate);
-            if (datePrice) {
+            let kData = this.getKDateByEventDate(ev.eventDate);
+            if (kData) {
                 let flagObj = {};
                 if (ev.type == 'report') {
                     let title = ev.quarter + '季度' + ev.profitsYoy + '%';
                     flagObj = {
-                        x: (new Date(moment(datePrice.date))).getTime(),
+                        x: (new Date(moment(kData.date))).getTime(),
                         title: title
                     }
                 }else if (ev.type == 'forecast') {
                     let title = ev.quarter + '季度' + (_.includes(ev.ranges, '%') ? ev.ranges : (ev.ranges + '%'))
                     flagObj = {
-                        x: (new Date(moment(datePrice.date))).getTime(),
+                        x: (new Date(moment(kData.date))).getTime(),
                         title: title,
                     }
                 }else {
                     let title = Dict.eventTypeMapper[ev.type];
                     flagObj = {
-                        x: (new Date(moment(datePrice.date))).getTime(),
+                        x: (new Date(moment(kData.date))).getTime(),
                         title: title,
                         fillColor: '#f54545',
                         color: 'red'

@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 const domain = 'http://127.0.0.1:8080';
-const Env = 'daily' //daily product
+const Env = 'product' //daily product
 const pythonDomain = 'http://127.0.0.1:8001';
 
 const URL = {
@@ -49,6 +49,48 @@ const Util = {
     },
     getDongCaiStockLink:function(code){
         return <a target="_blank" href={'http://emweb.securities.eastmoney.com/f10_v2/OperationsRequired.aspx?type=web&code='+Util.getFullCode(code)}>东</a>
+    },
+    getWeekDateIndex : function(chartData, date){
+        let i = 0;
+        for (; i < chartData.length; i++) {
+            if (chartData[i].date >= date) {
+                break;
+            }
+        }
+        //如果找到i 小于 长度，则代表已经找到
+        if (i < chartData.length - 1) {
+            return chartData[i];
+        }
+        //如果找到的i 是 最后一位，则需要进一步比较date
+        if (i == (chartData.length - 1)) {
+            if (chartData[i].date >= date) {
+                return chartData[i];
+            }
+        }
+        return null;
+    },
+    //根据日期找K线上对应的日期
+    getKDateByEventDate :function(date,chartData,dateMapper){
+        if (chartData) {
+            let cha = dateMapper[date];
+
+            if (!cha) {
+                //如果没找到对应的日期，继续找
+                cha = Util.getWeekDateIndex(chartData, date)
+            }
+
+            if (cha) {
+                //如果找到对应的日期
+                console.log('找到日期', cha.date, cha)
+                return {
+                    date: cha.date,
+                    price: cha.high //取最高价
+                }
+            }
+
+
+        }
+        return null;
     }
 }
 
@@ -58,7 +100,7 @@ let Config = {
         week: [10,30,50]
     },
     defaultPeriod:{
-        day:365,
+        day:500,
         week:700
     }
 }
