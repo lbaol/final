@@ -10,10 +10,11 @@ import {Env} from "common/config.js";
 import { request } from "common/ajax.js";
 import { LocaleProvider  } from 'antd';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
+import urlParse from "url-parse";
 import 'common/base.scss';
 import './index.scss';
 
-
+const urlQuery = urlParse(location.href, true).query;
 
 @FEvents
 export default class App extends Component {
@@ -28,7 +29,7 @@ export default class App extends Component {
     componentDidMount() {
         
         this.fatchAllStock();
-        this.emit('final:detail-init')
+        this.emit('final:show-the-stock',{code:urlQuery.code})
         
     }
 

@@ -205,9 +205,9 @@ export default class App extends Component {
     //检查是否有提前大盘新高
     checkLeadNewHighEvents=()=>{
         let {chartData,dateMapper,eventList} = this.state;
-        let startDate = '2017-11-29';
-        let endDate = '2018-01-03';
-       
+        let startDate = Config.indexPeakValley[0].start;
+        let endDate = Config.indexPeakValley[0].end;
+        
         let dayCount = 250;
         if(chartData.length<120){
             return

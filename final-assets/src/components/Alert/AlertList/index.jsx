@@ -4,6 +4,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import { Button, Input, Select, Collapse, Icon, DatePicker, Tabs, Table, Pagination, Radio, Modal } from 'antd';
 import FEvents from "components/Common/FEvent/index.js";
+import NoteEdit from "components/Note/NoteEdit/index.jsx";
 import { request } from "common/ajax.js";
 import { URL, Util, Dict, Config } from "common/config.js";
 import FavImport from "components/Fav/FavImport/index.jsx";
@@ -27,7 +28,7 @@ let _maDayCounts = [
 ]
 
 const intervalTime = 10000;
-const isInterval = true;
+const isInterval = false;
 
 @FEvents
 export default class App extends Component {
@@ -56,8 +57,7 @@ export default class App extends Component {
         }
 
         this.on('final:fav-import-finish', () => {
-            self.fatctMonitorList();
-            self.fatctPositionList();
+            this.refreshList();
         })
 
     }
@@ -315,16 +315,33 @@ export default class App extends Component {
         return code + '-' + type + '-' + count;
     }
 
+    refreshList=()=>{
+        this.fatctMonitorList();
+        this.fatctPositionList();
+    }
+
     onDeleteFavByIdClick = (id) => {
         const self = this;
-        request('/fav/deleteById',
-            (res) => {
-                self.fatctMonitorList();
-                self.fatctPositionList();
+        Modal.confirm({
+            title: '确定不是手抖点的删除?',
+            content: '',
+            onOk() {
+                request('/fav/deleteById',
+                    (res) => {
+                        self.refreshList()
+                    }, {
+                        id: id
+                    }, 'jsonp')
+            },
+            onCancel() {},
+          })
+        
+    }
 
-            }, {
-                id: id
-            }, 'jsonp')
+    onEditDefaultNoteClick=(code)=>{
+        this.emit('final:note-default-edit-show',{
+            code:code
+        })
     }
 
     renderTypeCountCell = (type, count, text, record) => {
@@ -336,6 +353,15 @@ export default class App extends Component {
             return <span className="alert-bg">{text}</span>
         }
         return text;
+    }
+
+    renderOperCell = (text, record) => {
+        return (<div>
+            <Icon type="delete" className="c-p" onClick={this.onDeleteFavByIdClick.bind(this, record.id)} />
+            <span className="ml10">
+                <Icon className="c-p" type="file-text" onClick={this.onEditDefaultNoteClick.bind(this, record.code)} />
+            </span>
+        </div>)
     }
 
 
@@ -370,7 +396,10 @@ export default class App extends Component {
                             }, {
                                 title: '代码',
                                 dataIndex: 'code',
-                                key: 'code'
+                                key: 'code',
+                                render: (text, record) => {
+                                    return (<a target="_blank"  href={'/detail.html?code='+text}>{record.code}</a>)
+                                }
                             }, {
                                 title: '10日',
                                 dataIndex: 'day10',
@@ -450,11 +479,7 @@ export default class App extends Component {
                                 title: '操作',
                                 dataIndex: 'action',
                                 key: 'action',
-                                render: (text, record) => {
-                                    return (<div>
-                                        <Icon type="delete" className="c-p" onClick={this.onDeleteFavByIdClick.bind(this, record.id)} />
-                                    </div>)
-                                }
+                                render: this.renderOperCell
                             }
                             ]} />
                     </div>
@@ -531,7 +556,10 @@ export default class App extends Component {
                                 }, {
                                     title: '代码',
                                     dataIndex: 'code',
-                                    key: 'code'
+                                    key: 'code',
+                                    render: (text, record) => {
+                                        return (<a target="_blank" href={'/detail.html?code='+text}>{record.code}</a>)
+                                    }
                                 }, {
                                     title: '数量',
                                     dataIndex: 'number',
@@ -582,11 +610,7 @@ export default class App extends Component {
                                     title: '操作',
                                     dataIndex: 'action',
                                     key: 'action',
-                                    render: (text, record) => {
-                                        return (<div>
-                                            <Icon type="delete" className="c-p" onClick={this.onDeleteFavByIdClick.bind(this, record.id)} />
-                                        </div>)
-                                    }
+                                    render: this.renderOperCell
                                 }
 
                                 ]} />
@@ -595,6 +619,7 @@ export default class App extends Component {
                     </Collapse>
 
                 </div>
+                <NoteEdit/>
             </div>
         );
     }

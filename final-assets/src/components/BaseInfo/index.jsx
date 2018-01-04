@@ -75,7 +75,7 @@ export default class App extends Component {
         })
     }
 
-    onEditFaultNoteClick=()=>{
+    onEditDefaultNoteClick=()=>{
         const {code} = this.state;
         this.emit('final:note-default-edit-show',{
             code:code
@@ -107,7 +107,7 @@ export default class App extends Component {
                         <Icon className="c-p" type="heart-o" onClick={this.onAddFavClick} />
                     </span> 
                     <span className="ml10">
-                        <Icon className="c-p" type="file-text" onClick={this.onEditFaultNoteClick} />
+                        <Icon className="c-p" type="file-text" onClick={this.onEditDefaultNoteClick} />
                     </span> 
                     <div className="f-r">
                         <span className="ml10">

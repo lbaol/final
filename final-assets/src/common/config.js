@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 const domain = 'http://127.0.0.1:8080';
-const Env = 'product' //daily product
+const Env = 'daily' //daily product
 const pythonDomain = 'http://127.0.0.1:8001';
 
 const URL = {
@@ -100,10 +100,16 @@ let Config = {
         week: [10,30,50]
     },
     defaultPeriod:{
-        day:500,
+        day:450,
         week:700
-    }
+    },
+    indexPeakValley:[{
+        start:'2017-11-29',
+        end:'2018-01-04'
+    }]
 }
+
+
 
 if(Env=='product'){
     Config.chart = {
@@ -145,7 +151,7 @@ let Dict = {
     noteType: [
         { label: '概要', value: 'summary' },
         { label: '按日期', value: 'date' },
-        { label: '总体', value: 'overall' }
+        { label: '总文档', value: 'overall' }
     ],
     yearType: [
         { label: '2017', value: '2017' },

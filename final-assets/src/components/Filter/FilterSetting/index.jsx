@@ -46,13 +46,10 @@ export default class App extends Component {
 
     componentDidMount() {
 
-        this.on('final:detail-init', (data) => {
-            this.refreshAllComponent();
-        });
 
         this.on('final:show-the-stock', (data) => {
             this.setState({
-                code:data && data.code
+                code:data && data.code || this.state.code
             },this.refreshAllComponent)
         });
     }
