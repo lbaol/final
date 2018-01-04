@@ -64,7 +64,7 @@ public interface NoteMapper {
         
         public String insert(NoteDO noteDO) { 
         	if(noteDO.getType()==null || noteDO.getType()=="") {
-        		noteDO.setType("default");
+        		noteDO.setType("summary");
         	}
         	
         	return new SQL(){{      

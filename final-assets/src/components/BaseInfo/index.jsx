@@ -7,7 +7,7 @@ import NoteEdit from "components/Note/NoteEdit/index.jsx";
 import DataSetting from "components/Data/Setting/index.jsx";
 import { Icon} from 'antd';
 import { request } from "common/ajax.js";
-import { Dict } from "common/config.js";
+import { Dict,Util } from "common/config.js";
 import 'common/base.scss';
 import './index.scss';
 
@@ -96,7 +96,7 @@ export default class App extends Component {
     render() {
 
         const {baseInfo,selectedFav} = this.state;
-        const basic = baseInfo.basic;
+        const basic = baseInfo.basic || {};
         
         return (
             <div className="base-info">
@@ -109,6 +109,12 @@ export default class App extends Component {
                     <span className="ml10">
                         <Icon className="c-p" type="file-text" onClick={this.onEditDefaultNoteClick} />
                     </span> 
+                    <span className="ml10">
+                        {Util.getXueQiuStockLink(basic.code)}
+                    </span>
+                    <span className="ml5">
+                        {Util.getDongCaiStockLink(basic.code)}
+                    </span>
                     <div className="f-r">
                         <span className="ml10">
                             <Icon className="c-p" type="file-text" onClick={this.onEditOverallNoteClick} />

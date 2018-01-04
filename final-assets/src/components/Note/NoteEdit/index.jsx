@@ -15,6 +15,7 @@ export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            id:'',
             code:'',
             visible: false,
             content:'',
@@ -29,52 +30,43 @@ export default class App extends React.Component {
             this.setState({
                 code:data && data.code,
                 type:'summary'
-            },this.fatchDefaultByCode);
+            },this.fatchByParams);
         });
 
         this.on('final:note-overall-edit-show', (data) => {
             this.setState({
                 type:'overall'
-            },this.fatchOverall);
+            },this.fatchByParams);
         });
     }
 
 
-    fatchOverall=()=>{
-        const self = this;
-        request('/note/getOverall',
-		(res)=>{
-            
-            self.setState({
-                content:res && res.content,
-                visible:true
-            })
-            
-		},{
-        },'jsonp')
-    }
+    
 
-    fatchDefaultByCode=()=>{
-        const {code} = this.state;
+    fatchByParams=()=>{
+        const {code,type,date} = this.state;
         const self = this;
-        request('/note/getByParam',
+        request('/note/getByParams',
 		(res)=>{
             
             if(res.noteList && res.noteList.length > 0){
                 self.setState({
                     content:res.noteList[0].content,
+                    id:res.noteList[0].id || '',
                     visible:true
                 })
             }else{
                 self.setState({
                     content:'',
+                    id:'',
                     visible:true
                 })
             }
             
 		},{
             code:code,
-            type:'default'
+            type:type,
+            date:date
         },'jsonp')
     }
     
@@ -120,7 +112,7 @@ export default class App extends React.Component {
     }
 
     render() {
-        const {content,code,type,date} = this.state;
+        const {id,content,code,type,date} = this.state;
         const formItemLayout = {
             labelCol: {
               xs: { span: 24 },
@@ -144,28 +136,28 @@ export default class App extends React.Component {
                         {
                             type!='overall' && 
                             <FormItem label="代码"  {...formItemLayout}>
-                                {code}
+                                
+                                <span class="mr20">
+                                    {code}
+                                </span>
+                                <Select style={{width:'150px'}} value={type} disabled={(type=='overall' || id)?true:false}  onChange={this.onTypeChange}>
+                                    {
+                                        Dict.noteType.map(e=>{
+                                            return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                        })
+                                    }
+                                </Select>
+                                {
+                                    type == 'date' && 
+                                    <span className="ml10">
+                                        <DatePicker value={date ? moment(date):moment()} onChange={this.onDateChange} />
+                                    </span>
+                                }
                             </FormItem>
                         }
                         
-                        <FormItem label="类型"  {...formItemLayout}>
-                            <Select style={{width:'150px'}} value={type} disabled={type=='overall'?true:false}  onChange={this.onTypeChange}>
-                                {
-                                    Dict.noteType.map(e=>{
-                                        return <Select.Option value={e.value}>{e.label}</Select.Option>
-                                    })
-                                }
-                            </Select>
-                            {
-                                type == 'date' && 
-                                <span className="ml10">
-                                    <DatePicker value={date ? moment(date):moment()} onChange={this.onDateChange} />
-                                </span>
-                            }
-                            
-                        </FormItem>
                         <FormItem label="内容"  {...formItemLayout}>
-                            <Input.TextArea rows={20} value={content} onChange={this.onInputChange.bind(this,'content')}/>
+                            <Input.TextArea rows={30} value={content} onChange={this.onInputChange.bind(this,'content')}/>
                         </FormItem>
                     </Form>
                 </Modal>

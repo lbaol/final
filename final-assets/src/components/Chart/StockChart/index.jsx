@@ -103,10 +103,10 @@ export default class App extends Component {
 
 
     render() {
-       const {code,chartData,mas} = this.state;
+       const {code,chartData,mas,period} = this.state;
 
         return (
-            <KChart code={code} chartData={chartData} mas={mas} />
+            <KChart code={code} chartData={chartData} mas={mas} notCheckEvent={period=='day'?false:true}/>
         );
     }
 }

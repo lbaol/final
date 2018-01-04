@@ -24,12 +24,16 @@ public class NoteControl {
 	private NoteMapper noteMapper;
 	
 	
-	@RequestMapping("/note/getByParam")
-    Map getByParam(String code,String type) {  
+	@RequestMapping("/note/getByParams")
+    Map getByParams(String code,String type,String date) {  
 		Map map = new HashMap();
 		Map params = new HashMap();
-		params.put("code",code);
-		params.put("type", type);
+		if("overall".equals(type)) {
+			params.put("type", type);
+		}else {
+			params.put("code",code);
+			params.put("type", type);
+		}
 		List<NoteDO> noteList =   noteMapper.getByParams(params);
 		map.put("noteList", noteList);
         return map;  
@@ -57,6 +61,7 @@ public class NoteControl {
 				NoteDO noteDO = new NoteDO();
 				noteDO.setCode(code);
 				noteDO.setContent(content);
+				noteDO.setType(type);
 				noteMapper.insert(noteDO);
 			}
 		}

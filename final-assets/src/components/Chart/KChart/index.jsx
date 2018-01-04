@@ -26,7 +26,7 @@ export default class App extends Component {
             chartData:props.chartData,
             code:props.code,
             eventList:[],
-            noEvent:props.noEvent == true ? true:false,
+            notCheckEvent:props.notCheckEvent == true ? true:false,
             dateMapper: {},
             hasEventChecked:false
         };
@@ -145,8 +145,8 @@ export default class App extends Component {
     }
 
     checkEvents=()=>{
-        let {noEvent} = this.state;
-        if(noEvent == true){
+        let {notCheckEvent} = this.state;
+        if(notCheckEvent == true){
             return;
         }
         
@@ -170,7 +170,7 @@ export default class App extends Component {
                     if(chartData[kData.index-1] && chartData[kData.index]){
                         let before = chartData[kData.index-1];
                         let after = chartData[kData.index];
-                        if((after.close/before.close)>1.07 && (after.open > before.close) && kData.index!=0){
+                        if((after.close/before.close)>1.07 && (after.open > before.close) && kData.index!=0 && kData.index!=1){
                             console.log('找到利润断层：',kData.date,'后一天收盘：',after.close,'前一天收盘：',before.close,'涨幅：',(after.close/before.close-1)*100)
                             if(_.findIndex(eventList,{eventDate:kData.date,type:'fault'})==-1){
                                 eventDateList.push(kData.date);
@@ -182,7 +182,7 @@ export default class App extends Component {
                     if(chartData[kData.index] && chartData[kData.index+1]){
                         let before = chartData[kData.index];
                         let after = chartData[kData.index+1];
-                        if((after.close/before.close)>1.07 && (after.open > before.close) && kData.index!=0){
+                        if((after.close/before.close)>1.07 && (after.open > before.close) && kData.index!=0 && kData.index!=1){
                             console.log('找到利润断层：',kData.date,'后一天收盘：',after.close,'前一天收盘：',before.close,'涨幅：',(after.close/before.close-1)*100)
                             if(_.findIndex(eventList,{eventDate:kData.date,type:'fault'})==-1){
                                 eventDateList.push(kData.date);
@@ -251,7 +251,7 @@ export default class App extends Component {
         let {chartData} = this.state;
         let high = chartData[index].high;
         for(let i = 1;i<=dayCount;i++){
-            if(chartData[index-i].high>high){
+            if(chartData && chartData[index-i] && chartData[index-i].high && high && (chartData[index-i].high > high)){
                 high = chartData[index-i].high;
             }
         }
@@ -260,11 +260,12 @@ export default class App extends Component {
 
     addOrUpdateEventByDateAndType=(date,type)=>{
         let {code} = this.state;
+        const self = this;
         request('/event/addOrUpdateByTypeAndDate',
             (res) => {
 
                 console.log(code,date,'fault','add or update finish!');
-                slef.emit('final:event-list-refresh')
+                self.emit('final:event-list-refresh')
                 
             }, {
                 code:code,

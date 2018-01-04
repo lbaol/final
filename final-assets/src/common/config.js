@@ -1,8 +1,25 @@
 import React from 'react';
 import _ from 'lodash';
 const domain = 'http://127.0.0.1:8080';
-const Env = 'daily' //daily product
+const Env = 'product' //daily product
 const pythonDomain = 'http://127.0.0.1:8001';
+
+
+
+let Config = {
+    defalutMas:{
+        day : [10,20,50,120],
+        week: [10,30,50]
+    },
+    defaultPeriod:{
+        day:450,
+        week:700
+    },
+    indexPeakValley:[{
+        start:'2017-11-29',
+        end:'2018-01-04'
+    }]
+}
 
 const URL = {
     forecast:{
@@ -94,20 +111,7 @@ const Util = {
     }
 }
 
-let Config = {
-    defalutMas:{
-        day : [10,20,50,120],
-        week: [10,30,50]
-    },
-    defaultPeriod:{
-        day:450,
-        week:700
-    },
-    indexPeakValley:[{
-        start:'2017-11-29',
-        end:'2018-01-04'
-    }]
-}
+
 
 
 
