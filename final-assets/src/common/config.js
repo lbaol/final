@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 const domain = 'http://127.0.0.1:8080';
-const Env = 'product' //daily product
+const Env = 'daily' //daily product
 const pythonDomain = 'http://127.0.0.1:8001';
 
 
@@ -18,7 +18,11 @@ let Config = {
     indexPeakValley:[{
         start:'2017-11-29',
         end:'2018-01-04'
-    }]
+    }],
+    alertList:{
+        doInterval:true,
+        intervalTime:10000
+    }
 }
 
 const URL = {
@@ -108,6 +112,19 @@ const Util = {
 
         }
         return null;
+    },
+    renderRise:function(d){
+        if(d && _.isNumber(_.toNumber(d))){
+            let d2 = _.toNumber(d);
+            if(d2>0){
+                return <span style={{color:'red'}}>{d}</span>
+            }else{
+                return <span style={{color:'green'}}>{d}</span>
+            }
+        }
+    },
+    renderRisePercent:function(d){
+        return <span>{Util.renderRise(d)}%</span>
     }
 }
 

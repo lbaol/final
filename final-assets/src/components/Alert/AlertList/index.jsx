@@ -27,8 +27,8 @@ let _maDayCounts = [
     },
 ]
 
-const intervalTime = 10000;
-const isInterval = false;
+const intervalTime = Config.alertList.intervalTime;
+const doInterval = Config.alertList.doInterval;
 
 @FEvents
 export default class App extends Component {
@@ -50,7 +50,7 @@ export default class App extends Component {
     componentDidMount() {
         this.fatctMonitorList();
         this.fatctPositionList();
-        if (isInterval == true) {
+        if (doInterval == true) {
             setInterval(this.getAlertList, 5000)
         } else {
             setTimeout(this.getAlertList, intervalTime)
@@ -80,7 +80,7 @@ export default class App extends Component {
                         this.fatchLastMas(d.code)
                     }
 
-                    if (isInterval == true) {
+                    if (doInterval == true) {
                         setInterval(() => {
                             self.getLastQuote(self.checkAlert)
                         }, intervalTime)
@@ -148,6 +148,7 @@ export default class App extends Component {
                 for (let k in res) {
                     quoteMapper[k.substring(2)] = res[k]
                 }
+                console.log(quoteMapper)
 
                 if (callback) {
                     self.setState({
@@ -365,6 +366,8 @@ export default class App extends Component {
     }
 
 
+
+
     render() {
         const { stockDataSource, alertDataSource, positionDataSource, quoteMapper } = this.state;
         const { stockDict } = this.props;
@@ -442,10 +445,8 @@ export default class App extends Component {
                                 dataIndex: 'rise',
                                 key: 'rise',
                                 render: (text, record, index) => {
-
-                                    return (<div>
-                                        {record.curPrice && record.preClose && _.round((record.curPrice / record.preClose - 1) * 100, 2)}%
-                                </div>)
+                                    let d = record.curPrice && record.preClose && _.round((record.curPrice / record.preClose - 1) * 100, 2);
+                                    return Util.renderRisePercent(d);
                                 }
                             },
                             {
@@ -564,6 +565,15 @@ export default class App extends Component {
                                     title: '数量',
                                     dataIndex: 'number',
                                     key: 'number'
+                                },{
+                                    title: '当日涨幅',
+                                    dataIndex: 'number',
+                                    key: 'risePercent',
+                                    render: (text, record, index) => {
+                                        let marketValue;
+                                        let quote = quoteMapper[record.code];
+                                        return Util.renderRisePercent(quote && quote.percentage) 
+                                    }
                                 },
                                 {
                                     title: '市值',
