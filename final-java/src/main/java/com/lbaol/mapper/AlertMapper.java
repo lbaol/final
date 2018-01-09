@@ -50,6 +50,12 @@ public interface AlertMapper {
                 if(params.get("count")!=null){      
                     WHERE("count = #{count}");      
                 }
+                if(params.get("time")!=null){      
+                    WHERE("time = #{time}");      
+                }
+                if(params.get("timePrice")!=null){      
+                    WHERE("time_price = #{timePrice}");      
+                }
                 if(params.get("date")!=null){      
                     WHERE("date = #{date}");      
                 }

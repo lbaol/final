@@ -148,7 +148,7 @@ export default class App extends Component {
                 for (let k in res) {
                     quoteMapper[k.substring(2)] = res[k]
                 }
-                console.log(quoteMapper)
+                // console.log(quoteMapper)
 
                 if (callback) {
                     self.setState({
@@ -225,7 +225,7 @@ export default class App extends Component {
         const m = moment();
         request('/alert/addOrUpdate',
             (res) => {
-                console.log(res, code, type, count, alertPrice, timePrice, time)
+                // console.log(res, code, type, count, alertPrice, timePrice, time)
             }, {
                 code: code,
                 type: type,

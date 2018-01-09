@@ -44,7 +44,7 @@ public class AlertControl {
 		params2.put("type", type);
 		params2.put("count", count);
 		params2.put("time", time);
-		params2.put("time_price", timePrice);
+		params2.put("timePrice", timePrice);
 		List<AlertDO> monitorList2 = alertMapper.getByParams(params2);
 		
 		if(monitorList2.size()<1) {
