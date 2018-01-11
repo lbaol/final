@@ -29,16 +29,17 @@ export default class App extends Component {
         
 
         this.on('final:base-info-refresh', (data) => {
-            this.emitRefresh(data)
+            if(data && data.code){
+                this.setState({
+                    code:data.code
+                },this.fatchBaseInfo)
+            }else{
+                this.fatchBaseInfo()
+            }
+            
         });
     }
 
-    emitRefresh=(data)=>{
-        const {code} = this.state;
-        this.setState({
-            code:data && data.code?data.code:code
-        },this.fatchBaseInfo)
-    }
 
 
     fatchBaseInfo=()=>{

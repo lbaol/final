@@ -11,6 +11,8 @@ import { request } from "common/ajax.js";
 import { LocaleProvider  } from 'antd';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import urlParse from "url-parse";
+import { Config } from "common/config.js";
+
 import 'common/base.scss';
 import './index.scss';
 
@@ -29,8 +31,36 @@ export default class App extends Component {
     componentDidMount() {
         
         this.fatchAllStock();
-        this.emit('final:show-the-stock',{code:urlQuery.code})
+        this.init();
+
+        this.on('final:show-the-stock', (data) => {
+            if(!data || !data.code){
+                return;
+            }
+            this.setState({
+                code: data.code
+            },()=>{
+                this.refreshAllComponent(data)
+            })
+        });
         
+    }
+
+    
+
+    init=()=>{
+        let data = {
+            code:urlQuery.code?urlQuery.code:'002008',
+            startDate:Config.defaultChart.startDate,
+            endDate:Config.defaultChart.endDate 
+        }
+        this.refreshAllComponent(data)
+    }
+
+    refreshAllComponent = (data) => {
+        this.emit('final:base-info-refresh', data);
+        this.emit('final:stock-chart-refresh', data);
+        this.emit('final:event-list-refresh', data);
     }
 
     fatchAllStock=()=>{
@@ -57,7 +87,7 @@ export default class App extends Component {
             
                 <div className={"page-wrap "+"page-wrap-"+Env}>
                     <div className="main-content">
-                        <FilterSetting/>
+                        {/* <FilterSetting/> */}
                         <StockChart />
                     </div>
                     <div  className="right-content">

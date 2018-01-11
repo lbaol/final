@@ -244,9 +244,8 @@ export default class App extends Component {
 
         if (code) {
             let newPeriod = type ? type : 'day';
-            let m = newPeriod == 'week' ? Config.defaultPeriod.week : Config.defaultPeriod.day;
             let newCode = Util.getFullCode(code);
-            let newStartDate = moment().subtract(m, 'day');
+            let newStartDate = moment().subtract(300, 'day');
             let newEndDate = moment()
 
             request('https://xueqiu.com/stock/forchartk/stocklist.json?type=before',

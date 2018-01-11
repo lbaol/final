@@ -24,7 +24,7 @@ export default class App extends Component {
         super(props);
         this.state = {
             code: '',
-            period: 'day',
+            period: props.period?props.period:'day',
             startDate: '',
             endDate: '',
             chartData: {},
@@ -34,6 +34,10 @@ export default class App extends Component {
     }
 
     componentWillMount() {
+        let {period} = this.state;
+        this.setState({
+            mas:Config.defalutMas[period]
+        })
     }
 
     componentDidMount() {
@@ -106,7 +110,7 @@ export default class App extends Component {
        const {code,chartData,mas,period} = this.state;
 
         return (
-            <KChart code={code} chartData={chartData} mas={mas} notCheckEvent={period=='day'?false:true}/>
+            <KChart code={code} needCheckEvent={true} chartData={chartData} mas={mas} />
         );
     }
 }

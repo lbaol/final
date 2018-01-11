@@ -8,9 +8,6 @@ import { request } from "common/ajax.js";
 import { URL, Util,Config } from "common/config.js";
 
 
-const _defaultDayMa = Config.defalutMas.day;
-const _defaultWeekMa = Config.defalutMas.week;
-
 
 @FEvents
 export default class App extends Component {
@@ -18,7 +15,7 @@ export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            code: '002008',
+            code: '',
             period: 'day',
             startDate: '',
             endDate:'',
@@ -35,23 +32,13 @@ export default class App extends Component {
     }
 
     componentWillMount() {
-        let { period } = this.state;
-        let m = period == 'day' ? Config.defaultPeriod.day : Config.defaultPeriod.week;
-        this.setState({
-            startDate: moment().subtract(m, 'day').format('YYYY-MM-DD'),
-            endDate: moment().format('YYYY-MM-DD'),
-            mas: period=='day'?_defaultDayMa:_defaultWeekMa            
-        })
+        
     }
 
     componentDidMount() {
 
 
-        this.on('final:show-the-stock', (data) => {
-            this.setState({
-                code:data && data.code || this.state.code
-            },this.refreshAllComponent)
-        });
+        
     }
 
 
@@ -67,7 +54,7 @@ export default class App extends Component {
             startDate: moment().subtract(m, 'day').format('YYYY-MM-DD'),
             endDate: moment().format('YYYY-MM-DD'),
             period:value,
-            mas:(value=='day'?_defaultDayMa:_defaultWeekMa)
+            mas:(value=='day'?Config.defalutMas.day:Config.defalutMas.week)
         },this.refreshAllComponent)
     }
 
@@ -84,12 +71,7 @@ export default class App extends Component {
         this.refreshAllComponent();
     }
 
-    refreshAllComponent = () => {
-        let data = this.state;
-        this.emit('final:base-info-refresh', data);
-        this.emit('final:stock-chart-refresh', data);
-        this.emit('final:event-list-refresh', data);
-    }
+    
 
 
     fieldChange = (name, value) => {

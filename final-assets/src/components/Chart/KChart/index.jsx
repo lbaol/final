@@ -26,7 +26,7 @@ export default class App extends Component {
             chartData:props.chartData,
             code:props.code,
             eventList:[],
-            notCheckEvent:props.notCheckEvent == true ? true:false,
+            needCheckEvent:props.needCheckEvent == true ? true:false,
             dateMapper: {},
             hasEventChecked:false
         };
@@ -145,8 +145,8 @@ export default class App extends Component {
     }
 
     checkEvents=()=>{
-        let {notCheckEvent} = this.state;
-        if(notCheckEvent == true){
+        let {needCheckEvent} = this.state;
+        if(needCheckEvent == false){
             return;
         }
         
@@ -420,12 +420,18 @@ export default class App extends Component {
 
         // create the chart
         Highcharts.stockChart('main-chart-container', {
-
+            scrollbar: {
+                enabled: false
+            },
+            navigator:{
+                enabled: false
+            },
             rangeSelector: {
-                selected: 2,
+                selected: 1,
                 inputEnabled: false,
                 buttons: [{ type: "ytd", text: "YTD" },
-                { type: "year", count: 1, text: "年" }, 
+                { type: "year", count: 1, text: "1y" }, 
+                { type: "year", count: 2, text: "2y" },
                 { type: 'all', text: 'All'}]
             },
 
@@ -459,7 +465,7 @@ export default class App extends Component {
                 title: {
                     text: 'OHLC'
                 },
-                height: '70%',
+                height: '84%',
                 lineWidth: 1,
                 crosshair: {
                     snap: false
@@ -467,7 +473,8 @@ export default class App extends Component {
                 resize: {
                     enabled: true
                 }
-            }, {
+            },
+            {
                 labels: {
                     align: 'right',
                     x: -3
@@ -475,14 +482,12 @@ export default class App extends Component {
                 title: {
                     text: 'Volume'
                 },
-                top: '75%',
-                height: '25%',
+                top: '85%',
+                height: '15%',
                 offset: 0,
                 lineWidth: 1
-            }],
-            scrollbar: {
-
-            },
+            }
+            ],
             series: initSeries
         });
     }

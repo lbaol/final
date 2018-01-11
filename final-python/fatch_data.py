@@ -25,6 +25,6 @@ def fatchStockBasics():
         con.execute('delete from stock_temp')
     df.to_sql('stock_temp',engine,if_exists='append')
 
-#fatchForecastData(year,quarter)
+fatchForecastData(year,quarter)
 #fatchReportData(year,quarter)
 

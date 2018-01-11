@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
+import moment from 'moment';
 const domain = 'http://127.0.0.1:8080';
 const Env = 'daily' //daily product
 const pythonDomain = 'http://127.0.0.1:8001';
@@ -8,20 +9,24 @@ const pythonDomain = 'http://127.0.0.1:8001';
 
 let Config = {
     defalutMas:{
-        day : [10,20,50,120],
+        day : [10,20,50,120,250],
         week: [10,30,50]
     },
     defaultPeriod:{
-        day:450,
-        week:700
+        day:1000,
+        week:1000
     },
     indexPeakValley:[{
         start:'2017-11-29',
-        end:'2018-01-04'
+        end:'2018-01-11'
     }],
     alertList:{
         doInterval:true,
         intervalTime:10000
+    },
+    defaultChart:{
+        startDate:moment().subtract(1000, 'day').format('YYYY-MM-DD'),
+        endDate: moment().format('YYYY-MM-DD')
     }
 }
 
@@ -145,7 +150,7 @@ if(Env=='daily'){
         upColor:'#a2d2ff',
         downColor:'#f5f5f5',
         width:'100%',
-        height:'600px'
+        height:'400px'
     }
 }
 
