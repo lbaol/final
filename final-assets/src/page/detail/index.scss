@@ -1,16 +1,9 @@
 
-.page-wrap {
+
+
+.page-content {
   display: flex;
 }
-
-.page-wrap-product {
-  opacity: 1;
-}
-
-.page-wrap-daily {
-  opacity: 0.1
-}
-
 
 .left-nav{
   display: inline-block;
@@ -25,8 +18,27 @@
 }
 
 .right-content {
-  padding-top: 10px;
-  min-width: 340px;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.normal {
+  width: 340px;
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
+.right-content-switch {
+  position: fixed;
+  right: 0;
+  top:0;
+}
+
+.chart-wrap {
+  width: 50%;
   display: inline-block;
 }
 

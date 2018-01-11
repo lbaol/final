@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import FEvents from "components/Common/FEvent/index.js";
-import EventList from "components/Event/EventList/index.jsx";
 import FavEdit from "components/Fav/FavEdit/index.jsx";
 import NoteEdit from "components/Note/NoteEdit/index.jsx";
-import DataSetting from "components/Data/Setting/index.jsx";
 import { Icon} from 'antd';
 import { request } from "common/ajax.js";
 import { Dict,Util } from "common/config.js";
@@ -19,7 +17,7 @@ export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            code:'',
+            code:props.code,
             baseInfo:{},
             selectedFav:[]
          };
@@ -28,16 +26,16 @@ export default class App extends Component {
     componentDidMount() {
         
 
-        this.on('final:base-info-refresh', (data) => {
-            if(data && data.code){
-                this.setState({
-                    code:data.code
-                },this.fatchBaseInfo)
-            }else{
-                this.fatchBaseInfo()
-            }
-            
-        });
+        this.fatchBaseInfo()
+    }
+
+    componentWillReceiveProps(nextProps) {
+        
+        if (nextProps.hasOwnProperty('code') && !_.isEqual(this.state.code, nextProps.code)) {
+            this.setState({
+                code: nextProps.code
+            }, this.fatchBaseInfo)
+        }
     }
 
 
@@ -83,15 +81,9 @@ export default class App extends Component {
         })
     }
 
-    onEditOverallNoteClick=()=>{
-        this.emit('final:note-overall-edit-show')
-    }
+    
 
 
-    onDataSettingClick=()=>{
-        const {code} = this.state;
-        this.emit('final:data-setting-show')
-    }
     
 
     render() {
@@ -116,27 +108,18 @@ export default class App extends Component {
                     <span className="ml5">
                         {Util.getDongCaiStockLink(basic.code)}
                     </span>
-                    <div className="f-r">
-                        <span className="ml10">
-                            <Icon className="c-p" type="file-text" onClick={this.onEditOverallNoteClick} />
-                        </span>
-                        <span className="ml10">
-                            <Icon className="c-p" type="setting" onClick={this.onDataSettingClick} />
-                        </span>
-                    </div>
-                     
-                </div>
-                <div>
+                    <span  className="ml20">
                     {
                         selectedFav && selectedFav.map((d)=>{
                             return <span className="mr10">{Dict.favTypeMapper[d.type]}</span>
                         })
                     }
+                    </span>
                 </div>
-                <EventList/>
+                
                 <FavEdit/>
                 <NoteEdit/>
-                <DataSetting/>
+                
             </div>
         );
     }

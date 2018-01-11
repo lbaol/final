@@ -30,6 +30,7 @@ export default class App extends Component {
             dateMapper: {},
             hasEventChecked:false
         };
+        this._id = 'chart'+Math.random();
     }
 
     componentWillMount() {
@@ -277,7 +278,7 @@ export default class App extends Component {
 
 
     renderChart = () => {
-
+        let {defaultRangeSelector} =this.props;
 
         let { chartData, code, mas,dateMapper,eventList } = this.state;
         let ohlc = [];
@@ -419,7 +420,7 @@ export default class App extends Component {
         
 
         // create the chart
-        Highcharts.stockChart('main-chart-container', {
+        Highcharts.stockChart(this._id, {
             scrollbar: {
                 enabled: false
             },
@@ -427,7 +428,7 @@ export default class App extends Component {
                 enabled: false
             },
             rangeSelector: {
-                selected: 1,
+                selected: _.isNumber(defaultRangeSelector)?defaultRangeSelector:1,
                 inputEnabled: false,
                 buttons: [{ type: "ytd", text: "YTD" },
                 { type: "year", count: 1, text: "1y" }, 
@@ -498,7 +499,7 @@ export default class App extends Component {
 
         return (
             <div className={'s-chart-wrap'} >
-                <div className="mt10" id="main-chart-container" style={{ width: Config.chart.width, minHeight: Config.chart.height }}>
+                <div className="mt10" id={this._id} style={{ width: Config.chart.width, minHeight: Config.chart.height }}>
                 </div>
             </div>
         );

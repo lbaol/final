@@ -23,54 +23,47 @@ export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            code: '',
+            code: props.code?props.code:'',
             period: props.period?props.period:'day',
             startDate: '',
             endDate: '',
             chartData: {},
             dateMapper: {},
-            mas: []
+            mas: [],
+            type:props.type?props.type:'stock' //stock,index
         };
     }
 
     componentWillMount() {
         let {period} = this.state;
         this.setState({
-            mas:Config.defalutMas[period]
+            mas:Config.defalutMas[period],
+            startDate:Config.defaultChart.startDate,
+            endDate:Config.defaultChart.endDate
         })
     }
 
     componentDidMount() {
-
-        this.on('final:stock-chart-refresh', (data) => {
-            this.emitRefresh(data)
-        });
+        this.fatchChartData();
     }
 
-    emitRefresh = (data) => {
-        const { code, period, startDate, endDate, mas } = this.state;
-        if(data){
-            this.setState({
-                ...this.state,
-                ...data,
-                code:data.code?data.code:this.state.code
-            }, this.fatchChartData)
-        }else{
-            this.fatchChartData()
-        }
+
+    componentWillReceiveProps(nextProps) {
         
+        if (nextProps.hasOwnProperty('code') && !_.isEqual(this.state.code, nextProps.code)) {
+            this.setState({
+                code: nextProps.code
+            }, this.fatchChartData)
+        }
     }
-
-
-
 
    
 
     fatchChartData() {
         const self = this;
-        const { code, period, startDate, endDate } = this.state;
+        const { code, period, startDate, endDate,type } = this.state;
         if (code) {
-            let newCode = Util.getFullCode(code);
+            let newCode = (type=='stock'? Util.getFullCode(code):code);
             let newStartDate = moment(startDate);
             let newEndDate = moment(endDate)
 
@@ -85,10 +78,6 @@ export default class App extends Component {
                     self.setState({
                         chartData: chartList
                     })
-
-
-
-
 
                 }, {
                     symbol: newCode,
@@ -108,9 +97,10 @@ export default class App extends Component {
 
     render() {
        const {code,chartData,mas,period} = this.state;
+       const {needCheckEvent,defaultRangeSelector} = this.props;
 
         return (
-            <KChart code={code} needCheckEvent={true} chartData={chartData} mas={mas} />
+            <KChart code={code} needCheckEvent={needCheckEvent} chartData={chartData} mas={mas} defaultRangeSelector={defaultRangeSelector} />
         );
     }
 }

@@ -17,7 +17,7 @@ export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-           code:'',
+           code:props.code,
            eventList:[],
            type:''
         };
@@ -28,22 +28,19 @@ export default class App extends Component {
 
     componentDidMount() {
 
-        this.on('final:event-edit-finish', (data) => {
-            this.emitRefresh(data)
+        this.on('final:event-edit-finish', () => {
+            this.emitRefresh()
         });
 
-        this.on('final:event-list-refresh', (data) => {
-            this.emitRefresh(data)
+        this.on('final:event-list-refresh', () => {
+            this.emitRefresh()
         });
 
-        
+        this.fatchEventList();
     }
 
-    emitRefresh=(data)=>{
-        const {code} = this.state;
-        this.setState({
-            code:data && data.code?data.code:code
-        },this.fatchEventList)
+    emitRefresh=()=>{
+        this.fatchEventList
     }
 
     fatchEventList=()=>{

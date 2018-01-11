@@ -33,8 +33,9 @@ export default class App extends Component {
                 <List
                     bordered
                     >
-                    <List.Item><a href="/detail.html">详情</a></List.Item>
-                    <List.Item><a href="/alert.html">alert</a></List.Item>
+                    <List.Item><a target="_blank" href="/detail.html">详情</a></List.Item>
+                    <List.Item><a target="_blank" href="/alert.html">alert</a></List.Item>
+                    <List.Item><a target="_blank" href="/setting.html">设置</a></List.Item>
                 </List>
                 </div>
             </LocaleProvider>
