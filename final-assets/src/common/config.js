@@ -1,9 +1,11 @@
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-const domain = 'http://127.0.0.1:8080';
+import { request } from "common/ajax.js";
+
+
 const Env = 'daily' //daily product
-const pythonDomain = 'http://127.0.0.1:8001';
+
 
 
 
@@ -30,25 +32,9 @@ let Config = {
     }
 }
 
-const URL = {
-    forecast:{
-        getAll:'/forecast/getAll'
-    },
-    report:{
-        getAll:'/report/getAll'
-    }
-}
+
 
 const Util = {
-    getUrl:function(path){
-      if (path.startsWith("http"))
-        return path;
-
-        if(path.indexOf('/python/') >=0){
-            return pythonDomain + path;
-        }
-      return domain + path;
-    },
     getFullCode:function(code){
         let newCode = code;
         if (_.startsWith(code, '6')) {
@@ -113,8 +99,6 @@ const Util = {
                     price: cha.high //取最高价
                 }
             }
-
-
         }
         return null;
     },
@@ -205,10 +189,22 @@ for(let key in Dict){
     }
 }
 
-const Domain = {
-    domain:domain,
-    python:pythonDomain
+
+function fatchStockDict(){
+    request('/stock/getAll',
+    (res)=>{
+        console.log('fatchStockDict',res)
+        let stockDict = {}
+        for(let st of res){
+            stockDict[st.code] = st
+        }
+        Dict.stockDict = stockDict;
+    },{
+    },'json',null,false)
 }
+
+fatchStockDict();
+
 
 export {
     URL,Util,Config,Env,Dict

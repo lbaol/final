@@ -21,7 +21,8 @@ export default class App extends Component {
         this.state = {
             favList: [],
             type:'prepare',
-            typeDS:Dict.favType
+            typeDS:Dict.favType,
+            selectedRowKeys:[]
         };
     }
 
@@ -45,7 +46,7 @@ export default class App extends Component {
 
 
     onStockItemClick=(code)=>{
-        this.emit('final:show-the-stock',{
+        this.emit('final:detail-show-stocks',{
             code:code
         })
     }
@@ -89,13 +90,36 @@ export default class App extends Component {
           })
     }
 
+    onSelectNoneClick=()=>{
+        this.setState({
+            selectedRowKeys:[]
+        })
+    }
+
+    onShowSelectedClick=()=>{
+        const {selectedRowKeys} = this.state; 
+        if(selectedRowKeys.length<=0){
+            return;
+        }
+        this.emit('final:detail-show-stocks',{
+            codes:selectedRowKeys
+        })
+    }
+
     render() {
-        const {favList, type,typeDS } = this.state;
+        const {favList, type,typeDS ,selectedRowKeys} = this.state;
         const {stockDict} = this.props;
         const pagination = {
             total:favList.length,
             pageSize:100
         }
+        const rowSelection = {
+            selectedRowKeys:selectedRowKeys,
+            onChange: (selectedRowKeys, selectedRows) => {
+                console.log('selectedRowKeys changed: ', selectedRowKeys);
+                this.setState({ selectedRowKeys });
+            }
+          };
         return (
             <div>
                 <div>
@@ -112,6 +136,12 @@ export default class App extends Component {
                     <span className="ml10">
                         <Icon type="delete" className="c-p" onClick={this.onDeleteFavByTypeClick} />
                     </span>
+                    <span className="ml10">
+                        <Icon type="minus-square-o" title="清除所选"  className="c-p" onClick={this.onSelectNoneClick} />
+                    </span>
+                    <span className="ml10">
+                        <Icon type="right-circle-o" title="展示所选" className="c-p" onClick={this.onShowSelectedClick} />
+                    </span>
                     <FavImport/>
                 </div>
                 <div className="mt10">
@@ -119,6 +149,8 @@ export default class App extends Component {
                         pagination={pagination}
                         dataSource={favList}
                         scroll={{ x: true, y: 300 }}
+                        rowSelection={rowSelection}
+                        rowKey={'code'}
                         columns={[{
                             title: '名称',
                             dataIndex: 'name',
@@ -141,7 +173,6 @@ export default class App extends Component {
                             dataIndex: 'action',
                             key:'action',
                             render: (text, record) => {
-                                
                                 return (<div>
                                     <Icon type="delete" className="c-p" onClick={this.onDeleteFavByIdClick.bind(this,record.id)} />
                                     <span className="ml5">

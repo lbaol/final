@@ -4,7 +4,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import { Button, Select,Icon, Input,Checkbox, DatePicker, Tabs, Table, Pagination, Radio, Form } from 'antd';
 import FEvents from "components/Common/FEvent/index.js";
-import { request } from "common/ajax.js";
+
 import { URL, Util,Config } from "common/config.js";
 
 

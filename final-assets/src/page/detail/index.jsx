@@ -6,11 +6,12 @@ import MainChart from "components/Chart/MainChart/index.jsx";
 import StockChart from "components/Chart/StockChart/index.jsx";
 import BaseInfo from "components/BaseInfo/index.jsx";
 import FilterSetting from "components/Filter/FilterSetting/index.jsx";
+import SliderLeft from "components/Common/SliderLeft/index.jsx";
 import SliderRight from "components/Common/SliderRight/index.jsx";
 import EventList from "components/Event/EventList/index.jsx";
 import {Env} from "common/config.js";
 import { request } from "common/ajax.js";
-import { LocaleProvider,Icon  } from 'antd';
+import { LocaleProvider,Icon,Affix,Button  } from 'antd';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import urlParse from "url-parse";
 import { Config } from "common/config.js";
@@ -27,9 +28,7 @@ export default class App extends Component {
         super(props);
         this.state = {
             stockDict:{},
-            visibleRight:false,
-            code:urlQuery.code?urlQuery.code:'002008',
-            codes:urlQuery.codes?urlQuery.codes:['002008']
+            codes:urlQuery.codes?urlQuery.codes:['603338']
         };
     }
 
@@ -37,24 +36,26 @@ export default class App extends Component {
         
         this.fatchAllStock();
 
-        this.on('final:show-the-stock', (data) => {
-            this.refresh(data)
+        this.on('final:detail-show-stocks', (data) => {
+            if(!data || (!data.code && !data.codes)){
+                return;
+            }
+            let codes = [];
+            if(data.code){
+                codes.push(data.code)
+            }
+            if(data.codes){
+                codes = data.codes;
+            }
+            this.setState({
+                codes: codes
+            })
         });
 
-        this.on('final:stock-chart-refresh', (data) => {
-            this.refresh(data)
-        });
-        
+
+       
     }
 
-    refresh=(data)=>{
-        if(!data || !data.code){
-            return;
-        }
-        this.setState({
-            codes: [].push(data.code)
-        })
-    }
 
     
 
@@ -93,7 +94,7 @@ export default class App extends Component {
                     <div  className="page-content">
                         <div className="main-content">
                             {/* <FilterSetting/> */}
-                            {/* <div>
+                            {/* <div className="chart-wrap">
                                 <StockChart type="index" code="SH000016" />
                             </div> */}
                             {
@@ -116,10 +117,6 @@ export default class App extends Component {
                             
                             
                         </div>
-                        <div  className={'right-content '+(visibleRight==true?'normal':'hidden')}>
-                            
-                            
-                        </div>
                     </div>
                     <SliderRight>
                         {
@@ -128,8 +125,11 @@ export default class App extends Component {
                             })
                         }
                         
-                        <ListFilter stockDict={this.state.stockDict}/>
+                        
                     </SliderRight>
+                    <SliderLeft>
+                        <ListFilter stockDict={this.state.stockDict}/>
+                    </SliderLeft>
                 </div>
             </LocaleProvider>
             

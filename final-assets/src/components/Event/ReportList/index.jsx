@@ -86,7 +86,7 @@ export default class App extends Component {
 
 
     onStockItemClick=(code)=>{
-        this.emit('final:show-the-stock',{
+        this.emit('final:detail-show-stocks',{
             code:code
         })
     }

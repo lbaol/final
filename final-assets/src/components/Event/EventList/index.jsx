@@ -40,7 +40,15 @@ export default class App extends Component {
     }
 
     emitRefresh=()=>{
-        this.fatchEventList
+        this.fatchEventList()
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.hasOwnProperty('code') && !_.isEqual(this.state.code, nextProps.code)) {
+            this.setState({
+                code: nextProps.code
+            }, this.fatchEventList)
+        }
     }
 
     fatchEventList=()=>{
@@ -77,6 +85,7 @@ export default class App extends Component {
 
     onDeleteEventClick=(id)=>{
         const self = this;
+        const {code} = this.state;
         Modal.confirm({
             title: '确定不是手抖点的删除  ?',
             content: '',
@@ -84,6 +93,7 @@ export default class App extends Component {
                 request('/event/deleteById',
                     (res)=>{
                         self.fatchEventList()
+                        self.emit('final:stock-chart-refresh',{code:code})
                     },{
                         id:id
                     },'jsonp')
@@ -94,12 +104,12 @@ export default class App extends Component {
 
     render() {
         const {eventList,code,type} = this.state;
-        
-        
+        const name = Dict.stockDict[code].name + ' ' + code;
+        console.log('render 信号'+' - '+name)
 
         return (
             <div className="event-block">
-                <Card title="信号" bordered={false}  extra={<EventEditMin code={code}/>} >
+                <Card title={'信号'+' - '+name} bordered={false}  extra={<EventEditMin code={code}/>} >
                     <Radio.Group  value={type} onChange={this.onTypeChange}  size="small">
                         <Radio.Button value="">全部</Radio.Button>
                         {

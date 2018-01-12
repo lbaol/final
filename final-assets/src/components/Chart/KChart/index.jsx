@@ -147,15 +147,15 @@ export default class App extends Component {
 
     checkEvents=()=>{
         let {needCheckEvent} = this.state;
-        if(needCheckEvent == false){
-            return;
+        if(needCheckEvent == true){
+            this.checkFaultEvents()
+            this.checkLeadNewHighEvents();
+            this.setState({
+                hasEventChecked:true
+            },this.fatchEventList)
         }
         
-        this.checkFaultEvents()
-        this.checkLeadNewHighEvents();
-        this.setState({
-            hasEventChecked:true
-        },this.fatchEventList)
+        
         
         
     }
@@ -239,7 +239,6 @@ export default class App extends Component {
                 for(let date of eventDateList){
                     this.addOrUpdateEventByDateAndType(date,'leadNewHigh');
                 }
-                
             }
         }
         

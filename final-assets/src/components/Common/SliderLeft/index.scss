@@ -1,0 +1,29 @@
+.slider-left {
+    padding: 0;
+    z-index: 1040;
+    position: fixed;
+    overflow: visible;
+    top: 0;
+    left: -540px;
+    width: 540px;
+    height: 100%;
+    transition: left .3s;
+
+    .slider-left-close {
+        position: absolute;
+        right: -10px;
+        top:50%;
+        button {
+            padding: 0;
+            height: 50px;
+            width: 14px;
+        }
+    }
+}
+
+.slider-left.show {
+    left: 0;
+}
+
+
+

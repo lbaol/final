@@ -45,11 +45,17 @@ export default class App extends Component {
 
     componentDidMount() {
         this.fatchChartData();
+
+        this.on('final:stock-chart-refresh',(data)=>{
+            if(data && data.code && data.code == this.state.code){
+                this.fatchChartData();
+            }
+            
+        })
     }
 
 
     componentWillReceiveProps(nextProps) {
-        
         if (nextProps.hasOwnProperty('code') && !_.isEqual(this.state.code, nextProps.code)) {
             this.setState({
                 code: nextProps.code
