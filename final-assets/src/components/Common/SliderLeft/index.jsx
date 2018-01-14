@@ -41,7 +41,9 @@ export default class App extends Component {
                 <span className="slider-left-close">
                     <Button onClick={this.onSliderButtonClick} type="primary">{visible==true?'<':'>'}</Button>
                 </span>
-                {this.props.children}
+                <div  className="slider-left-content">
+                    {this.props.children}
+                </div>
             </div>
         );
     }

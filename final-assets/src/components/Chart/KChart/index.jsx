@@ -171,7 +171,7 @@ export default class App extends Component {
                     if(chartData[kData.index-1] && chartData[kData.index]){
                         let before = chartData[kData.index-1];
                         let after = chartData[kData.index];
-                        if((after.close/before.close)>1.07 && (after.open > before.close) && kData.index!=0 && kData.index!=1){
+                        if((after.close/before.close)>1.07 && (after.open > before.close) && kData.index>=20 ){
                             console.log('找到利润断层：',kData.date,'后一天收盘：',after.close,'前一天收盘：',before.close,'涨幅：',(after.close/before.close-1)*100)
                             if(_.findIndex(eventList,{eventDate:kData.date,type:'fault'})==-1){
                                 eventDateList.push(kData.date);
@@ -183,7 +183,7 @@ export default class App extends Component {
                     if(chartData[kData.index] && chartData[kData.index+1]){
                         let before = chartData[kData.index];
                         let after = chartData[kData.index+1];
-                        if((after.close/before.close)>1.07 && (after.open > before.close) && kData.index!=0 && kData.index!=1){
+                        if((after.close/before.close)>1.07 && (after.open > before.close) && kData.index>=20){
                             console.log('找到利润断层：',kData.date,'后一天收盘：',after.close,'前一天收盘：',before.close,'涨幅：',(after.close/before.close-1)*100)
                             if(_.findIndex(eventList,{eventDate:kData.date,type:'fault'})==-1){
                                 eventDateList.push(kData.date);

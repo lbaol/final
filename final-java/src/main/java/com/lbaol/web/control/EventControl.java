@@ -65,7 +65,7 @@ public class EventControl {
     }
 	
 	@RequestMapping("/event/getByParams")
-    Map getByParams(String code,String type) {  
+    Map getByParams(String code,String type,String startDate) {  
 		Map map = new HashMap();
 		Map params = new HashMap();
 		if(StringUtils.isNotEmpty(code)) {
@@ -73,6 +73,9 @@ public class EventControl {
 		}
 		if(StringUtils.isNotEmpty(type)) {
 			params.put("type", type);
+		}
+		if(StringUtils.isNotEmpty(startDate)) {
+			params.put("startDate", startDate);
 		}
 		List<EventDO> eventList = eventMapper.getByParams(params);
 		map.put("eventList",eventList);

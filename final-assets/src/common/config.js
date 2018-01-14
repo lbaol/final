@@ -4,7 +4,7 @@ import moment from 'moment';
 import { request } from "common/ajax.js";
 
 
-const Env = 'daily' //daily product
+const Env = 'product' //daily product
 
 
 
@@ -20,10 +20,10 @@ let Config = {
     },
     indexPeakValley:[{
         start:'2017-11-29',
-        end:'2018-01-11'
+        end:'2018-01-12'
     }],
     alertList:{
-        doInterval:true,
+        doInterval:false,
         intervalTime:10000
     },
     defaultChart:{
@@ -145,10 +145,10 @@ let Dict = {
         { label: '关注', value: 'follow' },
         { label: '备选池', value: 'prepare' },
         { label: '持仓', value: 'position' },
-        { label: '杯柄', value: 'handle' },
-        { label: '断层', value: 'fault' },
-        { label: '领先新高', value: 'leadNewHigh' },
-        { label: '默认', value: 'default' },
+        // { label: '杯柄', value: 'handle' },
+        // { label: '断层', value: 'fault' },
+        // { label: '领先新高', value: 'leadNewHigh' },
+        // { label: '默认', value: 'default' },
         { label: '临时', value: 'temp' },
         { label: '监控', value: 'monitor' },
         { label: '金股18', value: 'gold18' }
@@ -156,7 +156,8 @@ let Dict = {
     eventType: [
         { label: '断层', value: 'fault' },
         { label: '杯柄', value: 'handle' },
-        { label: '领先新高', value: 'leadNewHigh' }
+        { label: '领先新高', value: 'leadNewHigh' },
+        { label: '突破', value: 'breakThrough' }
     ],
     noteType: [
         { label: '概要', value: 'summary' },

@@ -1,24 +1,29 @@
 .slider-left {
     background-color: #fff;
     height: 100%;
-    padding: 0;
+    padding-right: 10px;
     z-index: 1040;
     position: fixed;
-    overflow: visible;
     top: 0;
-    left: -540px;
+    left: -530px;
     width: 540px;
     height: 100%;
     transition: left .3s;
 
+    .slider-left-content{
+        height: 100%;
+        overflow: auto;
+    }
+
     .slider-left-close {
+        z-index:100;
         position: absolute;
-        right: -10px;
+        right: 0;
         top:50%;
         button {
             padding: 0;
             height: 50px;
-            width: 14px;
+            width: 10px;
         }
     }
 }

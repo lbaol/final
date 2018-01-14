@@ -9,6 +9,7 @@ import FilterSetting from "components/Filter/FilterSetting/index.jsx";
 import SliderLeft from "components/Common/SliderLeft/index.jsx";
 import SliderRight from "components/Common/SliderRight/index.jsx";
 import EventList from "components/Event/EventList/index.jsx";
+import FavEdit from "components/Fav/FavEdit/index.jsx";
 import {Env} from "common/config.js";
 import { request } from "common/ajax.js";
 import { LocaleProvider,Icon,Affix,Button  } from 'antd';
@@ -28,7 +29,7 @@ export default class App extends Component {
         super(props);
         this.state = {
             stockDict:{},
-            codes:urlQuery.codes?urlQuery.codes:['603338']
+            codes:urlQuery.codes?urlQuery.codes.split(','):['603338']
         };
     }
 
@@ -105,10 +106,10 @@ export default class App extends Component {
                                         </div>
                                         <div>
                                             <div className="chart-wrap">
-                                                <StockChart code={code} needCheckEvent={true}/>
+                                                <StockChart code={code} needCheckEvent={true} defaultRangeSelector={3}/>
                                             </div>
                                             <div className="chart-wrap">
-                                                <StockChart code={code} period="week" defaultRangeSelector={2} />
+                                                <StockChart code={code} period="week" defaultRangeSelector={3} />
                                             </div>
                                         </div>
                                     </div>
@@ -130,6 +131,7 @@ export default class App extends Component {
                     <SliderLeft>
                         <ListFilter stockDict={this.state.stockDict}/>
                     </SliderLeft>
+                    <FavEdit/>
                 </div>
             </LocaleProvider>
             

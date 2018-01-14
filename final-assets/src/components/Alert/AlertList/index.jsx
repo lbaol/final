@@ -42,14 +42,15 @@ export default class App extends Component {
             positionDataSource: [],
             typeDS: Dict.favType,
             quoteMapper: {},
-            codes: []
+            codes: [],
+            eventMapper:{}
 
         };
     }
 
     componentDidMount() {
-        this.fatctMonitorList();
-        this.fatctPositionList();
+        this.fatchMonitorList();
+        this.fatchPositionList();
         if (doInterval == true) {
             setInterval(this.getAlertList, 5000)
         } else {
@@ -62,7 +63,7 @@ export default class App extends Component {
 
     }
 
-    fatctMonitorList = () => {
+    fatchMonitorList = () => {
         const self = this;
         request('/fav/getByParam',
             (res) => {
@@ -70,6 +71,7 @@ export default class App extends Component {
                 let stockDataSource = res.favList;
                 for (let d of stockDataSource) {
                     this.state.codes.push(d.code);
+                    self.getEventsByCode(d.code)
                 }
 
                 self.setState({
@@ -97,13 +99,14 @@ export default class App extends Component {
 
 
 
-    fatctPositionList = () => {
+    fatchPositionList = () => {
         const self = this;
         request('/fav/getByParam',
             (res) => {
 
                 for (let d of res.favList) {
                     this.state.codes.push(d.code);
+                    self.getEventsByCode(d.code)
                 }
 
                 self.setState({
@@ -135,6 +138,8 @@ export default class App extends Component {
                 startDate: moment().add('day', -2).format('YYYY-MM-DD')
             }, 'jsonp')
     }
+
+
 
 
     getLastQuote = (callback) => {
@@ -181,6 +186,35 @@ export default class App extends Component {
             }
         }
         return totalValue;
+    }
+
+    checkEventByType=(code,type)=>{
+        const {eventMapper} = this.state;
+        if(_.isArray(eventMapper[code]) && eventMapper[code].length>0){
+            if(_.findIndex(eventMapper[code],{type:type})!=-1){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    getEventsByCode=(code)=>{
+        const self = this;
+        request('/event/getByParams',
+            (res) => {
+
+                if (res.eventList) {
+                    let eventMapper = self.state.eventMapper
+                    eventMapper[code] = res.eventList;
+
+                    self.setState({
+                        eventMapper: eventMapper
+                    })
+                }
+            }, {
+                startDate: moment().add('day', -200).format('YYYY-MM-DD'),
+                code:code
+            }, 'jsonp')
     }
 
 
@@ -316,8 +350,8 @@ export default class App extends Component {
     }
 
     refreshList=()=>{
-        this.fatctMonitorList();
-        this.fatctPositionList();
+        this.fatchMonitorList();
+        this.fatchPositionList();
     }
 
     onDeleteFavByIdClick = (id) => {
@@ -364,8 +398,9 @@ export default class App extends Component {
         </div>)
     }
 
-
-
+    renderEventTypeCell = (code,type) => {
+        return this.checkEventByType(code,type)==true?<Icon type="check" />:''
+    }
 
     render() {
         const { stockDataSource, alertDataSource, positionDataSource, quoteMapper } = this.state;
@@ -400,7 +435,7 @@ export default class App extends Component {
                                 dataIndex: 'code',
                                 key: 'code',
                                 render: (text, record) => {
-                                    return (<a target="_blank"  href={'/detail.html?code='+text}>{record.code}</a>)
+                                    return (<a target="_blank"  href={'/detail.html?codes='+text}>{record.code}</a>)
                                 }
                             }, {
                                 title: '10日',
@@ -429,6 +464,34 @@ export default class App extends Component {
                                 key: 'day120',
                                 render: (text, record) => {
                                     return this.renderTypeCountCell('day', 120, text, record)
+                                }
+                            }, {
+                                title: '领先新高',
+                                dataIndex: 'code',
+                                key: 'leadNewHigh',
+                                render: (text, record) => {
+                                    return this.renderEventTypeCell(record.code,'leadNewHigh')
+                                }
+                            }, {
+                                title: '断层',
+                                dataIndex: 'code',
+                                key: 'fault',
+                                render: (text, record) => {
+                                    return this.renderEventTypeCell(record.code,'fault')
+                                }
+                            }, {
+                                title: '杯柄',
+                                dataIndex: 'code',
+                                key: 'handle',
+                                render: (text, record) => {
+                                    return this.renderEventTypeCell(record.code,'handle')
+                                }
+                            }, {
+                                title: '突破',
+                                dataIndex: 'code',
+                                key: 'breakThrough',
+                                render: (text, record) => {
+                                    return this.renderEventTypeCell(record.code,'breakThrough')
                                 }
                             },
                             {
@@ -484,53 +547,56 @@ export default class App extends Component {
                             ]} />
                     </div>
                     <div className="f-l ml20">
-                        <Table size="small"
-                            title={() => '报警列表'}
-                            pagination={false}
-                            dataSource={alertDataSource}
-                            columns={[{
-                                title: '名称',
-                                dataIndex: 'name',
-                                key: 'name',
-                                render: (text, record) => {
-                                    let stock = stockDict[record.code];
-                                    return (<div>
-                                        {stock && stock.name}
-                                    </div>)
-                                }
-                            }, {
-                                title: '代码',
-                                dataIndex: 'code',
-                                key: 'code'
-                            }, {
-                                title: 'count',
-                                dataIndex: 'count',
-                                key: 'count'
-                            }, {
-                                title: 'type',
-                                dataIndex: 'type',
-                                key: 'type'
-                            }, {
-                                title: '提醒价格',
-                                dataIndex: 'alertPrice',
-                                key: 'alertPrice'
-                            }, {
-                                title: '当时价格',
-                                dataIndex: 'timePrice',
-                                key: 'timePrice'
-                            }, {
-                                title: '提醒时间',
-                                dataIndex: 'time',
-                                key: 'time'
-                            },
+                        <div class="alert-table-wrap">
+                            <Table size="small"
+                                title={() => '报警列表'}
+                                pagination={false}
+                                dataSource={alertDataSource}
+                                columns={[{
+                                    title: '名称',
+                                    dataIndex: 'name',
+                                    key: 'name',
+                                    render: (text, record) => {
+                                        let stock = stockDict[record.code];
+                                        return (<div>
+                                            {stock && stock.name}
+                                        </div>)
+                                    }
+                                }, {
+                                    title: '代码',
+                                    dataIndex: 'code',
+                                    key: 'code'
+                                }, {
+                                    title: 'count',
+                                    dataIndex: 'count',
+                                    key: 'count'
+                                }, {
+                                    title: 'type',
+                                    dataIndex: 'type',
+                                    key: 'type'
+                                }, {
+                                    title: '提醒价格',
+                                    dataIndex: 'alertPrice',
+                                    key: 'alertPrice'
+                                }, {
+                                    title: '当时价格',
+                                    dataIndex: 'timePrice',
+                                    key: 'timePrice'
+                                }, {
+                                    title: '提醒时间',
+                                    dataIndex: 'time',
+                                    key: 'time'
+                                },
 
-                            ]} />
+                                ]} />
+                        </div>
+                        
                     </div>
                 </div>
 
                 <div className="mt30">
                     <Collapse bordered={false}>
-                        <Collapse.Panel showArrow={false} header={totalValue} key="1" >
+                        <Collapse.Panel showArrow={false} header={<div><span>{totalValue}</span><span className="ml10"><a target="_blank" href={'/detail.html?codes='+positionDataSource.map(d=>d.code).join(',')}><Icon type="right-circle-o" /></a></span></div>} key="1" >
                             <Table size="small"
                                 pagination={false}
                                 dataSource={positionDataSource}
@@ -558,7 +624,35 @@ export default class App extends Component {
                                     dataIndex: 'code',
                                     key: 'code',
                                     render: (text, record) => {
-                                        return (<a target="_blank" href={'/detail.html?code='+text}>{record.code}</a>)
+                                        return (<a target="_blank" href={'/detail.html?codes='+text}>{record.code}</a>)
+                                    }
+                                }, {
+                                    title: '领先新高',
+                                    dataIndex: 'code',
+                                    key: 'leadNewHigh',
+                                    render: (text, record) => {
+                                        return this.renderEventTypeCell(record.code,'leadNewHigh')
+                                    }
+                                }, {
+                                    title: '断层',
+                                    dataIndex: 'code',
+                                    key: 'fault',
+                                    render: (text, record) => {
+                                        return this.renderEventTypeCell(record.code,'fault')
+                                    }
+                                }, {
+                                    title: '杯柄',
+                                    dataIndex: 'code',
+                                    key: 'handle',
+                                    render: (text, record) => {
+                                        return this.renderEventTypeCell(record.code,'handle')
+                                    }
+                                }, {
+                                    title: '突破',
+                                    dataIndex: 'code',
+                                    key: 'breakThrough',
+                                    render: (text, record) => {
+                                        return this.renderEventTypeCell(record.code,'breakThrough')
                                     }
                                 }, {
                                     title: '数量',

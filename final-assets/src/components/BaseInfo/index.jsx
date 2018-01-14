@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import FEvents from "components/Common/FEvent/index.js";
-import FavEdit from "components/Fav/FavEdit/index.jsx";
-import NoteEdit from "components/Note/NoteEdit/index.jsx";
 import { Icon} from 'antd';
 import { request } from "common/ajax.js";
 import { Dict,Util } from "common/config.js";
@@ -81,7 +79,12 @@ export default class App extends Component {
         })
     }
 
-    
+    onRefreshStockChart=()=>{
+        const {code} = this.state;
+        this.emit('final:stock-chart-refresh',{
+            code:code
+        })
+    }
 
 
     
@@ -103,6 +106,9 @@ export default class App extends Component {
                         <Icon className="c-p" type="file-text" onClick={this.onEditDefaultNoteClick} />
                     </span> 
                     <span className="ml10">
+                        <Icon className="c-p" type="sync" onClick={this.onRefreshStockChart} />
+                    </span> 
+                    <span className="ml10">
                         {Util.getXueQiuStockLink(basic.code)}
                     </span>
                     <span className="ml5">
@@ -117,8 +123,7 @@ export default class App extends Component {
                     </span>
                 </div>
                 
-                <FavEdit/>
-                <NoteEdit/>
+                
                 
             </div>
         );

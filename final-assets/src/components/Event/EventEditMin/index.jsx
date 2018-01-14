@@ -45,6 +45,7 @@ export default class App extends React.Component {
 		(res)=>{
             self.setState({visible:false})
             self.emit('final:event-list-refresh')
+            self.emit('final:stock-chart-refresh',{code:this.props.code})
 		},{
             code:this.props.code,
             ...this.state

@@ -1,24 +1,29 @@
 .slider-right {
     background-color: #fff;
     height: 100%;
-    padding: 0;
+    padding-left: 10px;
     z-index: 1040;
     position: fixed;
-    overflow: visible;
     top: 0;
-    right: -540px;
+    right: -530px;
     width: 540px;
     height: 100%;
     transition: right .3s;
 
+    .slider-right-content{
+        height: 100%;
+        overflow: auto;
+    }
+
     .slider-right-close {
+        z-index:100;
         position: absolute;
-        left: -10px;
-        top:50%;
+        left: 0;
+        top: 50%;
         button {
             padding: 0;
             height: 50px;
-            width: 14px;
+            width: 10px;
         }
     }
 }
