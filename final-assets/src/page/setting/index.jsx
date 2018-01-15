@@ -4,6 +4,7 @@ import FEvents from "components/Common/FEvent/index.js";
 import AlertList from "components/Alert/AlertList/index.jsx";
 import NoteEdit from "components/Note/NoteEdit/index.jsx";
 import DataSetting from "components/Data/Setting/index.jsx";
+import IndexPeriodManage from "components/IndexPeriod/Manage/index.jsx";
 import {Env} from "common/config.js";
 import { request } from "common/ajax.js";
 import { LocaleProvider ,Icon } from 'antd';
@@ -50,6 +51,9 @@ export default class App extends Component {
                     </span>
                     <DataSetting/>
                     <NoteEdit/>
+                    <div className="mt20">
+                        <IndexPeriodManage/>
+                    </div>
                 </div>
             </LocaleProvider>
             

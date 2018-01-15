@@ -596,7 +596,7 @@ export default class App extends Component {
 
                 <div className="mt30">
                     <Collapse bordered={false}>
-                        <Collapse.Panel showArrow={false} header={<div><span>{totalValue}</span><span className="ml10"><a target="_blank" href={'/detail.html?codes='+positionDataSource.map(d=>d.code).join(',')}><Icon type="right-circle-o" /></a></span></div>} key="1" >
+                        <Collapse.Panel showArrow={false} header={<div><span>{totalValue}</span><span className="ml30"><a target="_blank" href={'/detail.html?codes='+positionDataSource.map(d=>d.code).join(',')}><Icon type="right-circle-o" /></a></span></div>} key="1" >
                             <Table size="small"
                                 pagination={false}
                                 dataSource={positionDataSource}

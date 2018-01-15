@@ -4,7 +4,7 @@ import moment from 'moment';
 import { request } from "common/ajax.js";
 
 
-const Env = 'product' //daily product
+const Env = 'daily' //daily product
 
 
 
@@ -23,13 +23,14 @@ let Config = {
         end:'2018-01-12'
     }],
     alertList:{
-        doInterval:false,
+        doInterval:true,
         intervalTime:10000
     },
     defaultChart:{
         startDate:moment().subtract(1000, 'day').format('YYYY-MM-DD'),
         endDate: moment().format('YYYY-MM-DD')
-    }
+    },
+    indexPeriods:[]
 }
 
 
@@ -177,6 +178,13 @@ let Dict = {
     reportType: [
         { label: '报告', value: 'report' },
         { label: '预告', value: 'forecast' }
+    ],
+    marketType:[
+        {label:'沪市',value:'SH'},
+        {label:'深市',value:'ZH'},
+    ],
+    indexType:[
+        {label:'上证50',value:'SH000016'}
     ]
 }
 
@@ -204,7 +212,18 @@ function fatchStockDict(){
     },'json',null,false)
 }
 
+function fatchIndexPeriods(){
+    request('/indexPeriod/getAll',
+    (res)=>{
+        
+        Config.indexPeriods = res.list
+        console.log('Config indexPeriods:',Config)
+    },{
+    },'json',null,false)
+}
+
 fatchStockDict();
+fatchIndexPeriods();
 
 
 export {
