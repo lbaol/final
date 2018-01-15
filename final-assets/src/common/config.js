@@ -20,7 +20,7 @@ let Config = {
     },
     indexPeakValley:[{
         start:'2017-11-29',
-        end:'2018-01-12'
+        end:'2018-01-15'
     }],
     alertList:{
         doInterval:true,
