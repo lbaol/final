@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { LocaleProvider ,List } from 'antd';
 import {Env} from "common/config.js";
+import { request2 } from "common/ajax.js";
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import 'common/base.scss';
 
@@ -19,7 +20,6 @@ export default class App extends Component {
 
     componentDidMount() {
         
-       
     }
 
  

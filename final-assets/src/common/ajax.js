@@ -1,4 +1,6 @@
 import $ from 'jquery';
+import axios from 'axios';
+import jsonpAdapter from 'axios-jsonp';
 
 const domain = 'http://127.0.0.1:8080';
 const pythonDomain = 'http://127.0.0.1:8001';
@@ -13,6 +15,14 @@ function getUrl(path){
     return domain + path;
   }
 
+function convertReqData(reqData){
+    for (let key in reqData) {
+        if (typeof reqData[key] === 'object') {
+            reqData[key] = JSON.stringify(reqData[key]);
+        }
+    } 
+}
+
 export function request(
     url,
     callback,
@@ -20,11 +30,7 @@ export function request(
     dataType='jsonp',
     type,
     async) {
-        for (let key in reqData) {
-            if (typeof reqData[key] === 'object') {
-                reqData[key] = JSON.stringify(reqData[key]);
-            }
-        } 
+        convertReqData(reqData);
         return $.ajax({
             type: type?type:'get',
             dataType: dataType,
@@ -35,6 +41,43 @@ export function request(
                 withCredentials: true
             },
             async:async
+        }).done(function(data){
+            callback(data);
+        });
+}
+
+
+export function request2(
+    url,
+    reqData = {},
+    dataType,
+    mothod) {
+        convertReqData(reqData);
+        return axios.request({
+            url:getUrl(url),
+            method:mothod?mothod:'get',
+            adapter:dataType=='jsonp'?jsonpAdapter:null,
+            withCredentials:true
+        })
+}
+
+
+export function request_sync(
+    url,
+    callback,
+    reqData = {}
+    ) {
+        convertReqData(reqData);
+        return $.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: getUrl(url),
+            data:reqData,
+            timeout:1000000,
+            xhrFields: {
+                withCredentials: true
+            },
+            async:false
         }).done(function(data){
             callback(data);
         });

@@ -11,7 +11,16 @@
           }]
         }],
         ["import", { "libraryName": "antd", "style": "css" }],
-        ["transform-decorators-legacy"] 
+        ["transform-decorators-legacy"],
+        [
+          "transform-runtime",
+          {
+            "helpers": false,
+            "polyfill": false,
+            "regenerator": true,
+            "moduleName": "babel-runtime"
+          }
+        ]
         ]
       }
     }

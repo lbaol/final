@@ -659,6 +659,15 @@ export default class App extends Component {
                                     dataIndex: 'number',
                                     key: 'number'
                                 },{
+                                    title: '当前价格',
+                                    dataIndex: 'current',
+                                    key: 'current',
+                                    render: (text, record, index) => {
+                                        let marketValue;
+                                        let quote = quoteMapper[record.code];
+                                        return quote && quote.current
+                                    }
+                                },{
                                     title: '当日涨幅',
                                     dataIndex: 'number',
                                     key: 'risePercent',

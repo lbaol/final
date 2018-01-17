@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-import { request } from "common/ajax.js";
+import { request,request_sync} from "common/ajax.js";
 
 
 const Env = 'daily' //daily product
@@ -200,26 +200,26 @@ for(let key in Dict){
 
 
 function fatchStockDict(){
-    request('/stock/getAll',
+    console.log('fatchStockDict start');
+    request_sync('/stock/getAll',
     (res)=>{
-        console.log('fatchStockDict',res)
+        
         let stockDict = {}
         for(let st of res){
             stockDict[st.code] = st
         }
         Dict.stockDict = stockDict;
-    },{
-    },'json',null,false)
+        console.log('fatchStockDict end',Dict.stockDict);
+    })
 }
 
 function fatchIndexPeriods(){
-    request('/indexPeriod/getAll',
+    console.log('fatchIndexPeriods start');
+    request_sync('/indexPeriod/getAll',
     (res)=>{
-        
         Config.indexPeriods = res.list
-        console.log('Config indexPeriods:',Config)
-    },{
-    },'json',null,false)
+        console.log('fatchIndexPeriods end',Config)
+    })
 }
 
 fatchStockDict();
