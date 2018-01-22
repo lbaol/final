@@ -123,14 +123,14 @@ export default class App extends Component {
         request('/alert/getByParams',
             (res) => {
 
-                if (res.monitorList) {
+                if (res.alertList) {
                     let alertMapper = {}
-                    for (let d of res.monitorList) {
+                    for (let d of res.alertList) {
                         alertMapper[self.getAlertMapperKey(d.code, d.type, d.count)] = d
                     }
 
                     self.setState({
-                        alertDataSource: res.monitorList,
+                        alertDataSource: res.alertList,
                         alertMapper: alertMapper
                     })
                 }
@@ -151,7 +151,7 @@ export default class App extends Component {
 
                 let quoteMapper = {};
                 for (let k in res) {
-                    quoteMapper[k.substring(2)] = res[k]
+                    quoteMapper[k] = res[k]
                 }
                 // console.log(quoteMapper)
 
@@ -178,8 +178,8 @@ export default class App extends Component {
     sumTotalValue = (positionDataSource, quoteMapper) => {
         let totalValue = 0;
         for (let d of positionDataSource) {
-            if (quoteMapper[d.code]) {
-                let current = quoteMapper[d.code].current;
+            if (quoteMapper[Util.getFullCode(d.code)]) {
+                let current = quoteMapper[Util.getFullCode(d.code)].current;
                 if (_.isNumber(_.toNumber(current))) {
                     totalValue = totalValue + _.round(d.number * current)
                 }
@@ -222,7 +222,7 @@ export default class App extends Component {
         let { stockDataSource, quoteMapper } = this.state;
 
         for (let stock of stockDataSource) {
-            let curQuota = quoteMapper[stock.code];
+            let curQuota = quoteMapper[Util.getFullCode(stock.code)];
             if (curQuota && curQuota.current) {
                 let curPrice = curQuota.current;
                 stock.curPrice = curPrice;
@@ -406,6 +406,7 @@ export default class App extends Component {
         const { stockDataSource, alertDataSource, positionDataSource, quoteMapper } = this.state;
         const { stockDict } = this.props;
         const totalValue = this.sumTotalValue(positionDataSource, quoteMapper);
+        const indexDataSource = Dict.indexType;
         return (
             <div class="alert-list-container">
                 <div className="pt10 pb10 pl10">
@@ -425,9 +426,8 @@ export default class App extends Component {
                                 dataIndex: 'name',
                                 key: 'name',
                                 render: (text, record) => {
-                                    let stock = stockDict[record.code];
                                     return (<div>
-                                        {stock && stock.name}
+                                        {Util.getStockName(record.code)}
                                     </div>)
                                 }
                             }, {
@@ -493,22 +493,23 @@ export default class App extends Component {
                                 render: (text, record) => {
                                     return this.renderEventTypeCell(record.code,'breakThrough')
                                 }
-                            },
-                            {
-                                title: '昨日收盘',
-                                dataIndex: 'preClose',
-                                key: 'preClose'
                             }, {
                                 title: '当前价格',
                                 dataIndex: 'curPrice',
-                                key: 'curPrice'
+                                key: 'curPrice',
+                                render: (text, record, index) => {
+                                    let marketValue;
+                                    let quote = quoteMapper[Util.getFullCode(record.code)];
+                                    return quote && quote.current
+                                }
                             }, {
                                 title: '涨幅',
                                 dataIndex: 'rise',
                                 key: 'rise',
                                 render: (text, record, index) => {
-                                    let d = record.curPrice && record.preClose && _.round((record.curPrice / record.preClose - 1) * 100, 2);
-                                    return Util.renderRisePercent(d);
+                                    let marketValue;
+                                    let quote = quoteMapper[Util.getFullCode(record.code)];
+                                    return Util.renderRisePercent(quote && quote.percentage) 
                                 }
                             },
                             {
@@ -557,9 +558,8 @@ export default class App extends Component {
                                     dataIndex: 'name',
                                     key: 'name',
                                     render: (text, record) => {
-                                        let stock = stockDict[record.code];
                                         return (<div>
-                                            {stock && stock.name}
+                                            {Util.getStockName(record.code)}
                                         </div>)
                                     }
                                 }, {
@@ -614,9 +614,8 @@ export default class App extends Component {
                                     dataIndex: 'name',
                                     key: 'name',
                                     render: (text, record) => {
-                                        let stock = stockDict[record.code];
                                         return (<div>
-                                            {stock && stock.name}
+                                            {Util.getStockName(record.code)}
                                         </div>)
                                     }
                                 }, {
@@ -664,7 +663,7 @@ export default class App extends Component {
                                     key: 'current',
                                     render: (text, record, index) => {
                                         let marketValue;
-                                        let quote = quoteMapper[record.code];
+                                        let quote = quoteMapper[Util.getFullCode(record.code)];
                                         return quote && quote.current
                                     }
                                 },{
@@ -673,7 +672,7 @@ export default class App extends Component {
                                     key: 'risePercent',
                                     render: (text, record, index) => {
                                         let marketValue;
-                                        let quote = quoteMapper[record.code];
+                                        let quote = quoteMapper[Util.getFullCode(record.code)];
                                         return Util.renderRisePercent(quote && quote.percentage) 
                                     }
                                 },
@@ -683,8 +682,8 @@ export default class App extends Component {
                                     key: 'marketValue',
                                     render: (text, record, index) => {
                                         let marketValue;
-                                        let quote = quoteMapper[record.code];
-                                        // console.log(text, record, index,record.number,quoteMapper[record.code])
+                                        let quote = quoteMapper[Util.getFullCode(record.code)];
+                                        // console.log(text, record, index,record.number,quoteMapper[Util.getFullCode(record.code)])
                                         if (record.number && quote) {
                                             marketValue = _.round(record.number * quote.current);
                                         }
@@ -698,8 +697,8 @@ export default class App extends Component {
                                     render: (text, record, index) => {
                                         let marketValue;
                                         let marketValuePercent;
-                                        let quote = quoteMapper[record.code];
-                                        // console.log(text, record, index,record.number,quoteMapper[record.code])
+                                        let quote = quoteMapper[Util.getFullCode(record.code)];
+                                        // console.log(text, record, index,record.number,quoteMapper[Util.getFullCode(record.code)])
                                         if (record.number && quote && totalValue) {
                                             marketValue = _.round(record.number * quote.current);
                                             marketValuePercent = _.round(marketValue / totalValue * 100, 2);

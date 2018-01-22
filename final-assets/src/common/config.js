@@ -35,6 +35,119 @@ let Config = {
 
 
 
+
+
+
+
+
+
+if(Env=='product'){
+    Config.chart = {
+        upColor:'red',
+        downColor:'limegreen',
+        width:'100%',
+        height:'600px'
+    }
+}
+if(Env=='daily'){
+    Config.chart = {
+        upColor:'#a2d2ff',
+        downColor:'#f5f5f5',
+        width:'100%',
+        height:'400px'
+    }
+}
+
+
+
+let Dict = {
+    favType : [
+        { label: '关注', value: 'follow' },
+        { label: '备选池', value: 'prepare' },
+        { label: '持仓', value: 'position' },
+        // { label: '杯柄', value: 'handle' },
+        // { label: '断层', value: 'fault' },
+        // { label: '领先新高', value: 'leadNewHigh' },
+        // { label: '默认', value: 'default' },
+        { label: '临时', value: 'temp' },
+        { label: '监控', value: 'monitor' },
+        { label: '金股18', value: 'gold18' }
+    ],
+    eventType: [
+        { label: '断层', value: 'fault' },
+        { label: '杯柄', value: 'handle' },
+        { label: '领先新高', value: 'leadNewHigh' },
+        { label: '突破', value: 'breakThrough' }
+    ],
+    noteType: [
+        { label: '概要', value: 'summary' },
+        { label: '按日期', value: 'date' },
+        { label: '总文档', value: 'overall' }
+    ],
+    yearType: [
+        { label: '2017', value: '2017' },
+        { label: '2016', value: '2016' }
+    ],
+    quarterType: [
+        { label: '1', value: '1' },
+        { label: '2', value: '2' },
+        { label: '3', value: '3' },
+        { label: '4', value: '4' }
+    ],
+    reportType: [
+        { label: '报告', value: 'report' },
+        { label: '预告', value: 'forecast' }
+    ],
+    marketType:[
+        {label:'沪市',value:'SH'},
+        {label:'深市',value:'ZH'},
+    ],
+    indexType:[
+        {label:'上证50',value:'SH000016'},
+        {label:'沪深300',value:'SZ399300'},
+        {label:'中证500',value:'SH000905'}
+    ]
+}
+
+
+
+
+for(let key in Dict){
+    let mapperKey = key+'Mapper';
+    Dict[mapperKey] = {}
+    for(let d of Dict[key]){
+        Dict[mapperKey][d.value] = d.label
+    }
+}
+
+
+function fatchStockDict(){
+    console.log('fatchStockDict start');
+    request_sync('/stock/getAll',
+    (res)=>{
+        
+        let stockDict = {}
+        for(let st of res){
+            stockDict[st.code] = st
+        }
+        Dict.stockDict = stockDict;
+        console.log('fatchStockDict end',Dict.stockDict);
+    })
+}
+
+function fatchIndexPeriods(){
+    console.log('fatchIndexPeriods start');
+    request_sync('/indexPeriod/getAll',
+    (res)=>{
+        Config.indexPeriods = res.list
+        console.log('fatchIndexPeriods end',Config)
+    })
+}
+
+fatchStockDict();
+fatchIndexPeriods();
+
+
 const Util = {
     getFullCode:function(code){
         let newCode = code;
@@ -44,6 +157,14 @@ const Util = {
             newCode = 'SZ' + code;
         }
         return newCode;
+    },
+    getStockName:function(code){
+        if(Dict.stockDict[code]){
+            return Dict.stockDict[code].name
+        }
+        if(Dict.indexTypeMapper[code]){
+            return Dict.indexTypeMapper[code]
+        }
     },
     getLastMa:function(datas,count){
         if(_.isArray(datas)){
@@ -117,114 +238,6 @@ const Util = {
         return <span>{Util.renderRise(d)}%</span>
     }
 }
-
-
-
-
-
-if(Env=='product'){
-    Config.chart = {
-        upColor:'red',
-        downColor:'limegreen',
-        width:'100%',
-        height:'600px'
-    }
-}
-if(Env=='daily'){
-    Config.chart = {
-        upColor:'#a2d2ff',
-        downColor:'#f5f5f5',
-        width:'100%',
-        height:'400px'
-    }
-}
-
-
-
-let Dict = {
-    favType : [
-        { label: '关注', value: 'follow' },
-        { label: '备选池', value: 'prepare' },
-        { label: '持仓', value: 'position' },
-        // { label: '杯柄', value: 'handle' },
-        // { label: '断层', value: 'fault' },
-        // { label: '领先新高', value: 'leadNewHigh' },
-        // { label: '默认', value: 'default' },
-        { label: '临时', value: 'temp' },
-        { label: '监控', value: 'monitor' },
-        { label: '金股18', value: 'gold18' }
-    ],
-    eventType: [
-        { label: '断层', value: 'fault' },
-        { label: '杯柄', value: 'handle' },
-        { label: '领先新高', value: 'leadNewHigh' },
-        { label: '突破', value: 'breakThrough' }
-    ],
-    noteType: [
-        { label: '概要', value: 'summary' },
-        { label: '按日期', value: 'date' },
-        { label: '总文档', value: 'overall' }
-    ],
-    yearType: [
-        { label: '2017', value: '2017' },
-        { label: '2016', value: '2016' }
-    ],
-    quarterType: [
-        { label: '1', value: '1' },
-        { label: '2', value: '2' },
-        { label: '3', value: '3' },
-        { label: '4', value: '4' }
-    ],
-    reportType: [
-        { label: '报告', value: 'report' },
-        { label: '预告', value: 'forecast' }
-    ],
-    marketType:[
-        {label:'沪市',value:'SH'},
-        {label:'深市',value:'ZH'},
-    ],
-    indexType:[
-        {label:'上证50',value:'SH000016'}
-    ]
-}
-
-
-
-for(let key in Dict){
-    let mapperKey = key+'Mapper';
-    Dict[mapperKey] = {}
-    for(let d of Dict[key]){
-        Dict[mapperKey][d.value] = d.label
-    }
-}
-
-
-function fatchStockDict(){
-    console.log('fatchStockDict start');
-    request_sync('/stock/getAll',
-    (res)=>{
-        
-        let stockDict = {}
-        for(let st of res){
-            stockDict[st.code] = st
-        }
-        Dict.stockDict = stockDict;
-        console.log('fatchStockDict end',Dict.stockDict);
-    })
-}
-
-function fatchIndexPeriods(){
-    console.log('fatchIndexPeriods start');
-    request_sync('/indexPeriod/getAll',
-    (res)=>{
-        Config.indexPeriods = res.list
-        console.log('fatchIndexPeriods end',Config)
-    })
-}
-
-fatchStockDict();
-fatchIndexPeriods();
-
 
 export {
     URL,Util,Config,Env,Dict

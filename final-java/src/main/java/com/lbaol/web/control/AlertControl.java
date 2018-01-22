@@ -82,11 +82,11 @@ public class AlertControl {
 		params.put("code", code);
 		params.put("date", date);
 		params.put("startDate", startDate);
-		List<AlertDO> monitorList = alertMapper.getByParams(params);
+		List<AlertDO> alertList = alertMapper.getByParams(params);
 		
 		
 		Map resultMap = new HashMap();
-		resultMap.put("monitorList", monitorList);
+		resultMap.put("alertList", alertList);
 		return resultMap;
 		 
     }
