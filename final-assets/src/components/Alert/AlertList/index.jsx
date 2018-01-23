@@ -408,7 +408,7 @@ export default class App extends Component {
         const totalValue = this.sumTotalValue(positionDataSource, quoteMapper);
         const indexDataSource = Dict.indexType;
         return (
-            <div class="alert-list-container">
+            <div className="alert-list-container">
                 <div className="pt10 pb10 pl10">
                     <span >
                         <Icon className="c-p" type="plus-circle-o" onClick={this.onFavImportClick} />
