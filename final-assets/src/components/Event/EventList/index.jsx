@@ -104,7 +104,7 @@ export default class App extends Component {
 
     render() {
         const {eventList,code,type} = this.state;
-        const name = Dict.stockDict[code].name + ' ' + code;
+        const name = Util.getStockName(code) + ' ' + code;
         // console.log('render 信号'+' - '+name)
 
         return (

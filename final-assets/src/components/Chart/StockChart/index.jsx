@@ -30,6 +30,8 @@ export default class App extends Component {
             chartData: {},
             dateMapper: {},
             mas: [],
+            displayEvent:props.displayEvent == false?false:true,
+            displayReport:props.displayReport == false?false:true,
             type:props.type?props.type:'stock' //stock,index
         };
     }
@@ -50,7 +52,12 @@ export default class App extends Component {
             if(data && data.code && data.code == this.state.code){
                 this.fatchChartData();
             }
-            
+        })
+
+        this.on('final:stock-chart-display',(data)=>{
+            this.setState({
+                ...data
+            })
         })
     }
 
@@ -102,11 +109,11 @@ export default class App extends Component {
 
 
     render() {
-       const {code,chartData,mas,period} = this.state;
+       const {code,chartData,mas,period,displayEvent,displayReport} = this.state;
        const {needCheckEvent,defaultRangeSelector} = this.props;
 
         return (
-            <KChart code={code} needCheckEvent={needCheckEvent} chartData={chartData} mas={mas} defaultRangeSelector={defaultRangeSelector} />
+            <KChart code={code} needCheckEvent={needCheckEvent} displayReport={displayReport} displayEvent={displayEvent} chartData={chartData} mas={mas} defaultRangeSelector={defaultRangeSelector} />
         );
     }
 }

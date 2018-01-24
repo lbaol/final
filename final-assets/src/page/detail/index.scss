@@ -42,3 +42,12 @@
   display: inline-block;
 }
 
+.chart-config-form {
+  label {
+    font-size: 12px;
+  }
+  .ant-form-item .ant-switch {
+    margin: 0;
+  }
+}
+

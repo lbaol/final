@@ -57,7 +57,8 @@ export function request2(
             url:getUrl(url),
             method:mothod?mothod:'get',
             adapter:dataType=='jsonp'?jsonpAdapter:null,
-            withCredentials:true
+            withCredentials:true,
+            params:reqData
         })
 }
 

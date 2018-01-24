@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.jdbc.SQL;
 
+import com.lbaol.common.MapperUtil;
 import com.lbaol.dataobject.EventDO;
 
 public interface EventMapper {
@@ -71,7 +72,8 @@ public interface EventMapper {
 			int update(EventDO eventDO);  
     
     class EventProvider {  
-        public String getByParams(Map params) {  
+        public String getByParams(Map params) { 
+        	
         	return new SQL(){{      
                 SELECT("*");          
                 FROM("event");      
@@ -80,6 +82,12 @@ public interface EventMapper {
                 } 
                 if(params.get("type")!=null){      
                     WHERE("type = #{type}");      
+                }
+                if(params.get("types")!=null){      
+                    WHERE("type in " + MapperUtil.toWhereInString((String) params.get("types")));      
+                }
+                if(params.get("notInTypes")!=null){      
+                    WHERE("type not in " + MapperUtil.toWhereInString((String) params.get("notInTypes")));      
                 }
                 if(params.get("eventDate")!=null){      
                     WHERE("event_date = #{eventDate}");      

@@ -36,6 +36,7 @@ public class EventControl {
     Map getByCode(String code) {  
 		Map map = new HashMap();
 		StockDO stockDO = stockMapper.getByCode(code);
+		
 		Map params = new HashMap();
 		params.put("code", code);
 		List<EventDO> eventList = eventMapper.getByParams(params);
@@ -65,7 +66,7 @@ public class EventControl {
     }
 	
 	@RequestMapping("/event/getByParams")
-    Map getByParams(String code,String type,String startDate) {  
+    Map getByParams(String code,String type,String startDate,String types,String notInTypes ) {  
 		Map map = new HashMap();
 		Map params = new HashMap();
 		if(StringUtils.isNotEmpty(code)) {
@@ -73,6 +74,12 @@ public class EventControl {
 		}
 		if(StringUtils.isNotEmpty(type)) {
 			params.put("type", type);
+		}
+		if(StringUtils.isNotEmpty(types)) {
+			params.put("types", types);
+		}
+		if(StringUtils.isNotEmpty(notInTypes)) {
+			params.put("notInTypes", notInTypes);
 		}
 		if(StringUtils.isNotEmpty(startDate)) {
 			params.put("startDate", startDate);
