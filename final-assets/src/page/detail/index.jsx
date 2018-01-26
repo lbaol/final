@@ -32,7 +32,7 @@ export default class App extends Component {
             stockDict:{},
             codes:urlQuery.codes?urlQuery.codes.split(','):['603338'],
             displayEvent:true,
-            displayReport:true
+            displayReport:false
         };
     }
 
@@ -130,10 +130,10 @@ export default class App extends Component {
                                         </div>
                                         <div>
                                             <div className="chart-wrap">
-                                                <StockChart code={code} displayEvent={displayEvent}  defaultRangeSelector={2}/>
+                                                <StockChart code={code} displayEvent={displayEvent} displayReport={displayReport} defaultRangeSelector={1}/>
                                             </div>
                                             <div className="chart-wrap">
-                                                <StockChart code={code} displayEvent={displayEvent} period="week" defaultRangeSelector={3} />
+                                                <StockChart code={code} displayEvent={displayEvent} displayReport={displayReport} period="week" defaultRangeSelector={3} />
                                             </div>
                                         </div>
                                     </div>

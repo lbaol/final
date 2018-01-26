@@ -363,7 +363,7 @@ export default class App extends Component {
             rangeSelector: {
                 selected: _.isNumber(defaultRangeSelector)?defaultRangeSelector:1,
                 inputEnabled: false,
-                buttons: [{ type: "ytd", text: "YTD" },
+                buttons: [{ type: "month", count: 6, text: "6m" },
                 { type: "year", count: 1, text: "1y" }, 
                 { type: "year", count: 2, text: "2y" },
                 { type: 'all', text: 'All'}]
