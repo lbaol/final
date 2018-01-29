@@ -121,8 +121,8 @@ for(let key in Dict){
 }
 
 
-function fatchStockDict(){
-    console.log('fatchStockDict start');
+function fetchStockDict(){
+    console.log('fetchStockDict start');
     request_sync('/stock/getAll',
     (res)=>{
         
@@ -131,21 +131,21 @@ function fatchStockDict(){
             stockDict[st.code] = st
         }
         Dict.stockDict = stockDict;
-        console.log('fatchStockDict end',Dict.stockDict);
+        console.log('fetchStockDict end',Dict.stockDict);
     })
 }
 
-function fatchIndexPeriods(){
-    console.log('fatchIndexPeriods start');
+function fetchIndexPeriods(){
+    console.log('fetchIndexPeriods start');
     request_sync('/indexPeriod/getAll',
     (res)=>{
         Config.indexPeriods = res.list
-        console.log('fatchIndexPeriods end',Config)
+        console.log('fetchIndexPeriods end',Config)
     })
 }
 
-fatchStockDict();
-fatchIndexPeriods();
+fetchStockDict();
+fetchIndexPeriods();
 
 
 const Util = {

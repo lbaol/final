@@ -28,12 +28,12 @@ export default class App extends React.Component {
         this.on('final:fav-edit-show', (data) => {
             this.setState({
                 code:data && data.code
-            },this.fatchSelectedByCode);
+            },this.fetchSelectedByCode);
             
         });
     }
 
-    fatchSelectedByCode=()=>{
+    fetchSelectedByCode=()=>{
         const {code} = this.state;
         const self = this;
         request('/fav/getByParam',

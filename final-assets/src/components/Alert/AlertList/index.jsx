@@ -49,8 +49,8 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        this.fatchMonitorList();
-        this.fatchPositionList();
+        this.fetchMonitorList();
+        this.fetchPositionList();
         if (doInterval == true) {
             setInterval(this.getAlertList, 5000)
         } else {
@@ -63,7 +63,7 @@ export default class App extends Component {
 
     }
 
-    fatchMonitorList = () => {
+    fetchMonitorList = () => {
         const self = this;
         request('/fav/getByParam',
             (res) => {
@@ -79,7 +79,7 @@ export default class App extends Component {
                     codes: _.sortedUniq(this.state.codes)
                 }, () => {
                     for (let d of stockDataSource) {
-                        this.fatchLastMas(d.code)
+                        this.fetchLastMas(d.code)
                     }
 
                     if (doInterval == true) {
@@ -99,7 +99,7 @@ export default class App extends Component {
 
 
 
-    fatchPositionList = () => {
+    fetchPositionList = () => {
         const self = this;
         request('/fav/getByParam',
             (res) => {
@@ -273,7 +273,7 @@ export default class App extends Component {
 
 
 
-    fatchLastMas = (code, type) => {
+    fetchLastMas = (code, type) => {
         const self = this;
 
         if (code) {
@@ -350,8 +350,8 @@ export default class App extends Component {
     }
 
     refreshList=()=>{
-        this.fatchMonitorList();
-        this.fatchPositionList();
+        this.fetchMonitorList();
+        this.fetchPositionList();
     }
 
     onDeleteFavByIdClick = (id) => {

@@ -30,20 +30,20 @@ export default class App extends React.Component {
             this.setState({
                 code:data && data.code,
                 type:'summary'
-            },this.fatchByParams);
+            },this.fetchByParams);
         });
 
         this.on('final:note-overall-edit-show', (data) => {
             this.setState({
                 type:'overall'
-            },this.fatchByParams);
+            },this.fetchByParams);
         });
     }
 
 
     
 
-    fatchByParams=()=>{
+    fetchByParams=()=>{
         const {code,type,date} = this.state;
         const self = this;
         request('/note/getByParams',

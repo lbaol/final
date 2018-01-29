@@ -27,10 +27,10 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        this.fatchFavList();
+        this.fetchFavList();
     }
 
-    fatchFavList =()=>{
+    fetchFavList =()=>{
         const self = this;
         const {type} = this.state;
         request('/fav/getByParam',
@@ -59,14 +59,14 @@ export default class App extends Component {
     onTypeChange=(value)=>{
         this.setState({
             type:value
-        },this.fatchFavList)
+        },this.fetchFavList)
     }
 
     onDeleteFavByIdClick=(id)=>{
         const self = this;
         request('/fav/deleteById',
         (res)=>{
-            self.fatchFavList()
+            self.fetchFavList()
         },{
             id:id
         },'jsonp')
@@ -81,7 +81,7 @@ export default class App extends Component {
             onOk() {
                 request('/fav/deleteByType',
                     (res)=>{
-                        self.fatchFavList()
+                        self.fetchFavList()
                     },{
                         type:type
                     },'jsonp')

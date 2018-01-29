@@ -57,7 +57,7 @@ export default class App extends Component {
         this.setState({
             dateMapper:dateMapper,
             chartData:chartData
-        },this.fatchData)
+        },this.fetchData)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -76,7 +76,7 @@ export default class App extends Component {
 
 
 
-    fatchData = async () => {
+    fetchData = async () => {
         const self = this;
         const { code,displayEvent,displayReport } = this.state;
 

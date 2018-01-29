@@ -59,13 +59,13 @@ export default class App extends Component {
             startDate:data && data.startDate ? data.startDate : startDate,
             endDate: data && data.endDate ? data.endDate : endDate,
             mas: data && data.mas ? data.mas : mas
-        }, this.fatchChartData)
+        }, this.fetchChartData)
     }
 
 
 
 
-    fatchEventList = () => {
+    fetchEventList = () => {
         const self = this;
         const { code } = this.state;
         request('/event/getByCode',
@@ -86,7 +86,7 @@ export default class App extends Component {
             }, 'jsonp')
     }
 
-    fatchChartData() {
+    fetchChartData() {
         const self = this;
         const { code, period, startDate, endDate } = this.state;
         if (code) {
@@ -108,7 +108,7 @@ export default class App extends Component {
                     self.setState({
                         chartData: chartList,
                         dateMapper: dateMapper
-                    }, self.fatchEventList)
+                    }, self.fetchEventList)
 
 
 

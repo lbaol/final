@@ -24,11 +24,11 @@ export default class App extends Component {
     }
 
     componentWillMount(){
-        this.fatchList()
+        this.fetchList()
     }
 
 
-    fatchList=()=>{
+    fetchList=()=>{
         const self = this;
         const {code,type} = this.state;
         request('/indexPeriod/getAll',
@@ -64,7 +64,7 @@ export default class App extends Component {
         const {code,market,startDate,endDate} = this.state;
         request('/indexPeriod/save',
             (res) => {
-                self.fatchList()
+                self.fetchList()
             }, {
                 startDate,
                 endDate,
@@ -89,7 +89,7 @@ export default class App extends Component {
         if(i>-1){
             request('/indexPeriod/save',
                 (res) => {
-                    self.fatchList()
+                    self.fetchList()
                 }, {
                     ...list[i]
                 }, 'jsonp')

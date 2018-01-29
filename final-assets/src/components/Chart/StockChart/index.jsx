@@ -46,11 +46,11 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        this.fatchChartData();
+        this.fetchChartData();
 
         this.on('final:stock-chart-refresh',(data)=>{
             if(data && data.code && data.code == this.state.code){
-                this.fatchChartData();
+                this.fetchChartData();
             }
         })
 
@@ -66,13 +66,13 @@ export default class App extends Component {
         if (nextProps.hasOwnProperty('code') && !_.isEqual(this.state.code, nextProps.code)) {
             this.setState({
                 code: nextProps.code
-            }, this.fatchChartData)
+            }, this.fetchChartData)
         }
     }
 
    
 
-    fatchChartData() {
+    fetchChartData() {
         const self = this;
         const { code, period, startDate, endDate,type } = this.state;
         if (code) {

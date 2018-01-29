@@ -30,16 +30,16 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        this.fatchAllEventList();
+        this.fetchAllEventList();
 
         this.on('final:report-list-refresh',()=>{
-            this.fatchAllEventList();
+            this.fetchAllEventList();
         })
     }
 
     
 
-    fatchAllEventList = () => {
+    fetchAllEventList = () => {
         const self = this;
         const {defaultReportList} = this.state;
         request('/event/getAll',

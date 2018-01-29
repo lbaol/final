@@ -38,7 +38,7 @@ export default class App extends Component {
 
     componentDidMount() {
         
-        this.fatchAllStock();
+        this.fetchAllStock();
 
         this.on('final:detail-show-stocks', (data) => {
             if(!data || (!data.code && !data.codes)){
@@ -65,7 +65,7 @@ export default class App extends Component {
 
     
 
-    fatchAllStock=()=>{
+    fetchAllStock=()=>{
         const self = this;
         request('/stock/getAll',
         (res)=>{

@@ -16,7 +16,7 @@ export default class App extends React.Component {
         super(props);
         this.state = {
             visible: false,
-            type:'fatch', //fatch convert
+            type:'fetch', //fetch convert
             year:'2017',
             quarter:'4',
             reportType:'forecast', //report forecast
@@ -51,8 +51,8 @@ export default class App extends React.Component {
     
     onProcessReportClick=()=>{
         const {type}= this.state;
-        if(type=='fatch'){
-            this.fatchReport()
+        if(type=='fetch'){
+            this.fetchReport()
         }
         if(type=='convert'){
             this.convertReport()
@@ -61,19 +61,19 @@ export default class App extends React.Component {
    
     onProcessBasicsClick=()=>{
         const {type}= this.state;
-        if(type=='fatch'){
-            this.fatchBasic()
+        if(type=='fetch'){
+            this.fetchBasic()
         }
         if(type=='convert'){
             this.convertBasic()
         }
     }
 
-    fatchReport=()=>{
+    fetchReport=()=>{
         const self = this;
-        let hide = message.loading('start fatch '+this.state.reportType +' '+this.state.year+ ' ' +this.state.quarter,0)
-        request('/python/fatch/report',(res)=>{
-            console.log('fatch report finish',res);
+        let hide = message.loading('start fetch '+this.state.reportType +' '+this.state.year+ ' ' +this.state.quarter,0)
+        request('/python/fetch/report',(res)=>{
+            console.log('fetch report finish',res);
             hide();
             if(res.isSuccess == true){
                 self.setState({
@@ -98,10 +98,10 @@ export default class App extends React.Component {
         },'jsonp')
     }
 
-    fatchBasic=()=>{
+    fetchBasic=()=>{
         const self = this;
-        request('/python/fatch/basic',(res)=>{
-            console.log('fatch basic finish',res);
+        request('/python/fetch/basic',(res)=>{
+            console.log('fetch basic finish',res);
 		},{
         },'json')
     }
@@ -140,7 +140,7 @@ export default class App extends React.Component {
                 <div className="mt10">
                     
                     <Select style={{width:'120px'}} value={type}  onChange={this.onSelectChange.bind(this,'type')}>
-                        <Select.Option value="fatch">抓取</Select.Option>
+                        <Select.Option value="fetch">抓取</Select.Option>
                         <Select.Option value="convert">转换</Select.Option>
                     </Select>
                 </div>

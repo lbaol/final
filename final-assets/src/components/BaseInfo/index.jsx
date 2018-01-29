@@ -24,7 +24,7 @@ export default class App extends Component {
     componentDidMount() {
         
 
-        this.fatchBaseInfo()
+        this.fetchBaseInfo()
     }
 
     componentWillReceiveProps(nextProps) {
@@ -32,13 +32,13 @@ export default class App extends Component {
         if (nextProps.hasOwnProperty('code') && !_.isEqual(this.state.code, nextProps.code)) {
             this.setState({
                 code: nextProps.code
-            }, this.fatchBaseInfo)
+            }, this.fetchBaseInfo)
         }
     }
 
 
 
-    fatchBaseInfo=()=>{
+    fetchBaseInfo=()=>{
         const self = this;
         const {code} = this.state;
         request('/stock/getByCode',

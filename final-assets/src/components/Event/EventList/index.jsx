@@ -36,22 +36,22 @@ export default class App extends Component {
             this.emitRefresh()
         });
 
-        this.fatchEventList();
+        this.fetchEventList();
     }
 
     emitRefresh=()=>{
-        this.fatchEventList()
+        this.fetchEventList()
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.hasOwnProperty('code') && !_.isEqual(this.state.code, nextProps.code)) {
             this.setState({
                 code: nextProps.code
-            }, this.fatchEventList)
+            }, this.fetchEventList)
         }
     }
 
-    fatchEventList=()=>{
+    fetchEventList=()=>{
         const self = this;
         const {code,type} = this.state;
         request('/event/getByParams',
@@ -80,7 +80,7 @@ export default class App extends Component {
     onTypeChange=(e)=>{
         this.setState({
             type:e.target.value
-        },this.fatchEventList)
+        },this.fetchEventList)
     }
 
     onDeleteEventClick=(id)=>{
@@ -92,7 +92,7 @@ export default class App extends Component {
             onOk() {
                 request('/event/deleteById',
                     (res)=>{
-                        self.fatchEventList()
+                        self.fetchEventList()
                         self.emit('final:stock-chart-refresh',{code:code})
                     },{
                         id:id

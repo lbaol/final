@@ -22,10 +22,10 @@ export default class App extends Component {
 
     componentDidMount() {
         
-        this.fatchAllStock();
+        this.fetchAllStock();
     }
 
-    fatchAllStock=()=>{
+    fetchAllStock=()=>{
         const self = this;
         request('/stock/getAll',
         (res)=>{

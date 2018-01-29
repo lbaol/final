@@ -43,12 +43,12 @@ export default class App extends Component {
             period:data.period?data.period:period,
             startDate:data.startDate?data.startDate:startDate,
             endDate:data.endDate?data.endDate:endDate
-        },this.fatchChartData)
+        },this.fetchChartData)
     }
     
 
 
-	fatchChartData(){
+	fetchChartData(){
         const self = this;
         const {code,period,startDate,endDate}  = this.state;
         
@@ -70,7 +70,7 @@ export default class App extends Component {
                 const chartData = self.parseXQStockData(res.chartlist)
                 self.setState({
                     chartData:chartData
-                },self.fatchEventList)
+                },self.fetchEventList)
             },{
                 symbol:newCode,
                 period:'1'+period,
@@ -82,7 +82,7 @@ export default class App extends Component {
 		
     }
     
-    fatchEventList=()=>{
+    fetchEventList=()=>{
         const self = this;
         const {code} = this.state;
         request('/event/getByCode',
