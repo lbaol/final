@@ -130,8 +130,15 @@ export default class App extends Component {
                     this.state.codes.push(d.code)
                     if(!posDS[d.code]){
                         posDS[d.code] = {};
+                        posDS[d.code] = {
+                            ...d
+                        }
                         posDS[d.code].list = [];
+                    }else{
+                        let currentPos = posDS[d.code];
+                        currentPos.number = currentPos.number + d.number
                     }
+                    
                     posDS[d.code].list.push(d);
                 }
 
@@ -214,6 +221,7 @@ export default class App extends Component {
         if(posDS[code]){
             posDS[code].visible = !posDS[code].visible;
         }
+        this.setState({posDS})
     }
 
     sumTotalValue = (positionDataSource, quoteMapper) => {
@@ -774,6 +782,8 @@ export default class App extends Component {
                         <div className="pos-col name">名称</div>
                         <div className="pos-col code">code</div>
                         <div className="pos-col number">数量</div>
+                        <div className="pos-col cost">成本</div>
+                        <div className="pos-col returns">收益</div>
                         <div className="pos-col current">当前价格</div>
                         <div className="pos-col rise">当日涨幅</div>
                         <div className="pos-col value">市值</div>
@@ -781,15 +791,18 @@ export default class App extends Component {
                         <div className="pos-col oper">操作</div>
                     </div>
                     {Object.keys(posDS).map(k=>{
+                        let quote = quoteMapper[Util.getFullCode(k)];
                         return <div>
                             <div>
-                                <div className="pos-col name">名称</div>
-                                <div className="pos-col code">code</div>
-                                <div className="pos-col number">数量</div>
-                                <div className="pos-col current">当前价格</div>
-                                <div className="pos-col rise">当日涨幅</div>
-                                <div className="pos-col value">市值</div>
-                                <div className="pos-col proportion">占比</div>
+                                <div className="pos-col name">{Util.getStockName(k)}</div>
+                                <div className="pos-col code">{posDS[k].code}</div>
+                                <div className="pos-col number">{posDS[k].number}</div>
+                                <div className="pos-col cost">{posDS[k].cost}</div>
+                                <div className="pos-col returns"></div>
+                                <div className="pos-col current">{quote && quote.current}</div>
+                                <div className="pos-col rise">{Util.renderRisePercent(quote && quote.percentage)}</div>
+                                <div className="pos-col value">{_.round(posDS[k].number * (quote && quote.current))}</div>
+                                <div className="pos-col proportion"></div>
                                 <div className="pos-col oper">
                                     <Icon className="c-p" type="down" onClick={this.onShowPosDetailClick.bind(this,k)} />
                                 </div>
@@ -797,12 +810,14 @@ export default class App extends Component {
                             {
                                 posDS[k].visible == true && posDS[k].list.map(d=>{
                                     return (<div>
-                                        <div className="pos-col name"></div>
+                                        <div className="pos-col name">{Util.getStockName(d.code)}</div>
                                         <div className="pos-col code">{d.code}</div>
                                         <div className="pos-col number">{d.number}</div>
-                                        <div className="pos-col current"></div>
-                                        <div className="pos-col rise"></div>
-                                        <div className="pos-col value"></div>
+                                        <div className="pos-col cost">{d.cost}</div>
+                                        <div className="pos-col returns"></div>
+                                        <div className="pos-col current">{quote && quote.current}</div>
+                                        <div className="pos-col rise">{Util.renderRisePercent(quote && quote.percentage)}</div>
+                                        <div className="pos-col value">{_.round(d.number * (quote && quote.current))}</div>
                                         <div className="pos-col proportion"></div>
                                         <div className="pos-col oper">
                                             <Icon className="c-p" type="edit" onClick={this.onPosEditClick.bind(this,d.id)} />
