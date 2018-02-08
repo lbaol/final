@@ -23,7 +23,7 @@ let Config = {
         end:'2018-01-15'
     }],
     alertList:{
-        doInterval:true,
+        doInterval:false,
         intervalTime:10000
     },
     defaultChart:{
