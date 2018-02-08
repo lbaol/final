@@ -4,7 +4,7 @@ import moment from 'moment';
 import { request,request_sync} from "common/ajax.js";
 
 
-const Env = 'daily' //daily product
+const Env = 'product' //daily product
 
 
 
