@@ -12,7 +12,7 @@ const FormItem = Form.Item;
 
 
 @FEvents
-export default class App extends React.Component {
+export default class App extends Component {
 
     constructor(props) {
         super(props);
@@ -20,17 +20,19 @@ export default class App extends React.Component {
             id:'',
             code:'',
             cost:'',
-            date:'',
+            startDate:'',
+            endDate:'',
             number:'',
             visible: false
         };
     }
 
     componentDidMount() {
-        this.on('final:pos-edit-show', (data) => {
+        this.on('final:record-group-edit-show', (data) => {
             this.setState({
                 id:data && data.id?data.id:'',
-                date:'',
+                startDate:'',
+                endDate:'',
                 number:'',
                 code:'',
                 cost:'',
@@ -42,7 +44,7 @@ export default class App extends React.Component {
     fetchData=()=>{
         let {id} = this.state;
         if(id){
-            request('/pos/getById',
+            request('/recordGroup/getById',
             (res)=>{
                 if(res){
                     this.setState({
@@ -70,25 +72,25 @@ export default class App extends React.Component {
     }
    
 
-    onDateFieldChange=(value, valueString)=>{
+    onDateFieldChange=(name,value, valueString)=>{
         this.setState({
-            date:valueString
+            [name]:valueString
         })
     }
 
     onSaveClick=()=>{
         const self = this;
-        request('/pos/save',
+        request('/recordGroup/save',
 		(res)=>{
             self.setState({visible:false})
-            self.emit('final:pos-edit-finish')
+            self.emit('final:record-group-edit-finish')
 		},{
             ...this.state
         },'jsonp')
     }
 
     render() {
-        const {number,date,id,code,cost} = this.state;
+        const {number,startDate,endDate,id,code,cost} = this.state;
         const formItemLayout = {
             labelCol: {
               sm: { span: 6 },
@@ -101,19 +103,24 @@ export default class App extends React.Component {
         return (
             <div>
                 <Modal
-                    title={id?'修改持仓':'新增持仓'}
+                    title={id?'修改交易记录分组':'新增交易记录分组'}
                     visible={this.state.visible}
                     onOk={this.onSaveClick}
                     onCancel={this.handleCancel}
                 >
-                    <FormItem
+                    <FormItem className="required"
                         {...formItemLayout}
                         label="代码"
                     >
                         <Input value={code} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'code')}/>
                     </FormItem>
-                    
-                    <FormItem
+                    <FormItem className="required"
+                        {...formItemLayout}
+                        label="开始日期"
+                    >
+                        <DatePicker value={startDate && moment(startDate)} onChange={this.onDateFieldChange.bind(this,'startDate')} placeholder="开始日期" />
+                    </FormItem>
+                    <FormItem 
                         {...formItemLayout}
                         label="数量"
                     >
@@ -127,9 +134,9 @@ export default class App extends React.Component {
                     </FormItem>
                     <FormItem
                         {...formItemLayout}
-                        label="日期"
+                        label="结束日期"
                     >
-                        <DatePicker value={date} onChange={this.onDateFieldChange} placeholder="信号日期" />
+                        <DatePicker value={endDate && moment(endDate)} onChange={this.onDateFieldChange.bind(this,'endDate')} placeholder="结束日期" />
                     </FormItem>
                 </Modal>
             </div>

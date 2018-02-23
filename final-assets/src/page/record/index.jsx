@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { LocaleProvider ,List } from 'antd';
+import FEvents from "components/Common/FEvent/index.js";
+import RecordList from "components/Record/RecordList/index.jsx";
 import {Env} from "common/config.js";
-import { request2 } from "common/ajax.js";
+import { request } from "common/ajax.js";
+import { LocaleProvider  } from 'antd';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import 'common/base.scss';
 
 
 
-
+@FEvents
 export default class App extends Component {
 
     constructor(props) {
@@ -20,9 +22,11 @@ export default class App extends Component {
 
     componentDidMount() {
         
+       
     }
 
- 
+    
+
     
 
     render() {
@@ -30,14 +34,7 @@ export default class App extends Component {
         return (
             <LocaleProvider locale={zhCN}>
                 <div className={"page-wrap "+"page-wrap-"+Env}>
-                <List
-                    bordered
-                    >
-                    <List.Item><a target="_blank" href="/detail.html">详情</a></List.Item>
-                    <List.Item><a target="_blank" href="/alert.html">alert</a></List.Item>
-                    <List.Item><a target="_blank" href="/setting.html">设置</a></List.Item>
-                    <List.Item><a target="_blank" href="/record.html">交易记录</a></List.Item>
-                </List>
+                    <RecordList />
                 </div>
             </LocaleProvider>
             

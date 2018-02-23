@@ -23,7 +23,7 @@ let Config = {
         end:'2018-01-15'
     }],
     alertList:{
-        doInterval:false,
+        doInterval:true,
         intervalTime:10000
     },
     defaultChart:{
@@ -106,6 +106,10 @@ let Dict = {
         {label:'上证50',value:'SH000016'},
         {label:'沪深300',value:'SZ399300'},
         {label:'中证500',value:'SH000905'}
+    ],
+    recordDirection:[
+        {label:'买入',value:'buy'},
+        {label:'卖出',value:'sell'}
     ]
 }
 

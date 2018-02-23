@@ -12,28 +12,34 @@ const FormItem = Form.Item;
 
 
 @FEvents
-export default class App extends React.Component {
+export default class App extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             id:'',
             code:'',
-            cost:'',
             date:'',
             number:'',
+            stopPrice:'',
+            direction:'',
+            groupId:'',
+            price:'',
             visible: false
         };
     }
 
     componentDidMount() {
-        this.on('final:pos-edit-show', (data) => {
+        this.on('final:record-edit-show', (data) => {
             this.setState({
                 id:data && data.id?data.id:'',
+                groupId:data && data.groupId?data.groupId:'',
+                code:data && data.code?data.code:'',
                 date:'',
                 number:'',
-                code:'',
-                cost:'',
+                stopPrice:'',
+                direction:'',
+                price:'',
                 visible: true
             },this.fetchData);
         });
@@ -42,7 +48,7 @@ export default class App extends React.Component {
     fetchData=()=>{
         let {id} = this.state;
         if(id){
-            request('/pos/getById',
+            request('/record/getById',
             (res)=>{
                 if(res){
                     this.setState({
@@ -76,19 +82,25 @@ export default class App extends React.Component {
         })
     }
 
+    onSelectChange=(name,value)=>{
+        this.setState({
+            [name]:value
+        })
+    }
+
     onSaveClick=()=>{
         const self = this;
-        request('/pos/save',
+        request('/record/save',
 		(res)=>{
             self.setState({visible:false})
-            self.emit('final:pos-edit-finish')
+            self.emit('final:record-edit-finish')
 		},{
             ...this.state
         },'jsonp')
     }
 
     render() {
-        const {number,date,id,code,cost} = this.state;
+        const {id,code,count,date,price,stopPrice,fee,direction} = this.state;
         const formItemLayout = {
             labelCol: {
               sm: { span: 6 },
@@ -97,7 +109,6 @@ export default class App extends React.Component {
               sm: { span: 18 },
             },
           };
-        // console.log(type,date)
         return (
             <div>
                 <Modal
@@ -112,25 +123,49 @@ export default class App extends React.Component {
                     >
                         <Input value={code} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'code')}/>
                     </FormItem>
-                    
-                    <FormItem
-                        {...formItemLayout}
-                        label="数量"
-                    >
-                        <Input value={number} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'number')}/>
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label="成本"
-                    >
-                        <Input value={cost} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'cost')}/>
-                    </FormItem>
                     <FormItem
                         {...formItemLayout}
                         label="日期"
                     >
-                        <DatePicker value={date} onChange={this.onDateFieldChange} placeholder="信号日期" />
+                        <DatePicker value={date && moment(date)} style={{width:'165px'}} onChange={this.onDateFieldChange} placeholder="日期" />
                     </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="数量"
+                    >
+                        <Input value={count} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'count')}/>
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="方向"
+                    >
+                        <Select style={{width:'165px'}} value={direction}  onChange={this.onSelectChange.bind(this,'direction')}>
+                            {
+                                Dict.recordDirection.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
+                        </Select>
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="价格"
+                    >
+                        <Input value={price} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'price')}/>
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="止损价格"
+                    >
+                        <Input value={stopPrice} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'stopPrice')}/>
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="手续费"
+                    >
+                        <Input value={fee} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'fee')}/>
+                    </FormItem>
+                    
                 </Modal>
             </div>
         );

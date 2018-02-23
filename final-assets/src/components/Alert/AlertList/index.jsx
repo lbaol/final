@@ -52,18 +52,18 @@ export default class App extends Component {
     }
 
     componentDidMount() {
+        
+        this.fetchMonitorList();
         this.fetchPositionList2();
-        // this.fetchMonitorList();
-        // this.fetchPositionList();
-        // if (doInterval == true) {
-        //     setInterval(this.getAlertList, 5000)
-        // } else {
-        //     setTimeout(this.getAlertList, intervalTime)
-        // }
+        if (doInterval == true) {
+            setInterval(this.getAlertList, 5000)
+        } else {
+            setTimeout(this.getAlertList, intervalTime)
+        }
 
-        // this.on('final:fav-import-finish', () => {
-        //     this.refreshList();
-        // })
+        this.on('final:fav-import-finish', () => {
+            this.refreshList();
+        })
 
         this.on('final:pos-edit-finish', () => {
             this.fetchPositionList2()
@@ -108,24 +108,7 @@ export default class App extends Component {
 
 
 
-    fetchPositionList = () => {
-        const self = this;
-        request('/fav/getByParam',
-            (res) => {
-
-                for (let d of res.favList) {
-                    this.state.codes.push(d.code);
-                    self.getEventsByCode(d.code)
-                }
-
-                self.setState({
-                    positionDataSource: res.favList,
-                    codes: _.sortedUniq(this.state.codes)
-                }, this.getLastQuote)
-            }, {
-                type: 'position'
-            }, 'jsonp')
-    }
+  
 
     fetchPositionList2 = () => {
         const self = this;
@@ -723,140 +706,8 @@ export default class App extends Component {
                     </div>
                 </div>
 
-                <div className="mt30">
-                    
-                    <div>{totalValue}</div>
-                    <Table size="small" className="mt10"
-                        pagination={false}
-                        dataSource={positionDataSource}
-                        columns={[{
-                            title: '序号',
-                            dataIndex: 'index',
-                            key: 'index',
-                            render: (text, record, index) => {
-                                return (<div>
-                                    {index + 1}
-                                </div>)
-                            }
-                        }, {
-                            title: '名称',
-                            dataIndex: 'name',
-                            key: 'name',
-                            render: (text, record) => {
-                                return (<div>
-                                    {Util.getStockName(record.code)}
-                                </div>)
-                            }
-                        }, {
-                            title: '代码',
-                            dataIndex: 'code',
-                            key: 'code',
-                            render: (text, record) => {
-                                return (<a target="_blank" href={'/detail.html?codes='+text}>{record.code}</a>)
-                            }
-                        }, {
-                            title: '领先新高',
-                            dataIndex: 'code',
-                            key: 'leadNewHigh',
-                            render: (text, record) => {
-                                return this.renderEventTypeCell(record.code,'leadNewHigh')
-                            }
-                        }, {
-                            title: '断层',
-                            dataIndex: 'code',
-                            key: 'fault',
-                            render: (text, record) => {
-                                return this.renderEventTypeCell(record.code,'fault')
-                            }
-                        }, {
-                            title: '杯柄',
-                            dataIndex: 'code',
-                            key: 'handle',
-                            render: (text, record) => {
-                                return this.renderEventTypeCell(record.code,'handle')
-                            }
-                        }, {
-                            title: '突破',
-                            dataIndex: 'code',
-                            key: 'breakThrough',
-                            render: (text, record) => {
-                                return this.renderEventTypeCell(record.code,'breakThrough')
-                            }
-                        }, {
-                            title: '数量',
-                            dataIndex: 'number',
-                            key: 'number'
-                        },{
-                            title: '当前价格',
-                            dataIndex: 'current',
-                            key: 'current',
-                            render: (text, record, index) => {
-                                let marketValue;
-                                let quote = quoteMapper[Util.getFullCode(record.code)];
-                                return quote && quote.current
-                            }
-                        },{
-                            title: '当日涨幅',
-                            dataIndex: 'number',
-                            key: 'risePercent',
-                            render: (text, record, index) => {
-                                let marketValue;
-                                let quote = quoteMapper[Util.getFullCode(record.code)];
-                                return Util.renderRisePercent(quote && quote.percentage) 
-                            }
-                        },
-                        {
-                            title: '市值',
-                            dataIndex: 'number',
-                            key: 'marketValue',
-                            render: (text, record, index) => {
-                                let marketValue;
-                                let quote = quoteMapper[Util.getFullCode(record.code)];
-                                // console.log(text, record, index,record.number,quoteMapper[Util.getFullCode(record.code)])
-                                if (record.number && quote) {
-                                    marketValue = _.round(record.number * quote.current);
-                                }
-                                return (<div>{marketValue}</div>)
-                            }
-                        },
-                        {
-                            title: '占比',
-                            dataIndex: 'number',
-                            key: 'marketValuePercent',
-                            render: (text, record, index) => {
-                                let marketValue;
-                                let marketValuePercent;
-                                let quote = quoteMapper[Util.getFullCode(record.code)];
-                                // console.log(text, record, index,record.number,quoteMapper[Util.getFullCode(record.code)])
-                                if (record.number && quote && totalValue) {
-                                    marketValue = _.round(record.number * quote.current);
-                                    marketValuePercent = _.round(marketValue / totalValue * 100, 2);
-                                }
-                                return (<div>{marketValuePercent}%</div>)
-                            }
-                        },
-                        {
-                            title: '数量设置',
-                            dataIndex: 'number',
-                            key: 'numberSet',
-                            render: (text, record, index) => {
-
-                                return (<div>
-                                    <Input size="small" style={{ width: '100px' }} defaultValue={text} onChange={this.onNumberInputChange.bind(this, index, record)} />
-                                </div>)
-                            }
-                        },
-                        {
-                            title: '操作',
-                            dataIndex: 'action',
-                            key: 'action',
-                            render: this.renderOperCell
-                        }
-
-                        ]} />
-
-                </div>
-                <div className="mt30 ml20 pos-list">
+                
+                <div className="mt30 mb30 ml20 pos-list">
                     <div>
                         <span>
                             {totalValue2}
@@ -864,36 +715,36 @@ export default class App extends Component {
                         <span className="ml20">
                             <Icon className="c-p" type="plus-circle-o" onClick={this.onPosAddClick} />
                         </span>
-                        <span className="ml20">
+                        <span className="ml10">
                             <Icon className="c-p"  type="profile" onClick={this.onPosListCollapseClick} />
                         </span>
                     </div>
-                    <div>
-                        <div className="pos-col name">名称</div>
-                        <div className="pos-col code">代码</div>
-                        <div className="pos-col number">数量</div>
-                        <div className="pos-col cost">成本</div>
-                        <div className="pos-col returns">收益</div>
-                        <div className="pos-col current">当前价格</div>
-                        <div className="pos-col rise">当日涨幅</div>
-                        <div className="pos-col value">市值</div>
-                        <div className="pos-col proportion">占比</div>
-                        <div className="pos-col oper">操作</div>
+                    <div className="mt10">
+                        <div className="list-col name">名称</div>
+                        <div className="list-col code">代码</div>
+                        <div className="list-col number">数量</div>
+                        <div className="list-col cost">成本</div>
+                        <div className="list-col returns">收益</div>
+                        <div className="list-col current">当前价格</div>
+                        <div className="list-col rise">当日涨幅</div>
+                        <div className="list-col value">市值</div>
+                        <div className="list-col proportion">占比</div>
+                        <div className="list-col oper">操作</div>
                     </div>
                     {Object.keys(posDS).map(k=>{
                         let quote = quoteMapper[Util.getFullCode(k)];
                         return <div className="pos">
                             <div className="pos-item-total">
-                                <div className="pos-col name">{Util.getStockName(k)}</div>
-                                <div className="pos-col code">{posDS[k].code}</div>
-                                <div className="pos-col number">{posDS[k].number}</div>
-                                <div className="pos-col cost">{posDS[k].cost}</div>
-                                <div className={"pos-col returns "+this.getPosWarningClass(posDS[k],quote)}>{quote && Util.renderRisePercent(_.round((quote.current-posDS[k].cost)/posDS[k].cost*100,2))}</div>
-                                <div className="pos-col current">{quote && quote.current}</div>
-                                <div className="pos-col rise">{quote && Util.renderRisePercent(quote.percentage)}</div>
-                                <div className="pos-col value">{_.round(posDS[k].number * (quote && quote.current))}</div>
-                                <div className="pos-col proportion">{quote && _.round(posDS[k].number * quote.current/totalValue2*100)}%</div>
-                                <div className="pos-col oper">
+                                <div className="list-col name">{Util.getStockName(k)}</div>
+                                <div className="list-col code">{posDS[k].code}</div>
+                                <div className="list-col number">{posDS[k].number}</div>
+                                <div className="list-col cost">{posDS[k].cost}</div>
+                                <div className={"list-col returns "+this.getPosWarningClass(posDS[k],quote)}>{quote && Util.renderRisePercent(_.round((quote.current-posDS[k].cost)/posDS[k].cost*100,2))}</div>
+                                <div className="list-col current">{quote && quote.current}</div>
+                                <div className="list-col rise">{quote && Util.renderRisePercent(quote.percentage)}</div>
+                                <div className="list-col value">{_.round(posDS[k].number * (quote && quote.current))}</div>
+                                <div className="list-col proportion">{quote && _.round(posDS[k].number * quote.current/totalValue2*100)}%</div>
+                                <div className="list-col oper">
                                     <Icon className="c-p" type="down" onClick={this.onShowPosDetailClick.bind(this,k)} />{posDS[k].list.length>1?<span>({posDS[k].list.length})</span>:''}
                                 </div>
                             </div>
@@ -901,18 +752,18 @@ export default class App extends Component {
                                 posDS[k].visible == true && posDS[k].list.map(d=>{
                                     let ret = _.round((quote.current-d.cost)/d.cost*100,2);
                                     return (<div  className="pos-item">
-                                        <div className="pos-col name">{Util.getStockName(d.code)}</div>
-                                        <div className="pos-col code">{d.code}</div>
-                                        <div className="pos-col number">{d.number}</div>
-                                        <div className="pos-col cost">{d.cost}</div>
-                                        <div className={"pos-col returns "+((ret<=-8)?'warn':'')}>{quote && Util.renderRisePercent(ret)}</div>
-                                        <div className="pos-col current"></div>
-                                        <div className="pos-col rise"></div>
-                                        <div className="pos-col value">{quote && _.round(d.number *  quote.current)}</div>
-                                        <div className="pos-col proportion">{quote && _.round(d.number * quote.current/totalValue2*100)}%</div>
-                                        <div className="pos-col oper">
+                                        <div className="list-col name">{Util.getStockName(d.code)}</div>
+                                        <div className="list-col code">{d.code}</div>
+                                        <div className="list-col number">{d.number}</div>
+                                        <div className="list-col cost">{d.cost}</div>
+                                        <div className={"list-col returns "+((ret<=-8)?'warn':'')}>{quote && Util.renderRisePercent(ret)}</div>
+                                        <div className="list-col current"></div>
+                                        <div className="list-col rise"></div>
+                                        <div className="list-col value">{quote && _.round(d.number *  quote.current)}</div>
+                                        <div className="list-col proportion">{quote && _.round(d.number * quote.current/totalValue2*100)}%</div>
+                                        <div className="list-col oper">
                                             <span><Icon className="c-p" type="edit" onClick={this.onPosEditClick.bind(this,d.id)} /></span>
-                                            <span className="ml10"><Icon className="c-p" type="delete" onClick={this.onPosDeleteClick.bind(this,d.id)} /></span>
+                                            <span className="ml20"><Icon className="c-p" type="delete" onClick={this.onPosDeleteClick.bind(this,d.id)} /></span>
                                         </div>
                                     </div>)
                                 })

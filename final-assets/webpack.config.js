@@ -6,6 +6,7 @@ module.exports = {
         'index' :__dirname + "/src/page/index/enter.js",
         'detail' :__dirname + "/src/page/detail/enter.js",
         'alert':__dirname + "/src/page/alert/enter.js",
+        'record':__dirname + "/src/page/record/enter.js",
         'setting':__dirname + "/src/page/setting/enter.js",
         'test':__dirname + "/src/page/test/enter.js"
     },
