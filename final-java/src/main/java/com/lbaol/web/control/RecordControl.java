@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lbaol.common.NumberUtil;
@@ -31,7 +32,8 @@ public class RecordControl {
 	
 	
 	@RequestMapping("/record/save")
-	RpcResult addOrUpdate(Integer id,String code,Double count,Double price,String date,Integer groupId) { 
+	RpcResult addOrUpdate(Integer id,String code,Double count,Double price,String date,Integer groupId,String direction,
+			@RequestParam(value="fee",required = false,defaultValue  = "0") Double fee) { 
 		RpcResult rpcResult = new RpcResult();
 		
 		RecordDO recordDO = new RecordDO();
@@ -41,11 +43,17 @@ public class RecordControl {
 		if(price!=null && price >= 0) {
 			recordDO.setPrice(price);
 		}
+		if(fee!=null && fee >= 0) {
+			recordDO.setFee(fee);
+		}
 		if(groupId!=null && groupId >= 0) {
 			recordDO.setGroupId(groupId);
 		}
 		if(StringUtils.isNotEmpty(code)) {
 			recordDO.setCode(code);
+		}
+		if(StringUtils.isNotEmpty(direction)) {
+			recordDO.setDirection(direction);
 		}
 	
 		if(StringUtils.isNotEmpty(date)) {
@@ -72,6 +80,16 @@ public class RecordControl {
 		return recordDO;
     }
 	
+	@RequestMapping("/record/deleteById")
+	RpcResult deleteById(Integer id) {  
+		RpcResult rpcResult = new RpcResult();
+		RecordDO recordDO = recordMapper.getById(id);
+		recordMapper.deleteById(id);
+		updateRecordGroupCountAndCost(recordDO.getGroupId());
+		rpcResult.setIsSuccess(true);
+        return rpcResult;  
+    }
+	
 	@RequestMapping("/record/getByGroupId")
     Map getByGroupId(Integer groupId) {  
 		Map map = new HashMap();
@@ -90,7 +108,10 @@ public class RecordControl {
 			Double value = NumberUtil.mul(record.getPrice(), record.getCount());
 			totalValue = NumberUtil.add(value, totalValue);
 		}
-		Double cost = NumberUtil.round(NumberUtil.div(totalValue, totalCount));
+		Double cost = 0d;
+		if(totalCount!=0) {
+			cost = NumberUtil.round(NumberUtil.div(totalValue, totalCount));
+		}
 		recordGroupDO.setCount(totalCount);
 		recordGroupDO.setCost(cost);
 		recordGroupMapper.update(recordGroupDO);

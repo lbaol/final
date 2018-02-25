@@ -20,7 +20,7 @@ export default class App extends Component {
             id:'',
             code:'',
             date:'',
-            number:'',
+            count:'',
             stopPrice:'',
             direction:'',
             groupId:'',
@@ -36,7 +36,7 @@ export default class App extends Component {
                 groupId:data && data.groupId?data.groupId:'',
                 code:data && data.code?data.code:'',
                 date:'',
-                number:'',
+                count:'',
                 stopPrice:'',
                 direction:'',
                 price:'',
@@ -117,25 +117,25 @@ export default class App extends Component {
                     onOk={this.onSaveClick}
                     onCancel={this.handleCancel}
                 >
-                    <FormItem
+                    <FormItem className="required"
                         {...formItemLayout}
                         label="代码"
                     >
                         <Input value={code} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'code')}/>
                     </FormItem>
-                    <FormItem
+                    <FormItem className="required"
                         {...formItemLayout}
                         label="日期"
                     >
                         <DatePicker value={date && moment(date)} style={{width:'165px'}} onChange={this.onDateFieldChange} placeholder="日期" />
                     </FormItem>
-                    <FormItem
+                    <FormItem className="required"
                         {...formItemLayout}
                         label="数量"
                     >
                         <Input value={count} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'count')}/>
                     </FormItem>
-                    <FormItem
+                    <FormItem className="required"
                         {...formItemLayout}
                         label="方向"
                     >
@@ -147,7 +147,7 @@ export default class App extends Component {
                             }
                         </Select>
                     </FormItem>
-                    <FormItem
+                    <FormItem className="required"
                         {...formItemLayout}
                         label="价格"
                     >

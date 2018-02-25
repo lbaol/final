@@ -31,7 +31,7 @@ public class RecordGroupControl {
 	
 	
 	@RequestMapping("/recordGroup/save")
-	RpcResult addOrUpdate(Integer id,String code,Double count,Double cost,String startDate,String endDate) { 
+	RpcResult addOrUpdate(Integer id,String code,Double count,Double cost,String startDate,String endDate,String status) { 
 		RpcResult rpcResult = new RpcResult();
 		
 		RecordGroupDO recordGroupDO = new RecordGroupDO();
@@ -50,7 +50,9 @@ public class RecordGroupControl {
 		if(StringUtils.isNotEmpty(endDate)) {
 			recordGroupDO.setEndDate(endDate);
 		}
-		
+		if(StringUtils.isNotEmpty(status)) {
+			recordGroupDO.setStatus(status);
+		}
 		if(id != null && id >0) {
 			recordGroupDO.setId(id);
 			recordGroupMapper.update(recordGroupDO);
@@ -75,6 +77,19 @@ public class RecordGroupControl {
 		List<RecordGroupDO>  recordGroupList =  recordGroupMapper.getAll();
 		map.put("list", recordGroupList);
         return map;  
+    }
+	
+	@RequestMapping("/recordGroup/deleteById")
+	RpcResult deleteById(Integer id) {  
+		RpcResult rpcResult = new RpcResult();
+		List<RecordDO> recordList = recordMapper.getByGroupId(id);
+		if(recordList.size() > 0) {
+			rpcResult.setIsSuccess(false);
+	        return rpcResult;  
+		}
+		recordGroupMapper.deleteById(id);
+		rpcResult.setIsSuccess(true);
+        return rpcResult;  
     }
 	
 	@RequestMapping("/recordGroup/getPositionList")

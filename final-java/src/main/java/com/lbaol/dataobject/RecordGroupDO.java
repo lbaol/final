@@ -10,7 +10,16 @@ public class RecordGroupDO {
 	private String code;
 	private Double count;
 	private Double cost;
+	private String status;
 	
+	
+	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	private List<RecordDO> recordList;
 	
 	

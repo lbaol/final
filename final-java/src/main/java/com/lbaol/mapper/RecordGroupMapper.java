@@ -28,7 +28,7 @@ public interface RecordGroupMapper {
 	})
 	RecordGroupDO getById(@Param("id") Integer id);
 	
-	@Select("SELECT * FROM record_group where count != 0 order by start_date desc")
+	@Select("SELECT * FROM record_group where status != 'finish' order by start_date desc")
     @Results({
 		@Result(property = "startDate", column = "start_date"),
         @Result(property = "endDate", column = "end_date")
@@ -45,7 +45,7 @@ public interface RecordGroupMapper {
 	@Delete("DELETE FROM record_group WHERE id =#{id}")
     void deleteById(Integer id);
 	
-	@Insert("INSERT INTO record_group(code,count,start_date,end_date,cost) VALUES(#{code}, #{count}, #{startDate}, #{endDate}, #{cost})")
+	@Insert("INSERT INTO record_group(code,count,start_date,end_date,cost,status) VALUES(#{code}, #{count}, #{startDate}, #{endDate}, #{cost}, #{status})")
 	@Options(useGeneratedKeys=true, keyProperty="id")
 	void insert(RecordGroupDO recordGroupDO);
 	
@@ -68,18 +68,23 @@ public interface RecordGroupMapper {
             }}.toString();  
         } 
     	
+    	
+    	
         public String update(RecordGroupDO recordGroupDO) {  
         	
         	return new SQL()  
             {  
                 {  
-                    UPDATE("pos");  
+                    UPDATE("record_group");  
                     
                     if(recordGroupDO.getCount()!=null){  
                     	SET("count = #{count}");
                     }
                     if(recordGroupDO.getCost()!=null){  
                     	SET("cost = #{cost}");
+                    }
+                    if(StringUtils.isNotEmpty(recordGroupDO.getStatus())){  
+                    	SET("status = #{status}");
                     }
                     if(StringUtils.isNotEmpty(recordGroupDO.getStartDate())){  
                     	SET("start_date = #{startDate}");

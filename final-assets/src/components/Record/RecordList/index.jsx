@@ -19,28 +19,32 @@ export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            recordGroupList:[],
+            groupList:[],
             tab:'position'
         };
     }
 
     componentDidMount() {
         
-       this.fetchRecordGroupList()
+       this.fetchGroupList()
 
        this.on('final:record-group-edit-finish',()=>{
-           this.fetchRecordGroupList();
+           this.fetchGroupList();
        })
+
+       this.on('final:record-edit-finish',()=>{
+        this.fetchGroupList();
+    })
     }
 
-    fetchRecordGroupList = () => {
+    fetchGroupList = () => {
         let {tab} = this.state;
         let url = tab == 'all' ?'/recordGroup/getList':'/recordGroup/getPositionList'
         const self = this;
         request(url,
             (res) => {
                self.setState({
-                    recordGroupList:res.list
+                    groupList:res.list
                })
             }, {
             }, 'jsonp')
@@ -55,9 +59,52 @@ export default class App extends Component {
         this.emit('final:record-edit-show',{groupId:group.id,code:group.code});
     }
 
+    onShowRecordList = (i)=>{
+        let {groupList} = this.state;
+        groupList[i].visible = !groupList[i].visible;
+        this.setState({groupList})
+    }
+
+    onRecordEditClick=(id)=>{
+        this.emit('final:record-edit-show',{id:id})
+    }
+
+    onRecordDeleteClick=(id)=>{
+        const self = this;
+        Modal.confirm({
+            title: '确定不是手抖点的删除?',
+            content: '',
+            onOk() {
+                request('/record/deleteById',
+                    (res) => {
+                        self.fetchGroupList()
+                    }, {
+                        id: id
+                    }, 'jsonp')
+            },
+            onCancel() {},
+          })
+    }
+
+    onGroupDeleteClick=(id)=>{
+        const self = this;
+        Modal.confirm({
+            title: '确定不是手抖点的删除?',
+            content: '',
+            onOk() {
+                request('/recordGroup/deleteById',
+                    (res) => {
+                        self.fetchGroupList()
+                    }, {
+                        id: id
+                    }, 'jsonp')
+            },
+            onCancel() {},
+          })
+    }
    
     render() {
-        let {recordGroupList} = this.state;
+        let {groupList} = this.state;
         return (
             <div className="record-list-container">
                 <div className="pt10 pb10 pl10">
@@ -80,21 +127,53 @@ export default class App extends Component {
                         <div className="list-col oper">操作</div>
                     </div>
                     {
-                        recordGroupList.map(g=>{
-                            return <div className="group-item mt10">
-                                <div className="list-col name">{Util.getStockName(g.code)}</div>
-                                <div className="list-col code">{g.code}</div>
-                                <div className="list-col number">{g.count}</div>
-                                <div className="list-col cost">{g.cost}</div>
-                                <div className="list-col returns"></div>
-                                <div className="list-col current"></div>
-                                <div className="list-col rise"></div>
-                                <div className="list-col value"></div>
-                                <div className="list-col proportion"></div>
-                                <div className="list-col oper">
-                                    <Icon className="c-p" type="plus-circle-o" onClick={this.onRecordAddClick.bind(this,g)} />
-                                </div>
-                            </div>
+                        groupList.map((g,i)=>{
+                            return (<div className="record-group">
+                                    <div className="group-item mt10">
+                                        <div className="list-col name">{Util.getStockName(g.code)}</div>
+                                        <div className="list-col code">{g.code}</div>
+                                        <div className="list-col number">{g.count}</div>
+                                        <div className="list-col cost">{g.cost}</div>
+                                        <div className="list-col returns"></div>
+                                        <div className="list-col current"></div>
+                                        <div className="list-col rise"></div>
+                                        <div className="list-col value"></div>
+                                        <div className="list-col proportion"></div>
+                                        <div className="list-col oper">
+                                            <Icon className="c-p" type="plus-circle-o" onClick={this.onRecordAddClick.bind(this,g)} />
+                                            <span className="ml10">
+                                                <Icon className="c-p" type="down" onClick={this.onShowRecordList.bind(this,i)} />{g.recordList && g.recordList.length>0?<span>({g.recordList.length})</span>:''}
+                                            </span>
+                                            <span className="ml10">
+                                                <Icon className="c-p" type="delete" onClick={this.onGroupDeleteClick.bind(this,g.id)} />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {
+                                        g.visible == true && g.recordList && g.recordList.map(d=>{
+                                            return (
+                                                <div className="record-item">
+                                                    <div className="list-col name">{Util.getStockName(d.code)}</div>
+                                                    <div className="list-col code">{d.code}</div>
+                                                    <div className="list-col number">{d.count}</div>
+                                                    <div className="list-col cost">{d.price}</div>
+                                                    <div className="list-col returns"></div>
+                                                    <div className="list-col current"></div>
+                                                    <div className="list-col rise"></div>
+                                                    <div className="list-col value"></div>
+                                                    <div className="list-col proportion"></div>
+                                                    <div className="list-col oper">
+                                                        <span><Icon className="c-p" type="edit" onClick={this.onRecordEditClick.bind(this,d.id)} /></span>
+                                                        <span className="ml20">
+                                                            <Icon className="c-p" type="delete" onClick={this.onRecordDeleteClick.bind(this,d.id)} />
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>)
+                                
                             })
                     }
                 </div>

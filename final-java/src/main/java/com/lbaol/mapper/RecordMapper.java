@@ -42,7 +42,7 @@ public interface RecordMapper {
 	@Delete("DELETE FROM record WHERE id =#{id}")
     void deleteById(Integer id);
 	
-	@Insert("INSERT INTO record(code,count,date,fee,stop_price,direction,group_id) VALUES(#{code}, #{count}, #{date}, #{fee}, #{stopPrice}, #{direction}, #{groupId})")
+	@Insert("INSERT INTO record(code,count,date,fee,stop_price,direction,group_id,price) VALUES(#{code}, #{count}, #{date}, #{fee}, #{stopPrice}, #{direction}, #{groupId}, #{price})")
 	@Options(useGeneratedKeys=true, keyProperty="id")
 	void insert(RecordDO recordDO);
 	
@@ -58,10 +58,22 @@ public interface RecordMapper {
         	return new SQL()  
             {  
                 {  
-                    UPDATE("pos");  
+                    UPDATE("record");  
                     
                     if(recordDO.getCount()!=null){  
                     	SET("count = #{count}");
+                    }
+                    if(recordDO.getPrice()!=null){  
+                    	SET("price = #{price}");
+                    }
+                    if(recordDO.getDirection()!=null){  
+                    	SET("direction = #{direction}");
+                    }
+                    if(recordDO.getStopPrice()!=null){  
+                    	SET("stop_price = #{stopPrice}");
+                    }
+                    if(recordDO.getFee()!=null){  
+                    	SET("fee = #{fee}");
                     }
                     if(StringUtils.isNotEmpty(recordDO.getDate())){  
                     	SET("date = #{date}");

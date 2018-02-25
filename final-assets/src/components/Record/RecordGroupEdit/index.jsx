@@ -23,6 +23,7 @@ export default class App extends Component {
             startDate:'',
             endDate:'',
             number:'',
+            status:'',
             visible: false
         };
     }
@@ -36,6 +37,7 @@ export default class App extends Component {
                 number:'',
                 code:'',
                 cost:'',
+                status:'',
                 visible: true
             },this.fetchData);
         });
@@ -89,8 +91,14 @@ export default class App extends Component {
         },'jsonp')
     }
 
+    onSelectChange=(name,value)=>{
+        this.setState({
+            [name]:value
+        })
+    }
+
     render() {
-        const {number,startDate,endDate,id,code,cost} = this.state;
+        const {number,startDate,endDate,id,code,cost,status} = this.state;
         const formItemLayout = {
             labelCol: {
               sm: { span: 6 },
@@ -137,6 +145,15 @@ export default class App extends Component {
                         label="结束日期"
                     >
                         <DatePicker value={endDate && moment(endDate)} onChange={this.onDateFieldChange.bind(this,'endDate')} placeholder="结束日期" />
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="状态"
+                    >
+                        <Select style={{width:'165px'}} value={status}  onChange={this.onSelectChange.bind(this,'status')}>
+                            <Select.Option value=""></Select.Option>
+                            <Select.Option value="finish">结束</Select.Option>
+                        </Select>
                     </FormItem>
                 </Modal>
             </div>
