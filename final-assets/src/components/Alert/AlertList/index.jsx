@@ -28,8 +28,8 @@ let _maDayCounts = [
     },
 ]
 
-const intervalTime = Config.alertList.intervalTime;
-const doInterval = Config.alertList.doInterval;
+const intervalTime = Config.quote.intervalTime;
+const doInterval = Config.quote.doInterval;
 
 @FEvents
 export default class App extends Component {

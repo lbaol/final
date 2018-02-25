@@ -7,7 +7,7 @@ import FEvents from "components/Common/FEvent/index.js";
 import RecordGroupEdit from "components/Record/RecordGroupEdit/index.jsx";
 import RecordEdit from "components/Record/RecordEdit/index.jsx";
 import { request } from "common/ajax.js";
-import { URL, Util, Dict, Config } from "common/config.js";
+import { URL, Util, Dict, Config,Data } from "common/config.js";
 import './index.scss';
 
 
@@ -33,8 +33,14 @@ export default class App extends Component {
        })
 
        this.on('final:record-edit-finish',()=>{
-        this.fetchGroupList();
-    })
+            this.fetchGroupList();
+        })
+
+        setInterval(()=>{
+            this.setState({
+                groupList:this.state.groupList
+            })
+        },Config.quote.intervalTime)
     }
 
     fetchGroupList = () => {
@@ -46,8 +52,18 @@ export default class App extends Component {
                self.setState({
                     groupList:res.list
                })
+               let codeArray = self.getCodeArray(res.list);
+               Data.addCodeArrayToQuote(codeArray);
             }, {
             }, 'jsonp')
+    }
+
+    getCodeArray=(list)=>{
+        let codeArray = [];
+        for(let d of list){
+            codeArray.push(d.code);
+        }
+        return codeArray;
     }
 
 
@@ -151,6 +167,8 @@ export default class App extends Component {
                                     </div>
                                     {
                                         g.visible == true && g.recordList && g.recordList.map(d=>{
+                                            let quote = Data.quote[Util.getFullCode(d.code)];
+                                            console.log('quote',quote)
                                             return (
                                                 <div className="record-item">
                                                     <div className="list-col name">{Util.getStockName(d.code)}</div>
@@ -158,7 +176,7 @@ export default class App extends Component {
                                                     <div className="list-col number">{d.count}</div>
                                                     <div className="list-col cost">{d.price}</div>
                                                     <div className="list-col returns"></div>
-                                                    <div className="list-col current"></div>
+                                                    <div className="list-col current">{quote && quote.current}</div>
                                                     <div className="list-col rise"></div>
                                                     <div className="list-col value"></div>
                                                     <div className="list-col proportion"></div>

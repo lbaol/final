@@ -22,9 +22,9 @@ let Config = {
         start:'2017-11-29',
         end:'2018-01-15'
     }],
-    alertList:{
+    quote:{
         doInterval:true,
-        intervalTime:10000
+        intervalTime:3000
     },
     defaultChart:{
         startDate:moment().subtract(1000, 'day').format('YYYY-MM-DD'),
@@ -125,6 +125,18 @@ for(let key in Dict){
 }
 
 
+let quoteCodes = [];
+let Data = {
+    stock : {},
+    quote : {},
+    addCodeArrayToQuote:(codeArray)=>{
+        let codes = [].concat(quoteCodes,codeArray);
+        codes = _.sortedUniq(codes);
+        quoteCodes = codes;
+    }
+};
+
+//获取股票基本信息
 function fetchStockDict(){
     console.log('fetchStockDict start');
     request_sync('/stock/getAll',
@@ -135,6 +147,7 @@ function fetchStockDict(){
             stockDict[st.code] = st
         }
         Dict.stockDict = stockDict;
+        Data.stock = stockDict;
         console.log('fetchStockDict end',Dict.stockDict);
     })
 }
@@ -243,6 +256,34 @@ const Util = {
     }
 }
 
+//获取实时行情
+
+function getLastQuote(){
+    let codes = quoteCodes;
+    if(codes.length > 0 ){
+        let reqCodes = codes.map(d => Util.getFullCode(d));
+        request('https://xueqiu.com/v4/stock/quote.json',
+            (res) => {
+
+                let quote = {};
+                for (let k in res) {
+                    quote[k] = res[k]
+                }
+                Data.quote = quote;
+                console.log('quoteMapper',quote);
+            }, {
+                code: reqCodes.join(',')
+            }, 'jsonp')
+    }
+    
+}
+if (Config.quote.doInterval == true) {
+    setInterval(getLastQuote, Config.quote.intervalTime)
+} else {
+    setTimeout(getLastQuote, Config.quote.intervalTime)
+}
+
+
 export {
-    URL,Util,Config,Env,Dict
+    URL,Util,Config,Env,Dict,Data
 }

@@ -22,7 +22,7 @@ export default class App extends Component {
         
     }
 
- 
+    
     
 
     render() {
@@ -30,8 +30,7 @@ export default class App extends Component {
         return (
             <LocaleProvider locale={zhCN}>
                 <div className={"page-wrap "+"page-wrap-"+Env}>
-                <List
-                    bordered
+                <List bordered
                     >
                     <List.Item><a target="_blank" href="/detail.html">详情</a></List.Item>
                     <List.Item><a target="_blank" href="/alert.html">alert</a></List.Item>
