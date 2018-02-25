@@ -1,4 +1,3 @@
-import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
 import { request,request_sync} from "common/ajax.js";
@@ -24,7 +23,7 @@ let Config = {
     }],
     quote:{
         doInterval:true,
-        intervalTime:3000
+        intervalTime:5000
     },
     defaultChart:{
         startDate:moment().subtract(1000, 'day').format('YYYY-MM-DD'),
@@ -270,7 +269,7 @@ function getLastQuote(){
                     quote[k] = res[k]
                 }
                 Data.quote = quote;
-                console.log('quoteMapper',quote);
+                // console.log('quoteMapper',quote);
             }, {
                 code: reqCodes.join(',')
             }, 'jsonp')

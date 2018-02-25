@@ -144,6 +144,7 @@ export default class App extends Component {
                     </div>
                     {
                         groupList.map((g,i)=>{
+                            let quote = Data.quote[Util.getFullCode(g.code)];
                             return (<div className="record-group">
                                     <div className="group-item mt10">
                                         <div className="list-col name">{Util.getStockName(g.code)}</div>
@@ -151,7 +152,7 @@ export default class App extends Component {
                                         <div className="list-col number">{g.count}</div>
                                         <div className="list-col cost">{g.cost}</div>
                                         <div className="list-col returns"></div>
-                                        <div className="list-col current"></div>
+                                        <div className="list-col current">{quote && quote.current}</div>
                                         <div className="list-col rise"></div>
                                         <div className="list-col value"></div>
                                         <div className="list-col proportion"></div>
@@ -167,8 +168,7 @@ export default class App extends Component {
                                     </div>
                                     {
                                         g.visible == true && g.recordList && g.recordList.map(d=>{
-                                            let quote = Data.quote[Util.getFullCode(d.code)];
-                                            console.log('quote',quote)
+                                            
                                             return (
                                                 <div className="record-item">
                                                     <div className="list-col name">{Util.getStockName(d.code)}</div>
