@@ -4,12 +4,14 @@ import ReactDOM,{ render } from 'react-dom';
 import { LocaleProvider  } from 'antd';
 import Index from "./index.jsx";
 import RecordList from "components/Record/RecordList/index.jsx";
+import PositionList from "components/Position/PositionList/index.jsx";
 
 
 render((
   <LocaleProvider locale={"zhCN"}>
     <Router history={hashHistory}>
       <Route path="/" component={Index}/>
+      <Route path="/position_list" component={PositionList}/>
       <Route path="/record_list" component={RecordList}/>
     </Router>
   </LocaleProvider>

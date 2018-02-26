@@ -1,3 +1,4 @@
+import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
 import { request,request_sync} from "common/ajax.js";
@@ -97,7 +98,7 @@ let Dict = {
         { label: '报告', value: 'report' },
         { label: '预告', value: 'forecast' }
     ],
-    marketType:[
+    exchangeType:[
         {label:'沪市',value:'SH'},
         {label:'深市',value:'ZH'},
     ],
@@ -106,10 +107,23 @@ let Dict = {
         {label:'沪深300',value:'SZ399300'},
         {label:'中证500',value:'SH000905'}
     ],
+    marketType:[
+        {label:'大陆A股',value:'a'},
+        {label:'港股',value:'hk'},
+        {label:'美股',value:'us'},
+    ],
     recordDirection:[
         {label:'买入',value:'buy'},
         {label:'卖出',value:'sell'}
-    ]
+    ],
+    recordType:[
+        {label:'股票',value:'stock'},
+        {label:'期货',value:'futures'},
+    ],
+    recordOper:[
+        {label:'开仓',value:'open'},
+        {label:'平仓',value:'close'},
+    ],
 }
 
 
@@ -251,7 +265,7 @@ const Util = {
         }
     },
     renderRisePercent:function(d){
-        return <span>{Util.renderRise(d)}%</span>
+        return d && <span>{Util.renderRise(d)}%</span>
     }
 }
 

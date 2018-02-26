@@ -33,7 +33,7 @@ public class RecordControl {
 	
 	@RequestMapping("/record/save")
 	RpcResult addOrUpdate(Integer id,String code,Double count,Double price,String date,Integer groupId,String direction,
-			@RequestParam(value="fee",required = false,defaultValue  = "0") Double fee) { 
+			@RequestParam(value="fee",required = false,defaultValue  = "0") Double fee,String market,String type) { 
 		RpcResult rpcResult = new RpcResult();
 		
 		RecordDO recordDO = new RecordDO();
@@ -58,6 +58,12 @@ public class RecordControl {
 	
 		if(StringUtils.isNotEmpty(date)) {
 			recordDO.setDate(date);
+		}
+		if(StringUtils.isNotEmpty(market)) {
+			recordDO.setMarket(market);
+		}
+		if(StringUtils.isNotEmpty(type)) {
+			recordDO.setType(type);
 		}
 
 		
@@ -108,12 +114,12 @@ public class RecordControl {
 			Double value = NumberUtil.mul(record.getPrice(), record.getCount());
 			totalValue = NumberUtil.add(value, totalValue);
 		}
-		Double cost = 0d;
+		Double price = 0d;
 		if(totalCount!=0) {
-			cost = NumberUtil.round(NumberUtil.div(totalValue, totalCount));
+			price = NumberUtil.round(NumberUtil.div(totalValue, totalCount));
 		}
 		recordGroupDO.setCount(totalCount);
-		recordGroupDO.setCost(cost);
+		recordGroupDO.setPrice(price);
 		recordGroupMapper.update(recordGroupDO);
 	}
 	

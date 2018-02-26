@@ -114,7 +114,7 @@ export default class App extends Component {
                     <span class="ml10">
                         <Select  style={{width:'70px'}} size="small" value={market}  onChange={this.onMarketChange}>
                             {
-                                Dict.marketType.map(d=><Select.Option value={d.value}>{d.label}</Select.Option>)
+                                Dict.exchangeType.map(d=><Select.Option value={d.value}>{d.label}</Select.Option>)
                             }
                         </Select>
                     </span>

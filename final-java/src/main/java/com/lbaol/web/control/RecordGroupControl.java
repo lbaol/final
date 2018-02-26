@@ -31,7 +31,7 @@ public class RecordGroupControl {
 	
 	
 	@RequestMapping("/recordGroup/save")
-	RpcResult addOrUpdate(Integer id,String code,Double count,Double cost,String startDate,String endDate,String status) { 
+	RpcResult addOrUpdate(Integer id,String code,Double count,Double price,String startDate,String endDate,String status,String market,String type) { 
 		RpcResult rpcResult = new RpcResult();
 		
 		RecordGroupDO recordGroupDO = new RecordGroupDO();
@@ -41,8 +41,8 @@ public class RecordGroupControl {
 		if(StringUtils.isNotEmpty(code)) {
 			recordGroupDO.setCode(code);
 		}
-		if(cost!=null && cost >= 0) {
-			recordGroupDO.setCost(cost);
+		if(price!=null && price >= 0) {
+			recordGroupDO.setPrice(price);
 		}
 		if(StringUtils.isNotEmpty(startDate)) {
 			recordGroupDO.setStartDate(startDate);
@@ -52,6 +52,12 @@ public class RecordGroupControl {
 		}
 		if(StringUtils.isNotEmpty(status)) {
 			recordGroupDO.setStatus(status);
+		}
+		if(StringUtils.isNotEmpty(market)) {
+			recordGroupDO.setMarket(market);
+		}
+		if(StringUtils.isNotEmpty(type)) {
+			recordGroupDO.setType(type);
 		}
 		if(id != null && id >0) {
 			recordGroupDO.setId(id);
@@ -92,8 +98,26 @@ public class RecordGroupControl {
         return rpcResult;  
     }
 	
-	@RequestMapping("/recordGroup/getPositionList")
-    Map getPositionList() {  
+	@RequestMapping("/recordGroup/getPositionByMarketAndType")
+    Map getPositionList(String market,String type) {  
+		Map map = new HashMap();
+		if(market == null) {
+			market = "";
+		}
+		if(type == null) {
+			type = "";
+		}
+		List<RecordGroupDO>  recordGroupList =  recordGroupMapper.getPositionByMarketAndType(market,type);
+		for(RecordGroupDO recordGroupDO : recordGroupList) {
+			List<RecordDO> recordList = recordMapper.getByGroupId(recordGroupDO.getId());
+			recordGroupDO.setRecordList(recordList);
+		}
+		map.put("list", recordGroupList);
+        return map;  
+    }
+	
+	@RequestMapping("/recordGroup/getAllPosition")
+    Map getAllPosition() {  
 		Map map = new HashMap();
 		List<RecordGroupDO>  recordGroupList =  recordGroupMapper.getAllPosition();
 		for(RecordGroupDO recordGroupDO : recordGroupList) {

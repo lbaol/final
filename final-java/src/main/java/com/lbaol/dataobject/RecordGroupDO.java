@@ -9,11 +9,23 @@ public class RecordGroupDO {
 	private String endDate;
 	private String code;
 	private Double count;
-	private Double cost;
+	private Double price;
 	private String status;
+	private String type; //stock 股票;futures 期货;
+	private String market; // a 大陆; hk 香港;us 美股;
 	
-	
-	
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public String getMarket() {
+		return market;
+	}
+	public void setMarket(String market) {
+		this.market = market;
+	}
 	public String getStatus() {
 		return status;
 	}
@@ -61,11 +73,11 @@ public class RecordGroupDO {
 	public void setCount(Double count) {
 		this.count = count;
 	}
-	public Double getCost() {
-		return cost;
+	public Double getPrice() {
+		return price;
 	}
-	public void setCost(Double cost) {
-		this.cost = cost;
+	public void setPrice(Double price) {
+		this.price = price;
 	}
 	
 	

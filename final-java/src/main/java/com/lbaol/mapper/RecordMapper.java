@@ -78,6 +78,12 @@ public interface RecordMapper {
                     if(StringUtils.isNotEmpty(recordDO.getDate())){  
                     	SET("date = #{date}");
                     }
+                    if(StringUtils.isNotEmpty(recordDO.getMarket())){  
+                    	SET("market = #{market}");
+                    }
+                    if(StringUtils.isNotEmpty(recordDO.getType())){  
+                    	SET("type = #{type}");
+                    }
                     WHERE("id = #{id}");  
                 }  
             } .toString();  

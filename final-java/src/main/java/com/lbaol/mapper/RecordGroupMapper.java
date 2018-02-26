@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
@@ -14,9 +15,11 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.jdbc.SQL;
 
+import com.lbaol.dataobject.FavDO;
 import com.lbaol.dataobject.PosDO;
 import com.lbaol.dataobject.RecordDO;
 import com.lbaol.dataobject.RecordGroupDO;
+import com.lbaol.mapper.FavMapper.FavProvider;
 
 public interface RecordGroupMapper {
 	
@@ -28,7 +31,14 @@ public interface RecordGroupMapper {
 	})
 	RecordGroupDO getById(@Param("id") Integer id);
 	
-	@Select("SELECT * FROM record_group where status != 'finish' order by start_date desc")
+	@Select("SELECT * FROM record_group where (status != 'finish' || status  is null) && market=#{market} && type=#{type}  order by start_date desc")
+    @Results({
+		@Result(property = "startDate", column = "start_date"),
+        @Result(property = "endDate", column = "end_date")
+	})
+    List<RecordGroupDO> getPositionByMarketAndType(@Param("market")String market,@Param("type")String type);
+	
+	@Select("SELECT * FROM record_group where status != 'finish' || status  is null  order by start_date desc")
     @Results({
 		@Result(property = "startDate", column = "start_date"),
         @Result(property = "endDate", column = "end_date")
@@ -45,7 +55,7 @@ public interface RecordGroupMapper {
 	@Delete("DELETE FROM record_group WHERE id =#{id}")
     void deleteById(Integer id);
 	
-	@Insert("INSERT INTO record_group(code,count,start_date,end_date,cost,status) VALUES(#{code}, #{count}, #{startDate}, #{endDate}, #{cost}, #{status})")
+	@InsertProvider(type = RecordGroupProvider.class, method = "insert")  
 	@Options(useGeneratedKeys=true, keyProperty="id")
 	void insert(RecordGroupDO recordGroupDO);
 	
@@ -68,9 +78,48 @@ public interface RecordGroupMapper {
             }}.toString();  
         } 
     	
+    	public String insert(RecordGroupDO recordGroupDO) { 
+    		if(recordGroupDO.getMarket() == null){  
+    			recordGroupDO.setMarket("");
+            }
+    		if(recordGroupDO.getType() == null){  
+    			recordGroupDO.setType("");
+            }
+    		if(recordGroupDO.getStatus() == null){  
+    			recordGroupDO.setStatus("");
+            }
+    		if(recordGroupDO.getEndDate() == null){  
+    			recordGroupDO.setEndDate("");
+            }
+    		if(recordGroupDO.getStartDate() == null){  
+    			recordGroupDO.setStartDate("");
+            }
+        	return new SQL(){{      
+        		INSERT_INTO("record_group");  
+        			VALUES("code", "#{code}");  
+        			VALUES("count", "#{count}");
+        			VALUES("start_date", "#{startDate}");
+        			VALUES("end_date", "#{endDate}");
+        			VALUES("price", "#{price}");
+        			VALUES("status", "#{status}");
+        			VALUES("market", "#{market}");
+        			VALUES("type", "#{type}");
+            }}.toString();  
+        } 
+    	
     	
     	
         public String update(RecordGroupDO recordGroupDO) {  
+        	
+        	if(recordGroupDO.getStatus() == null) {
+        		recordGroupDO.setStatus("");
+        	}
+        	if(recordGroupDO.getEndDate() == null) {
+        		recordGroupDO.setEndDate("");
+        	}
+        	if(recordGroupDO.getStartDate() == null) {
+        		recordGroupDO.setStartDate("");
+        	}
         	
         	return new SQL()  
             {  
@@ -80,17 +129,23 @@ public interface RecordGroupMapper {
                     if(recordGroupDO.getCount()!=null){  
                     	SET("count = #{count}");
                     }
-                    if(recordGroupDO.getCost()!=null){  
-                    	SET("cost = #{cost}");
+                    if(recordGroupDO.getPrice()!=null){  
+                    	SET("price = #{price}");
                     }
-                    if(StringUtils.isNotEmpty(recordGroupDO.getStatus())){  
+                    if(recordGroupDO.getStatus()!=null){  
                     	SET("status = #{status}");
                     }
-                    if(StringUtils.isNotEmpty(recordGroupDO.getStartDate())){  
+                    if(recordGroupDO.getStartDate()!=null){  
                     	SET("start_date = #{startDate}");
                     }
-                    if(StringUtils.isNotEmpty(recordGroupDO.getEndDate())){  
+                    if(recordGroupDO.getEndDate()!= null){  
                     	SET("end_date = #{endDate}");
+                    }
+                    if(StringUtils.isNotEmpty(recordGroupDO.getMarket())){  
+                    	SET("market = #{market}");
+                    }
+                    if(StringUtils.isNotEmpty(recordGroupDO.getType())){  
+                    	SET("type = #{type}");
                     }
                     WHERE("id = #{id}");  
                 }  

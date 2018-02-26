@@ -24,6 +24,8 @@ export default class App extends Component {
             endDate:'',
             number:'',
             status:'',
+            market:'',  // a 大陆a股; hk 香港;us 美股;
+            type:'',    //stock 股票; futures 期货;
             visible: false
         };
     }
@@ -38,6 +40,8 @@ export default class App extends Component {
                 code:'',
                 cost:'',
                 status:'',
+                market:'',
+                type:'',
                 visible: true
             },this.fetchData);
         });
@@ -98,7 +102,7 @@ export default class App extends Component {
     }
 
     render() {
-        const {number,startDate,endDate,id,code,cost,status} = this.state;
+        const {number,startDate,endDate,id,code,cost,status,market,type} = this.state;
         const formItemLayout = {
             labelCol: {
               sm: { span: 6 },
@@ -151,8 +155,32 @@ export default class App extends Component {
                         label="状态"
                     >
                         <Select style={{width:'165px'}} value={status}  onChange={this.onSelectChange.bind(this,'status')}>
-                            <Select.Option value=""></Select.Option>
+                            <Select.Option value="">进行中</Select.Option>
                             <Select.Option value="finish">结束</Select.Option>
+                        </Select>
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="类型"
+                    >
+                        <Select style={{width:'165px'}} value={type}  onChange={this.onSelectChange.bind(this,'type')}>
+                            {
+                                Dict.recordType.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
+                        </Select>
+                    </FormItem>
+                    <FormItem 
+                        {...formItemLayout}
+                        label="市场"
+                    >
+                        <Select style={{width:'165px'}} value={market}  onChange={this.onSelectChange.bind(this,'market')}>
+                            {
+                                Dict.marketType.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
                         </Select>
                     </FormItem>
                 </Modal>

@@ -19,8 +19,8 @@ export default class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            groupList:[],
-            tab:'position'
+            groupList:[]
+
         };
     }
 
@@ -43,30 +43,36 @@ export default class App extends Component {
 
     intervalRefresh=()=>{
         let {groupList} = this.state;
+
         for(let g of groupList){
             let quote = Data.quote[Util.getFullCode(g.code)]
             if(quote){
                 let groupWarn = false;
                 for(let d of g.recordList){
+                    //处理止损价格
                     if(quote.current<=d.stopPrice){
                         console.log(d.code,'到达止损价格:',d.stopPrice)
                         d.warn = true;
                         groupWarn = true;
                     }else{
                         d.warn = false;
-                    }
+                    } 
+
+                    d.value = _.round(d.count * quote.current,2);
                 }
                 g.warn = groupWarn;
+                //处理市值
+                g.value = _.round(g.count * quote.current,2);
             }
         }
-        this.setState(groupList)
+        groupList = _.orderBy(groupList, 'value','desc');
+        this.setState({groupList})
     }
 
     fetchGroupList = () => {
         let {tab} = this.state;
-        let url = tab == 'all' ?'/recordGroup/getList':'/recordGroup/getAllPosition'
         const self = this;
-        request(url,
+        request('/recordGroup/getPositionByMarketAndType',
             (res) => {
                 let groupList = res.list;
                 this.preProcess(groupList);
@@ -76,6 +82,8 @@ export default class App extends Component {
                let codeArray = self.getCodeArray(groupList);
                Data.addCodeArrayToQuote(codeArray);
             }, {
+                market:this.props.market,
+                type:this.props.type
             }, 'jsonp')
     }
 
@@ -106,7 +114,7 @@ export default class App extends Component {
     }
 
     onRecordAddClick = (group)=>{
-        this.emit('final:record-edit-show',{groupId:group.id,code:group.code,market:group.market,type:group.type});
+        this.emit('final:record-edit-show',{groupId:group.id,code:group.code});
     }
 
     onShowRecordList = (i)=>{
@@ -117,6 +125,10 @@ export default class App extends Component {
 
     onRecordEditClick=(id)=>{
         this.emit('final:record-edit-show',{id:id})
+    }
+
+    onRecordGroupEditClick=(id)=>{
+        this.emit('final:record-group-edit-show',{id:id})
     }
 
     onRecordDeleteClick=(id)=>{
@@ -167,12 +179,7 @@ export default class App extends Component {
         return totalValue;
     }
 
-    renderValueCell=(count,quote)=>{
-        if(!count || !quote){
-            return;
-        }
-        return _.round(count * quote.current);
-    }
+   
 
     renderProportionCell=(count,quote,totalValue)=>{
         if(!count || !quote){
@@ -195,12 +202,11 @@ export default class App extends Component {
             <div className="record-list-container">
                 <div className="mt30 mb30 ml20 record-list">
                     <div>
-                        <span >
+                        <span>A股持仓及操作记录</span> 
+                        <span className="ml30">市值：{totalValue}</span>  
+                        <span className="ml30" placehold="增加操作记录分组" >
                             <Icon className="c-p" type="plus-circle-o" onClick={this.onRecordGroupAddClick} />
-                        </span>
-                    </div>
-                    <div>
-                        {totalValue}
+                        </span>     
                     </div>
                     <div className="mt10">
                         <div className="list-col name">名称</div>
@@ -230,14 +236,17 @@ export default class App extends Component {
                                         <div className="list-col stop-price">{g.warn==true && <span className="warn-tag"></span>}</div>
                                         <div className="list-col current">{quote && quote.current}</div>
                                         <div className="list-col rise">{quote && Util.renderRisePercent(quote.percentage)}</div>
-                                        <div className="list-col value">{this.renderValueCell(g.count,quote)}</div>
+                                        <div className="list-col value">{g.value}</div>
                                         <div className="list-col proportion">{this.renderProportionCell(g.count,quote,totalValue)}</div>
                                         <div className="list-col oper">
                                             <Icon className="c-p" type="plus-circle-o" onClick={this.onRecordAddClick.bind(this,g)} />
                                             <span className="ml10">
+                                                <Icon className="c-p" type="edit" onClick={this.onRecordGroupEditClick.bind(this,g.id)} />
+                                            </span>
+                                            <span className="ml10">
                                                 <Icon className="c-p" type="delete" onClick={this.onGroupDeleteClick.bind(this,g.id)} />
                                             </span>
-                                            <span className="ml20">
+                                            <span className="ml10">
                                                 {g.recordList && g.recordList.length>0 && 
                                                     <span><Icon className="c-p" type="down" onClick={this.onShowRecordList.bind(this,i)} />({g.recordList.length})</span>
                                                 }
@@ -258,7 +267,7 @@ export default class App extends Component {
                                                     <div className="list-col stop-price"><span className={d.warn==true?'warn':''}>{d.stopPrice}</span></div>
                                                     <div className="list-col current">{quote && quote.current}</div>
                                                     <div className="list-col rise">{quote && Util.renderRisePercent(quote.percentage)}</div>
-                                                    <div className="list-col value">{this.renderValueCell(d.count,quote)}</div>
+                                                    <div className="list-col value">{d.value}</div>
                                                     <div className="list-col proportion">{this.renderProportionCell(d.count,quote,totalValue)}</div>
                                                     <div className="list-col oper">
                                                         <span><Icon className="c-p" type="edit" onClick={this.onRecordEditClick.bind(this,d.id)} /></span>

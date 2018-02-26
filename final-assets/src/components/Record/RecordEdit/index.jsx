@@ -25,6 +25,9 @@ export default class App extends Component {
             direction:'',
             groupId:'',
             price:'',
+            market:'',
+            type:'',
+            oper:'',
             visible: false
         };
     }
@@ -35,11 +38,14 @@ export default class App extends Component {
                 id:data && data.id?data.id:'',
                 groupId:data && data.groupId?data.groupId:'',
                 code:data && data.code?data.code:'',
+                market:data && data.market?data.market:'',
+                type:data && data.type?data.type:'',
                 date:'',
                 count:'',
                 stopPrice:'',
                 direction:'',
                 price:'',
+                oper:'',
                 visible: true
             },this.fetchData);
         });
@@ -100,7 +106,7 @@ export default class App extends Component {
     }
 
     render() {
-        const {id,code,count,date,price,stopPrice,fee,direction} = this.state;
+        const {id,code,count,date,price,stopPrice,fee,direction,market,type,oper} = this.state;
         const formItemLayout = {
             labelCol: {
               sm: { span: 6 },
@@ -117,6 +123,18 @@ export default class App extends Component {
                     onOk={this.onSaveClick}
                     onCancel={this.handleCancel}
                 >
+                    <FormItem
+                        {...formItemLayout}
+                        label="类型"
+                    >
+                        <Select style={{width:'165px'}} value={type}  onChange={this.onSelectChange.bind(this,'type')}>
+                            {
+                                Dict.recordType.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
+                        </Select>
+                    </FormItem>
                     <FormItem className="required"
                         {...formItemLayout}
                         label="代码"
@@ -134,6 +152,18 @@ export default class App extends Component {
                         label="数量"
                     >
                         <Input value={count} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'count')}/>
+                    </FormItem>
+                    <FormItem 
+                        {...formItemLayout}
+                        label="操作"
+                    >
+                        <Select style={{width:'165px'}} value={oper}  onChange={this.onSelectChange.bind(this,'oper')}>
+                            {
+                                Dict.recordOper.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
+                        </Select>
                     </FormItem>
                     <FormItem className="required"
                         {...formItemLayout}
@@ -166,6 +196,18 @@ export default class App extends Component {
                         <Input value={fee} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'fee')}/>
                     </FormItem>
                     
+                    <FormItem 
+                        {...formItemLayout}
+                        label="市场"
+                    >
+                        <Select style={{width:'165px'}} value={market}  onChange={this.onSelectChange.bind(this,'market')}>
+                            {
+                                Dict.marketType.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
+                        </Select>
+                    </FormItem>
                 </Modal>
             </div>
         );
