@@ -23,7 +23,7 @@ let Config = {
         end:'2018-01-15'
     }],
     quote:{
-        doInterval:true,
+        doInterval:false,
         intervalTime:5000
     },
     defaultChart:{
@@ -124,6 +124,10 @@ let Dict = {
         {label:'开仓',value:'open'},
         {label:'平仓',value:'close'},
     ],
+    recordStatus:[
+        {label:'交易中',value:'trade'},
+        {label:'结束',value:'finish'}
+    ]
 }
 
 
@@ -138,14 +142,27 @@ for(let key in Dict){
 }
 
 
-let quoteCodes = [];
+let stockQuoteCodes = [];
+let futuresQuoteCodes=[];
 let Data = {
     stock : {},
-    quote : {},
-    addCodeArrayToQuote:(codeArray)=>{
-        let codes = [].concat(quoteCodes,codeArray);
+    stockQuote : {},
+    addCodesToStockQuote:(codeArray)=>{
+        let codes = [].concat(stockQuoteCodes,codeArray);
         codes = _.sortedUniq(codes);
-        quoteCodes = codes;
+        stockQuoteCodes = codes;
+    },
+    futuresQuote : {},
+    addCodesToFuturesQuote:(codeArray)=>{
+        let codes = [].concat(futuresQuote,codeArray);
+        codes = _.sortedUniq(codes);
+        futuresQuoteCodes = codes;
+    },
+    getStockQuote:(code)=>{
+        return Data.stockQuote[Util.getFullCode(code)]
+    },
+    getFuturesQuote:(code)=>{
+        return Data.futuresQuote[code]
     }
 };
 
@@ -269,32 +286,51 @@ const Util = {
     }
 }
 
-//获取实时行情
+//获取股票实时行情
+function getLastStockQuote(){
+    if(Config.quote.doInterval == true){
+        let codes = stockQuoteCodes;
+        if(codes.length > 0 ){
+            let reqCodes = codes.map(d => Util.getFullCode(d));
+            request('https://xueqiu.com/v4/stock/quote.json',
+                (res) => {
 
-function getLastQuote(){
-    let codes = quoteCodes;
-    if(codes.length > 0 ){
-        let reqCodes = codes.map(d => Util.getFullCode(d));
-        request('https://xueqiu.com/v4/stock/quote.json',
-            (res) => {
-
-                let quote = {};
-                for (let k in res) {
-                    quote[k] = res[k]
-                }
-                Data.quote = quote;
-                // console.log('quoteMapper',quote);
-            }, {
-                code: reqCodes.join(',')
-            }, 'jsonp')
+                    let quote = {};
+                    for (let k in res) {
+                        quote[k] = res[k]
+                    }
+                    Data.stockQuote = quote;
+                    // console.log('quoteMapper',quote);
+                }, {
+                    code: reqCodes.join(',')
+                }, 'jsonp')
+        }
     }
-    
 }
-if (Config.quote.doInterval == true) {
-    setInterval(getLastQuote, Config.quote.intervalTime)
-} else {
-    setTimeout(getLastQuote, Config.quote.intervalTime)
+
+//获取期货实时行情
+function getLastFuturesQuote(){
+    if(Config.quote.doInterval == true){
+        let codes = futuresQuoteCodes;
+        // if(codes.length > 0 ){
+            let reqCodes = codes.map(d => d);
+            request('http://api.money.126.net/data/feed/FU_IF1806,money.api',
+                (res) => {
+
+                    console.log('futuresQuote',res);
+                    // Data.futuresQuote = quote;
+                    
+                }, {
+                    code: reqCodes.join(',')
+                }, 'jsonp')
+        // }
+    }
 }
+
+setInterval(()=>{
+    getLastStockQuote();
+    getLastFuturesQuote();
+}, Config.quote.intervalTime)
 
 
 export {

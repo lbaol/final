@@ -29,7 +29,8 @@ export function request(
     reqData = {},
     dataType='jsonp',
     type,
-    async) {
+    async,
+    jsonpCallback) {
         convertReqData(reqData);
         return $.ajax({
             type: type?type:'get',
@@ -40,7 +41,8 @@ export function request(
             xhrFields: {
                 withCredentials: true
             },
-            async:async
+            async:async,
+            jsonpCallback:jsonpCallback
         }).done(function(data){
             callback(data);
         });

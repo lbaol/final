@@ -120,6 +120,31 @@ export default class App extends Component {
                     onOk={this.onSaveClick}
                     onCancel={this.handleCancel}
                 >
+                    <FormItem  className="required"
+                        {...formItemLayout}
+                        label="类型" >
+                        <Select style={{width:'165px'}} value={type}  onChange={this.onSelectChange.bind(this,'type')}>
+                            {
+                                Dict.recordType.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
+                        </Select>
+                    </FormItem>
+                    {
+                        type =='stock' && 
+                        <FormItem   className="required"
+                            {...formItemLayout}
+                            label="市场" >
+                            <Select style={{width:'165px'}} value={market}  onChange={this.onSelectChange.bind(this,'market')}>
+                                {
+                                    Dict.marketType.map(e=>{
+                                        return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                    })
+                                }
+                            </Select>
+                        </FormItem>
+                    }
                     <FormItem className="required"
                         {...formItemLayout}
                         label="代码"
@@ -138,12 +163,16 @@ export default class App extends Component {
                     >
                         <Input value={number} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'number')}/>
                     </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label="成本"
-                    >
-                        <Input value={cost} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'cost')}/>
-                    </FormItem>
+                    {
+                        type =='stock' &&
+                        <FormItem
+                            {...formItemLayout}
+                            label="成本"
+                        >
+                            <Input value={cost} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'cost')}/>
+                        </FormItem>
+                    }
+                    
                     <FormItem
                         {...formItemLayout}
                         label="结束日期"
@@ -155,34 +184,15 @@ export default class App extends Component {
                         label="状态"
                     >
                         <Select style={{width:'165px'}} value={status}  onChange={this.onSelectChange.bind(this,'status')}>
-                            <Select.Option value="">进行中</Select.Option>
-                            <Select.Option value="finish">结束</Select.Option>
+                        {
+                            Dict.recordStatus.map(e=>{
+                                return <Select.Option value={e.value}>{e.label}</Select.Option>
+                            })
+                        }
                         </Select>
                     </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label="类型"
-                    >
-                        <Select style={{width:'165px'}} value={type}  onChange={this.onSelectChange.bind(this,'type')}>
-                            {
-                                Dict.recordType.map(e=>{
-                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
-                                })
-                            }
-                        </Select>
-                    </FormItem>
-                    <FormItem 
-                        {...formItemLayout}
-                        label="市场"
-                    >
-                        <Select style={{width:'165px'}} value={market}  onChange={this.onSelectChange.bind(this,'market')}>
-                            {
-                                Dict.marketType.map(e=>{
-                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
-                                })
-                            }
-                        </Select>
-                    </FormItem>
+                    
+                    
                 </Modal>
             </div>
         );
