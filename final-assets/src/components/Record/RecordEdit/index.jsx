@@ -22,12 +22,13 @@ export default class App extends Component {
             date:'',
             count:'',
             stopPrice:'',
-            direction:'',
+            subOper:'',
             groupId:'',
             price:'',
             market:'',
             type:'',
             oper:'',
+            openId:'',
             visible: false
         };
     }
@@ -43,9 +44,10 @@ export default class App extends Component {
                 date:'',
                 count:'',
                 stopPrice:'',
-                direction:'',
+                subOper:'',
                 price:'',
                 oper:'',
+                openId:'',
                 visible: true
             },this.fetchData);
         });
@@ -106,7 +108,7 @@ export default class App extends Component {
     }
 
     render() {
-        const {id,code,count,date,price,stopPrice,fee,direction,market,type,oper} = this.state;
+        const {id,code,count,date,price,stopPrice,fee,subOper,market,type,oper,openId} = this.state;
         const formItemLayout = {
             labelCol: {
               sm: { span: 6 },
@@ -118,12 +120,12 @@ export default class App extends Component {
         return (
             <div>
                 <Modal
-                    title={id?'修改持仓':'新增持仓'}
+                    title={id?'修改交易记录':'新增交易记录'}
                     visible={this.state.visible}
                     onOk={this.onSaveClick}
                     onCancel={this.handleCancel}
                 >
-                    <FormItem
+                    <FormItem  className="required"
                         {...formItemLayout}
                         label="类型"
                     >
@@ -137,7 +139,7 @@ export default class App extends Component {
                     </FormItem>
                     {
                         type == 'stock' && 
-                        <FormItem 
+                        <FormItem   className="required"
                             {...formItemLayout}
                             label="市场" >
                             <Select style={{width:'165px'}} value={market}  onChange={this.onSelectChange.bind(this,'market')}>
@@ -162,13 +164,12 @@ export default class App extends Component {
                     >
                         <DatePicker value={date && moment(date)} style={{width:'165px'}} onChange={this.onDateFieldChange} placeholder="日期" />
                     </FormItem>
-                    <FormItem className="required"
+                    <FormItem  className="required"
                         {...formItemLayout}
-                        label="方向"
-                    >
-                        <Select style={{width:'165px'}} value={direction}  onChange={this.onSelectChange.bind(this,'direction')}>
+                        label="操作" >
+                        <Select style={{width:'165px'}} value={oper}  onChange={this.onSelectChange.bind(this,'oper')}>
                             {
-                                Dict.recordDirection.map(e=>{
+                                Dict.recordOper.map(e=>{
                                     return <Select.Option value={e.value}>{e.label}</Select.Option>
                                 })
                             }
@@ -176,20 +177,28 @@ export default class App extends Component {
                     </FormItem>
                     {
                         type=='futures' &&
-                        <FormItem 
+                        <FormItem className="required"
                             {...formItemLayout}
-                            label="操作" >
-                            <Select style={{width:'165px'}} value={oper}  onChange={this.onSelectChange.bind(this,'oper')}>
+                            label="开平"
+                        >
+                            <Select style={{width:'165px'}} value={subOper}  onChange={this.onSelectChange.bind(this,'subOper')}>
                                 {
-                                    Dict.recordOper.map(e=>{
+                                    Dict.recordSubOper.map(e=>{
                                         return <Select.Option value={e.value}>{e.label}</Select.Option>
                                     })
                                 }
                             </Select>
                         </FormItem>
                     }
-                    
-                    
+                    {
+                        subOper=='close' &&
+                        <FormItem className="required"
+                            {...formItemLayout}
+                            label="开仓ID/买入ID"
+                        >
+                            <Input value={openId} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'openId')}/>
+                        </FormItem>
+                    }
                     <FormItem className="required"
                         {...formItemLayout}
                         label="数量"

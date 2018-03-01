@@ -22,10 +22,11 @@ export default class App extends Component {
             cost:'',
             startDate:'',
             endDate:'',
-            number:'',
+            count:'',
             status:'',
             market:'',  // a 大陆a股; hk 香港;us 美股;
             type:'',    //stock 股票; futures 期货;
+            direction:'', //long 多;short 空;
             visible: false
         };
     }
@@ -36,12 +37,13 @@ export default class App extends Component {
                 id:data && data.id?data.id:'',
                 startDate:'',
                 endDate:'',
-                number:'',
+                count:'',
                 code:'',
                 cost:'',
                 status:'',
                 market:'',
                 type:'',
+                direction:'',
                 visible: true
             },this.fetchData);
         });
@@ -102,7 +104,7 @@ export default class App extends Component {
     }
 
     render() {
-        const {number,startDate,endDate,id,code,cost,status,market,type} = this.state;
+        const {count,startDate,endDate,id,code,cost,status,market,type,direction} = this.state;
         const formItemLayout = {
             labelCol: {
               sm: { span: 6 },
@@ -157,11 +159,25 @@ export default class App extends Component {
                     >
                         <DatePicker value={startDate && moment(startDate)} onChange={this.onDateFieldChange.bind(this,'startDate')} placeholder="开始日期" />
                     </FormItem>
+                    {
+                        <FormItem
+                            {...formItemLayout}
+                            label="方向"
+                        >
+                            <Select style={{width:'165px'}} value={direction}  onChange={this.onSelectChange.bind(this,'direction')}>
+                            {
+                                Dict.recordDirection.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
+                            </Select>
+                        </FormItem>
+                    }
                     <FormItem 
                         {...formItemLayout}
                         label="数量"
                     >
-                        <Input value={number} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'number')}/>
+                        <Input value={count} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'count')}/>
                     </FormItem>
                     {
                         type =='stock' &&
@@ -172,6 +188,7 @@ export default class App extends Component {
                             <Input value={cost} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'cost')}/>
                         </FormItem>
                     }
+                    
                     
                     <FormItem
                         {...formItemLayout}

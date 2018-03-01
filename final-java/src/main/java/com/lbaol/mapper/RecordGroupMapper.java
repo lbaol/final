@@ -104,6 +104,7 @@ public interface RecordGroupMapper {
         			VALUES("status", "#{status}");
         			VALUES("market", "#{market}");
         			VALUES("type", "#{type}");
+        			VALUES("direction", "#{direction}");
             }}.toString();  
         } 
     	
@@ -143,6 +144,9 @@ public interface RecordGroupMapper {
                     }
                     if(StringUtils.isNotEmpty(recordGroupDO.getMarket())){  
                     	SET("market = #{market}");
+                    }
+                    if(StringUtils.isNotEmpty(recordGroupDO.getDirection())){  
+                    	SET("direction = #{direction}");
                     }
                     if(StringUtils.isNotEmpty(recordGroupDO.getType())){  
                     	SET("type = #{type}");

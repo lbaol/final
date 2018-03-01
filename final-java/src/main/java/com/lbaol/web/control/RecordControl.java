@@ -32,8 +32,9 @@ public class RecordControl {
 	
 	
 	@RequestMapping("/record/save")
-	RpcResult addOrUpdate(Integer id,String code,Double count,Double price,String date,Integer groupId,String direction,
-			@RequestParam(value="fee",required = false,defaultValue  = "0") Double fee,String market,String type) { 
+	RpcResult addOrUpdate(Integer id,String code,Double count,Double price,String date,Integer groupId,String oper,String subOper,
+			@RequestParam(value="fee",required = false,defaultValue  = "0") Double fee,String market,String type,
+			Integer openId) { 
 		RpcResult rpcResult = new RpcResult();
 		
 		RecordDO recordDO = new RecordDO();
@@ -49,11 +50,18 @@ public class RecordControl {
 		if(groupId!=null && groupId >= 0) {
 			recordDO.setGroupId(groupId);
 		}
+		if(openId!=null) {
+			recordDO.setOpenId(openId);
+		}
+		
 		if(StringUtils.isNotEmpty(code)) {
 			recordDO.setCode(code);
 		}
-		if(StringUtils.isNotEmpty(direction)) {
-			recordDO.setDirection(direction);
+		if(StringUtils.isNotEmpty(oper)) {
+			recordDO.setOper(oper);
+		}
+		if(StringUtils.isNotEmpty(subOper)) {
+			recordDO.setSubOper(subOper);
 		}
 	
 		if(StringUtils.isNotEmpty(date)) {
@@ -67,11 +75,34 @@ public class RecordControl {
 		}
 
 		
-		if(id != null && id >0) {
-			recordDO.setId(id);
-			recordMapper.update(recordDO);
-		}else {
-			recordMapper.insert(recordDO);
+		
+		
+		
+		if("futures".equals(type)) {
+			if(id != null && id >0) {
+				recordDO.setId(id);
+				recordMapper.update(recordDO);
+				if("open".equals(subOper)) {
+					updateFuturesOpenRecordRemaining(id);
+				}else if("close".equals(subOper)) {
+					updateFuturesOpenRecordRemaining(openId);
+				}
+			}else {
+				if(subOper == "open") {
+					recordDO.setRemaining(count);
+				}
+				recordMapper.insert(recordDO);
+			}
+		}
+		
+		
+		if("stocks".equals(type)) {
+			if(id != null && id >0) {
+				recordDO.setId(id);
+				recordMapper.update(recordDO);
+			}else {
+				recordMapper.insert(recordDO);
+			}
 		}
 		
 		updateRecordGroupCountAndCost(groupId);
@@ -92,6 +123,9 @@ public class RecordControl {
 		RecordDO recordDO = recordMapper.getById(id);
 		recordMapper.deleteById(id);
 		updateRecordGroupCountAndCost(recordDO.getGroupId());
+		if(recordDO.getOpenId()!=null && "futures".equals(recordDO.getType())) {
+			updateFuturesOpenRecordRemaining(recordDO.getOpenId());
+		}
 		rpcResult.setIsSuccess(true);
         return rpcResult;  
     }
@@ -104,23 +138,47 @@ public class RecordControl {
         return map;  
     }
 	
+	//计算开仓剩余数量
+	private void updateFuturesOpenRecordRemaining(Integer openId) {
+		RecordDO openRecord = recordMapper.getById(openId);
+		if(openId!=null && openId>0) {
+			Map params = new HashMap();
+			params.put("openId", openId);
+			params.put("subOper","close" );
+			List<RecordDO> closeRecordList = recordMapper.getByParams(params);
+			Double closeCount = 0d;
+			for(RecordDO closeRecord : closeRecordList) {
+				closeCount = NumberUtil.add(closeRecord.getCount(), closeCount);
+			}
+			Double remaining = NumberUtil.sub(openRecord.getCount(), closeCount);
+			openRecord.setRemaining(remaining);
+			recordMapper.update(openRecord);
+		}
+		
+	}
+	
 	private void updateRecordGroupCountAndCost(Integer groupId) {
 		RecordGroupDO recordGroupDO =  recordGroupMapper.getById(groupId);
-		List<RecordDO> recordList = recordMapper.getByGroupId(groupId);
-		Double totalCount = 0d ;
-		Double totalValue = 0d ;
-		for(RecordDO record : recordList) {
-			totalCount = NumberUtil.add(record.getCount(), totalCount);
-			Double value = NumberUtil.mul(record.getPrice(), record.getCount());
-			totalValue = NumberUtil.add(value, totalValue);
+		if(recordGroupDO.getType()=="stock") {
+			List<RecordDO> recordList = recordMapper.getByGroupId(groupId);
+			Double totalCount = 0d ;
+			Double totalValue = 0d ;
+			for(RecordDO record : recordList) {
+				totalCount = NumberUtil.add(record.getCount(), totalCount);
+				Double value = NumberUtil.mul(record.getPrice(), record.getCount());
+				totalValue = NumberUtil.add(value, totalValue);
+			}
+			Double price = 0d;
+			if(totalCount!=0) {
+				price = NumberUtil.round(NumberUtil.div(totalValue, totalCount));
+			}
+			recordGroupDO.setCount(totalCount);
+			recordGroupDO.setPrice(price);
+			recordGroupMapper.update(recordGroupDO);
 		}
-		Double price = 0d;
-		if(totalCount!=0) {
-			price = NumberUtil.round(NumberUtil.div(totalValue, totalCount));
-		}
-		recordGroupDO.setCount(totalCount);
-		recordGroupDO.setPrice(price);
-		recordGroupMapper.update(recordGroupDO);
+		
+		
+		
 	}
 	
 	

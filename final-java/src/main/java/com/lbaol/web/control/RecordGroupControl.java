@@ -109,7 +109,7 @@ public class RecordGroupControl {
 		}
 		List<RecordGroupDO>  recordGroupList =  recordGroupMapper.getPositionByMarketAndType(market,type);
 		for(RecordGroupDO recordGroupDO : recordGroupList) {
-			List<RecordDO> recordList = recordMapper.getByGroupId(recordGroupDO.getId());
+			List<RecordDO> recordList = getOpenRecordList(recordGroupDO.getId(),recordGroupDO.getType());
 			recordGroupDO.setRecordList(recordList);
 		}
 		map.put("list", recordGroupList);
@@ -127,6 +127,27 @@ public class RecordGroupControl {
 		map.put("list", recordGroupList);
         return map;  
     }
+	
+	private List<RecordDO> getOpenRecordList(Integer groupId,String type) {
+		Map params1 = new HashMap();
+		params1.put("groupId", groupId);
+		if("stock".equals(type)) {
+			params1.put("oper", "buy");
+		}
+		if("futures".equals(type)) {
+			params1.put("subOper", "open");
+		}
+		List<RecordDO> openRecordList = recordMapper.getByParams(params1);
+		for(RecordDO openRecord : openRecordList) {
+			Map params2 = new HashMap();
+			params2.put("openId", openRecord.getId());
+			List<RecordDO> closeRecordList = recordMapper.getByParams(params2);
+			openRecord.setCloseRecordList(closeRecordList);
+		}
+		
+		return openRecordList;
+		
+	}
 	
 	
 	

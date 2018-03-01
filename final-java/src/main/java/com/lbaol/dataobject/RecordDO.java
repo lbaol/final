@@ -1,5 +1,7 @@
 package com.lbaol.dataobject;
 
+import java.util.List;
+
 public class RecordDO {
 	
 	private Integer id;
@@ -8,13 +10,34 @@ public class RecordDO {
 	private Double price;
 	private Double fee;
 	private Double stopPrice;
-	private String direction; //buy 买; sell 卖 ;
 	private Integer groupId;
 	private String date;
 	private String type; //stock 股票;futures 期货;
-	private String oper; //open 开仓;close 平仓;
+	private String oper; 	//buy 买; sell 卖 ;
+	private String subOper; //open 开仓;close 平仓;
 	private String market; // a 大陆; hk 香港;us 美股;
+	private Integer openId;
+	private Double remaining;
+	private List<RecordDO> closeRecordList;
 	
+	public List<RecordDO> getCloseRecordList() {
+		return closeRecordList;
+	}
+	public void setCloseRecordList(List<RecordDO> closeRecordList) {
+		this.closeRecordList = closeRecordList;
+	}
+	public Integer getOpenId() {
+		return openId;
+	}
+	public void setOpenId(Integer openId) {
+		this.openId = openId;
+	}
+	public Double getRemaining() {
+		return remaining;
+	}
+	public void setRemaining(Double remaining) {
+		this.remaining = remaining;
+	}
 	public String getType() {
 		return type;
 	}
@@ -76,11 +99,11 @@ public class RecordDO {
 	public void setStopPrice(Double stopPrice) {
 		this.stopPrice = stopPrice;
 	}
-	public String getDirection() {
-		return direction;
+	public String getSubOper() {
+		return subOper;
 	}
-	public void setDirection(String direction) {
-		this.direction = direction;
+	public void setSubOper(String subOper) {
+		this.subOper = subOper;
 	}
 	public Integer getGroupId() {
 		return groupId;

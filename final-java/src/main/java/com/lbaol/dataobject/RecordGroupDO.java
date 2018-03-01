@@ -13,7 +13,14 @@ public class RecordGroupDO {
 	private String status;
 	private String type; //stock 股票;futures 期货;
 	private String market; // a 大陆; hk 香港;us 美股;
+	private String direction; //long 多;short 空;
 	
+	public String getDirection() {
+		return direction;
+	}
+	public void setDirection(String direction) {
+		this.direction = direction;
+	}
 	public String getType() {
 		return type;
 	}

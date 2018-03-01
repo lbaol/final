@@ -20,6 +20,9 @@ function convertReqData(reqData){
         if (typeof reqData[key] === 'object') {
             reqData[key] = JSON.stringify(reqData[key]);
         }
+        if (reqData[key]=='null'){
+            delete reqData[key]
+        }
     } 
 }
 

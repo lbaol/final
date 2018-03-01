@@ -113,16 +113,20 @@ let Dict = {
         {label:'美股',value:'us'},
     ],
     recordDirection:[
+        {label:'多',value:'long'},
+        {label:'空',value:'short'}
+    ],
+    recordOper:[
         {label:'买入',value:'buy'},
-        {label:'卖出',value:'sell'}
+        {label:'卖出',value:'sell'},
+    ],
+    recordSubOper:[
+        {label:'开仓',value:'open'},
+        {label:'平仓',value:'close'}
     ],
     recordType:[
         {label:'股票',value:'stock'},
         {label:'期货',value:'futures'},
-    ],
-    recordOper:[
-        {label:'开仓',value:'open'},
-        {label:'平仓',value:'close'},
     ],
     recordStatus:[
         {label:'交易中',value:'trade'},
@@ -147,14 +151,14 @@ let futuresQuoteCodes=[];
 let Data = {
     stock : {},
     stockQuote : {},
+    futuresQuote: {},
     addCodesToStockQuote:(codeArray)=>{
         let codes = [].concat(stockQuoteCodes,codeArray);
         codes = _.sortedUniq(codes);
         stockQuoteCodes = codes;
     },
-    futuresQuote : {},
     addCodesToFuturesQuote:(codeArray)=>{
-        let codes = [].concat(futuresQuote,codeArray);
+        let codes = [].concat(futuresQuoteCodes,codeArray);
         codes = _.sortedUniq(codes);
         futuresQuoteCodes = codes;
     },
@@ -312,18 +316,24 @@ function getLastStockQuote(){
 function getLastFuturesQuote(){
     if(Config.quote.doInterval == true){
         let codes = futuresQuoteCodes;
-        // if(codes.length > 0 ){
-            let reqCodes = codes.map(d => d);
-            request('http://api.money.126.net/data/feed/FU_IF1806,money.api',
+        if(codes.length > 0 ){
+            let reqCodes = codes.map(d => 'FU_'+d);
+            request('http://api.money.126.net/data/feed/'+reqCodes.join(',')+',money.api',
                 (res) => {
-
-                    console.log('futuresQuote',res);
-                    // Data.futuresQuote = quote;
+                    let quote = {};
+                    for(let k in res){
+                        let d = res[k];
+                        quote[d.symbol] = {
+                            current:d.price,
+                            percentage:_.round(d.percent*100,2)
+                        }
+                    }
+                    Data.futuresQuote = quote;
                     
                 }, {
-                    code: reqCodes.join(',')
-                }, 'jsonp')
-        // }
+                    
+                }, 'jsonp','','','_ntes_quote_callback')
+        }
     }
 }
 
