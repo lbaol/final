@@ -22,7 +22,8 @@ export default class App extends Component {
             groupList: [],
             type:props.type, //stock股票 futures期货
             stockTotalValue:0,
-            futuresTotalReturns:0
+            futuresTotalReturns:0,
+            isGroupItemVisable:false
         };
     }
 
@@ -177,6 +178,18 @@ export default class App extends Component {
         </span>
     }
 
+    onGroupListCollapseClick = () => {
+        let {groupList,isGroupItemVisable} = this.state;
+        let visible = !isGroupItemVisable;
+        for(let d of groupList){
+            d.visible = visible;
+        }
+        this.setState({
+            groupList:groupList,
+            isGroupItemVisable:visible
+        })
+    }
+
     /* ================================ stock 相关处理 start ================================ */
 
     stockPreProcess = (groupList) => {
@@ -194,34 +207,75 @@ export default class App extends Component {
         let { groupList } = this.state;
 
 
-        
+        // for (let d of g.recordList) {
+        //     //处理止损价格
+        //     // if (quote.current <= d.stopPrice) {
+        //     //     console.log(d.code, '到达止损价格:', d.stopPrice)
+        //     //     d.warn = true;
+        //     //     groupWarn = true;
+        //     // } else {
+        //     //     d.warn = false;
+        //     // }
+
+        //     d.value = _.round(d.count * quote.current, 2);
+        //     //处理收益
+        //     d.returns =_.round((quote.current - d.price) / d.price * 100, 2);
+            
+        // }
+        // g.warn = groupWarn;
+        // //处理市值
+        // g.value = _.round(g.count * quote.current, 2);
+        // totalValue = totalValue + g.value;
+        // //处理收益
+        // g.returns =_.round((quote.current - g.price) / g.price * 100, 2);
        
         let totalValue = 0;
+        let totalReturns = 0;
         for (let g of groupList) {
-            let quote = Data.getStockQuote(g.code)
+            let quote = Data.getStockQuote(g.code);
+            let groupWarn = false;
+            g.remaining = 0 ; 
+            g.count = 0 ;
+            g.returns = 0;
+            g.openRise = 0;
             if (quote) {
-                let groupWarn = false;
                 for (let d of g.recordList) {
-                    //处理止损价格
+                    if(d.closeRecordList && d.closeRecordList.length > 0 ){
+                        //如果还有剩余仓位，先计算剩余仓位的浮盈
+                        if(d.remaining){
+                            d.returns = _.round(d.remaining*(quote.current - d.price), 2);
+                        }else{
+                            d.returns = 0;
+                        }
+                        for(let c of d.closeRecordList){
+                            //计算平仓时的收益
+                            c.returns = _.round(c.count * (c.price-d.price),2);
+                            d.returns = d.returns + c.returns;
+                        }
+                    }else{
+                        //计算收益：如果没有平仓记录，用剩余仓位、当前行情、开仓价格计算收益
+                        d.returns = _.round(d.remaining*(quote.current - d.price), 2);
+                    }
                     if (quote.current <= d.stopPrice) {
-                        console.log(d.code, '到达止损价格:', d.stopPrice)
+                        console.log(d.code,quote.name, '到达止损价格:', d.stopPrice)
                         d.warn = true;
                         groupWarn = true;
-                    } else {
+                    }else{
                         d.warn = false;
                     }
-
-                    d.value = _.round(d.count * quote.current, 2);
-                    //处理收益
-                    d.returns =_.round((quote.current - d.price) / d.price * 100, 2);
-                    
+                    d.value = _.round(d.remaining * quote.current, 2);
+                    g.returns = g.returns + d.returns;
+                    g.remaining = g.remaining + d.remaining;
+                    g.count = g.count + d.count;
+                    //开仓后的涨跌幅
+                    d.openRise = _.round((quote.current - d.price)/d.price*100,2);
+                    g.openRise = g.openRise + (d.openRise * d.count) ;
                 }
-                g.warn = groupWarn;
-                //处理市值
-                g.value = _.round(g.count * quote.current, 2);
+                totalReturns = totalReturns + g.returns;
+                g.value = _.round(g.remaining * quote.current, 2);
                 totalValue = totalValue + g.value;
-                //处理收益
-                g.returns =_.round((quote.current - g.price) / g.price * 100, 2);
+                g.openRise = _.round(g.openRise/g.count, 2);
+                g.warn = groupWarn;
             }
         }
 
@@ -253,14 +307,19 @@ export default class App extends Component {
                     <span className="ml30" placehold="增加操作记录分组" >
                         <Icon className="c-p" type="plus-circle-o" onClick={this.onRecordGroupAddClick} />
                     </span>
+                    <span className="ml20">
+                        <Icon className="c-p"  type="profile" onClick={this.onGroupListCollapseClick} />
+                    </span>
                 </div>
                 <div className="mt10 stock-list-w">
                     <div className="list-col name">名称</div>
                     <div className="list-col code">代码</div>
                     <div className="list-col date">日期</div>
-                    <div className="list-col count">数量</div>
-                    <div className="list-col price">成本</div>
-                    <div className="list-col returns">收益</div>
+                    <div className="list-col oper">买卖</div>
+                    <div className="list-col count">开仓数量</div>
+                    <div className="list-col remaining">剩余数量</div>
+                    <div className="list-col price">买价/卖价</div>
+                    <div className="list-col open-rise">开仓涨跌</div>
                     <div className="list-col stop-price">止损</div>
                     <div className="list-col current">当前价格</div>
                     <div className="list-col today-rise">当日涨幅</div>
@@ -273,12 +332,14 @@ export default class App extends Component {
                         let quote = Data.getStockQuote(g.code);
                         return (<div className="record-group ">
                             <div className="group-item stock-list-w">
-                                <div className="list-col name">{Util.getStockName(g.code)}</div>
+                                <div className="list-col name">{quote && quote.name}</div>
                                 <div className="list-col code">{g.code}</div>
                                 <div className="list-col date">{g.startDate}</div>
+                                <div className="list-col oper"></div>
                                 <div className="list-col count">{g.count}</div>
+                                <div className="list-col remaining">{g.remaining}</div>
                                 <div className="list-col price">{g.price}</div>
-                                <div className="list-col returns">{Util.renderRisePercent(g.returns)}</div>
+                                <div className="list-col open-rise">{Util.renderRisePercent(g.openRise)}</div>
                                 <div className="list-col stop-price">{g.warn == true && <span className="warn-tag"></span>}</div>
                                 <div className="list-col current">{quote && quote.current}</div>
                                 <div className="list-col today-rise">{quote && Util.renderRisePercent(quote.percentage)}</div>
@@ -289,27 +350,9 @@ export default class App extends Component {
                                 </div>
                             </div>
                             {
+                                
                                 g.visible == true && g.recordList && g.recordList.map(d => {
-                                    return (
-                                        <div className="stock-list-w">
-                                            <div className="record-item">
-                                                <div className="list-col name">{Util.getStockName(d.code)}</div>
-                                                <div className="list-col code">{d.code}</div>
-                                                <div className="list-col date">{d.date}</div>
-                                                <div className="list-col count">{d.count}</div>
-                                                <div className="list-col price">{d.price}</div>
-                                                <div className="list-col returns">{Util.renderRisePercent(d.returns)}</div>
-                                                <div className="list-col stop-price"><span className={d.warn == true ? 'warn' : ''}>{d.stopPrice}</span></div>
-                                                <div className="list-col current">{quote && quote.current}</div>
-                                                <div className="list-col today-rise">{quote && Util.renderRisePercent(quote.percentage)}</div>
-                                                <div className="list-col value">{d.value}</div>
-                                                <div className="list-col proportion">{this.stockRenderProportionCell(d.value, stockTotalValue)}</div>
-                                                <div className="list-col row-oper">
-                                                    {this.renderRecordOper(d)}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )
+                                    return this.stockRenderRecordBlock(d,g,quote,true)
                                 })
                             }
                         </div>)
@@ -319,6 +362,35 @@ export default class App extends Component {
             </div>)
     }
 
+    stockRenderRecordBlock=(d,g,quote,isOpen)=>{
+        let {stockTotalValue } = this.state;
+        return (
+            <div className={isOpen==true?"record-items stock-list-w":''}>
+                <div className="record-item">
+                    <div className="list-col name">{quote && quote.name}</div>
+                    <div className="list-col code">{d.code}</div>
+                    <div className="list-col date">{d.date}</div>
+                    <div className={"list-col oper "+(isOpen==true?'c-pri':'')}>{Dict.recordOperMapper[d.oper]}</div>
+                    <div className="list-col count">{d.count}</div>
+                    <div className="list-col remaining">{d.remaining}</div>
+                    <div className="list-col price">{d.price}</div>
+                    <div className="list-col open-rise">{Util.renderRisePercent(d.openRise)}</div>
+                    <div className="list-col stop-price"><span className={d.warn == true ? 'warn' : ''}>{d.stopPrice}</span></div>
+                    <div className="list-col current">{quote && quote.current}</div>
+                    <div className="list-col today-rise">{quote && Util.renderRisePercent(quote.percentage)}</div>
+                    <div className="list-col value">{d.value}</div>
+                    <div className="list-col proportion">{this.stockRenderProportionCell(d.value, stockTotalValue)}</div>
+                    <div className="list-col row-oper">
+                        {this.renderRecordOper(d)}
+                    </div>
+                </div>
+                {d.closeRecordList && d.closeRecordList.map(d2=>{
+                    return this.stockRenderRecordBlock(d2,g,quote)
+                })}
+            </div>
+        )
+    }
+
     /* ================================ stock 相关处理 end ================================ */
 
 
@@ -326,7 +398,7 @@ export default class App extends Component {
 
     futuresIntervalRefresh=()=>{
         let { groupList } = this.state;
-        let futuresTotalReturns = 0;
+        let totalReturns = 0;
         for (let g of groupList) {
             g.returns = 0;
             g.count = 0;
@@ -357,13 +429,13 @@ export default class App extends Component {
                     //开仓后的涨跌幅
                     d.openRise = _.round((quote.current - d.price)/d.price*100,2);
                 }
-                futuresTotalReturns = futuresTotalReturns + g.returns;
+                totalReturns = totalReturns + g.returns;
             }
         }
         
         this.setState({ 
             groupList:groupList,
-            futuresTotalReturns:futuresTotalReturns
+            futuresTotalReturns:totalReturns
         })
     }
 
@@ -377,6 +449,9 @@ export default class App extends Component {
                     <span className="ml30">总收益：{futuresTotalReturns}</span>
                     <span className="ml30" placehold="增加操作记录分组" >
                         <Icon className="c-p" type="plus-circle-o" onClick={this.onRecordGroupAddClick} />
+                    </span>
+                    <span className="ml20">
+                        <Icon className="c-p"  type="profile" onClick={this.onGroupListCollapseClick} />
                     </span>
                 </div>
                 <div className="mt10  futures-list-w">

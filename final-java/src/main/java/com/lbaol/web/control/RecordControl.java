@@ -83,9 +83,9 @@ public class RecordControl {
 				recordDO.setId(id);
 				recordMapper.update(recordDO);
 				if("open".equals(subOper)) {
-					updateFuturesOpenRecordRemaining(id);
+					updateOpenRecordRemaining(id);
 				}else if("close".equals(subOper)) {
-					updateFuturesOpenRecordRemaining(openId);
+					updateOpenRecordRemaining(openId);
 				}
 			}else {
 				if(subOper == "open") {
@@ -96,10 +96,16 @@ public class RecordControl {
 		}
 		
 		
-		if("stocks".equals(type)) {
+		if("stock".equals(type)) {
 			if(id != null && id >0) {
 				recordDO.setId(id);
 				recordMapper.update(recordDO);
+				if("buy".equals(recordDO.getOper())) {
+					updateOpenRecordRemaining(id);
+				}else if("sell".equals(recordDO.getOper())) {
+					updateOpenRecordRemaining(openId);
+				}
+				
 			}else {
 				recordMapper.insert(recordDO);
 			}
@@ -123,8 +129,8 @@ public class RecordControl {
 		RecordDO recordDO = recordMapper.getById(id);
 		recordMapper.deleteById(id);
 		updateRecordGroupCountAndCost(recordDO.getGroupId());
-		if(recordDO.getOpenId()!=null && "futures".equals(recordDO.getType())) {
-			updateFuturesOpenRecordRemaining(recordDO.getOpenId());
+		if(recordDO.getOpenId()!=null) {
+			updateOpenRecordRemaining(recordDO.getOpenId());
 		}
 		rpcResult.setIsSuccess(true);
         return rpcResult;  
@@ -138,13 +144,18 @@ public class RecordControl {
         return map;  
     }
 	
-	//计算开仓剩余数量
-	private void updateFuturesOpenRecordRemaining(Integer openId) {
+	//计算期货开仓剩余数量
+	private void updateOpenRecordRemaining(Integer openId) {
 		RecordDO openRecord = recordMapper.getById(openId);
 		if(openId!=null && openId>0) {
 			Map params = new HashMap();
 			params.put("openId", openId);
-			params.put("subOper","close" );
+			if("stock".equals(openRecord.getType())) {
+				params.put("oper","sell" );
+			}else if("futures".equals(openRecord.getType())) {
+				params.put("subOper","close" );
+			}
+			
 			List<RecordDO> closeRecordList = recordMapper.getByParams(params);
 			Double closeCount = 0d;
 			for(RecordDO closeRecord : closeRecordList) {
@@ -154,8 +165,25 @@ public class RecordControl {
 			openRecord.setRemaining(remaining);
 			recordMapper.update(openRecord);
 		}
-		
 	}
+	
+	//计算股票剩余数量
+//	private void updateStockOpenRecordRemaining(Integer openId) {
+//		RecordDO openRecord = recordMapper.getById(openId);
+//		if(openId!=null && openId>0) {
+//			Map params = new HashMap();
+//			params.put("openId", openId);
+//			params.put("oper","sell" );
+//			List<RecordDO> closeRecordList = recordMapper.getByParams(params);
+//			Double closeCount = 0d;
+//			for(RecordDO closeRecord : closeRecordList) {
+//				closeCount = NumberUtil.add(closeRecord.getCount(), closeCount);
+//			}
+//			Double remaining = NumberUtil.sub(openRecord.getCount(), closeCount);
+//			openRecord.setRemaining(remaining);
+//			recordMapper.update(openRecord);
+//		}
+//	}
 	
 	private void updateRecordGroupCountAndCost(Integer groupId) {
 		RecordGroupDO recordGroupDO =  recordGroupMapper.getById(groupId);

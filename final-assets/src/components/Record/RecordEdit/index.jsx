@@ -191,7 +191,7 @@ export default class App extends Component {
                         </FormItem>
                     }
                     {
-                        subOper=='close' &&
+                        (type=='stock' && subOper=='sell') || (type=='futures' && subOper=='close') &&
                         <FormItem className="required"
                             {...formItemLayout}
                             label="开仓ID/买入ID"

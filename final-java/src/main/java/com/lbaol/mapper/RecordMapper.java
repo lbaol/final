@@ -59,7 +59,7 @@ public interface RecordMapper {
 	@Delete("DELETE FROM record WHERE id =#{id}")
     void deleteById(Integer id);
 	
-	@Insert("INSERT INTO record(code,count,date,fee,stop_price,oper,sub_oper,group_id,price,open_id,remaining) VALUES(#{code}, #{count}, #{date}, #{fee}, #{stopPrice}, #{oper}, #{subOper}, #{groupId}, #{price}, #{openId}, #{remaining})")
+	@Insert("INSERT INTO record(code,count,date,fee,stop_price,oper,sub_oper,group_id,price,open_id,remaining,type) VALUES(#{code}, #{count}, #{date}, #{fee}, #{stopPrice}, #{oper}, #{subOper}, #{groupId}, #{price}, #{openId}, #{remaining}, #{type})")
 	@Options(useGeneratedKeys=true, keyProperty="id")
 	void insert(RecordDO recordDO);
 	

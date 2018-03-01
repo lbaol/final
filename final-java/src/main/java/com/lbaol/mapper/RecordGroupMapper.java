@@ -57,7 +57,7 @@ public interface RecordGroupMapper {
 	
 	@InsertProvider(type = RecordGroupProvider.class, method = "insert")  
 	@Options(useGeneratedKeys=true, keyProperty="id")
-	void insert(RecordGroupDO recordGroupDO);
+	Integer insert(RecordGroupDO recordGroupDO);
 	
 	@UpdateProvider(type = RecordGroupProvider.class,  
             method = "update")  

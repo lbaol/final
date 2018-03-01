@@ -31,7 +31,16 @@ public class RecordGroupControl {
 	
 	
 	@RequestMapping("/recordGroup/save")
-	RpcResult addOrUpdate(Integer id,String code,Double count,Double price,String startDate,String endDate,String status,String market,String type) { 
+	RpcResult addOrUpdate(Integer id,
+				String code,
+				Double count,
+				Double price,
+				String startDate,
+				String endDate,
+				String status,
+				String market,
+				String type,
+				String direction) { 
 		RpcResult rpcResult = new RpcResult();
 		
 		RecordGroupDO recordGroupDO = new RecordGroupDO();
@@ -59,11 +68,44 @@ public class RecordGroupControl {
 		if(StringUtils.isNotEmpty(type)) {
 			recordGroupDO.setType(type);
 		}
+		if(StringUtils.isNotEmpty(direction)) {
+			recordGroupDO.setDirection(direction);
+		}
 		if(id != null && id >0) {
 			recordGroupDO.setId(id);
 			recordGroupMapper.update(recordGroupDO);
 		}else {
 			recordGroupMapper.insert(recordGroupDO);
+			//如果是股票，同时插入一条买入记录
+			Integer groupId = recordGroupDO.getId();
+			if(groupId>0) {
+				RecordDO recordDO = new RecordDO();
+				recordDO.setGroupId(groupId);
+				recordDO.setOper("buy");
+				if(count!=null && count >= 0) {
+					recordDO.setCount(count);
+					recordDO.setRemaining(count);
+				}
+				if(StringUtils.isNotEmpty(code)) {
+					recordDO.setCode(code);
+				}
+				if(price!=null && price >= 0) {
+					recordDO.setPrice(price);
+				}
+				if(StringUtils.isNotEmpty(startDate)) {
+					recordDO.setDate(startDate);
+				}
+				if(StringUtils.isNotEmpty(market)) {
+					recordDO.setMarket(market);
+				}	
+				if(StringUtils.isNotEmpty(type)) {
+					recordDO.setType(type);
+				}
+				recordMapper.insert(recordDO);
+			}
+			
+			
+			
 		}
 		
 		rpcResult.setIsSuccess(true);
@@ -121,7 +163,7 @@ public class RecordGroupControl {
 		Map map = new HashMap();
 		List<RecordGroupDO>  recordGroupList =  recordGroupMapper.getAllPosition();
 		for(RecordGroupDO recordGroupDO : recordGroupList) {
-			List<RecordDO> recordList = recordMapper.getByGroupId(recordGroupDO.getId());
+			List<RecordDO> recordList = getOpenRecordList(recordGroupDO.getId(),recordGroupDO.getType());
 			recordGroupDO.setRecordList(recordList);
 		}
 		map.put("list", recordGroupList);

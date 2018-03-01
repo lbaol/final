@@ -19,7 +19,7 @@ export default class App extends Component {
         this.state = {
             id:'',
             code:'',
-            cost:'',
+            price:'',
             startDate:'',
             endDate:'',
             count:'',
@@ -39,7 +39,7 @@ export default class App extends Component {
                 endDate:'',
                 count:'',
                 code:'',
-                cost:'',
+                price:'',
                 status:'',
                 market:'',
                 type:'',
@@ -104,7 +104,7 @@ export default class App extends Component {
     }
 
     render() {
-        const {count,startDate,endDate,id,code,cost,status,market,type,direction} = this.state;
+        const {count,startDate,endDate,id,code,price,status,market,type,direction} = this.state;
         const formItemLayout = {
             labelCol: {
               sm: { span: 6 },
@@ -160,7 +160,7 @@ export default class App extends Component {
                         <DatePicker value={startDate && moment(startDate)} onChange={this.onDateFieldChange.bind(this,'startDate')} placeholder="开始日期" />
                     </FormItem>
                     {
-                        <FormItem
+                        type=="futures" && <FormItem
                             {...formItemLayout}
                             label="方向"
                         >
@@ -183,9 +183,9 @@ export default class App extends Component {
                         type =='stock' &&
                         <FormItem
                             {...formItemLayout}
-                            label="成本"
+                            label="价格"
                         >
-                            <Input value={cost} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'cost')}/>
+                            <Input value={price} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'price')}/>
                         </FormItem>
                     }
                     
