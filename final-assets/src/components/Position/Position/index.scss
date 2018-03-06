@@ -1,83 +1,90 @@
-.futures-list-w {
-    width: 1200px;
-    padding-left: 5px;
-}
 
-.stock-list-w {
-    width: 1200px;
-    padding-left: 5px;
-}
 
-.record-list {
-    
-    .list-col {
-        vertical-align: top;
-        display: inline-block;
-        width: 70px;
-        font-size: 12px;
-        height: 30px;
-        margin: 2px 0;
-        line-height: 30px;
-    }
+.position-container {
 
-    
-    .group-item{
-        margin-bottom: 3px;
-        background-color: #f1f1f1;
-    }
-
-    .record-items {
-        border-bottom:1px solid #e8e8e8;
-        margin-bottom: 3px;
-    }
-
-    .record-item:hover{
-        background-color: aliceblue;
-    }
-
-    .warn {
-        background-color: #c4ffc4;
-        display: inline-block;
-        padding: 0 2px;
+    .futures-list-w {
+        width: 1200px;
+        padding-left: 5px;
     }
     
-    .warn-tag {
-        height: 6px;
-        width: 30px;
-        display: inline-block;
-        background-color: #77ea77;
-        border-radius: 6px;
+    .stock-list-w {
+        width: 1200px;
+        padding-left: 5px;
+    }
+
+    .record-list {
+    
+        .list-col {
+            vertical-align: top;
+            display: inline-block;
+            width: 70px;
+            font-size: 12px;
+            height: 30px;
+            margin: 2px 0;
+            line-height: 30px;
+        }
+    
+        
+        .group-item{
+            margin-bottom: 3px;
+            background-color: #f1f1f1;
+        }
+    
+        .record-items {
+            border-bottom:1px solid #e8e8e8;
+            margin-bottom: 3px;
+        }
+    
+        .record-item:hover{
+            background-color: aliceblue;
+        }
+    
+        .warn {
+            background-color: #c4ffc4;
+            display: inline-block;
+            padding: 0 2px;
+        }
+        
+        .warn-tag {
+            height: 6px;
+            width: 30px;
+            display: inline-block;
+            background-color: #77ea77;
+            border-radius: 6px;
+            
+        }
+    
+        .list-col.id{
+            width: 30px;
+        }
+    
+        .list-col.date{
+            width: 75px;
+        }
+    
+        .list-col.row-oper{
+            width: 120px;
+        }
+    
+        .list-col.direction {
+            width: 30px;
+        }
+    
+        .list-col.oper{
+            width: 50px;
+        }
+    
+        .list-col.sub-oper{
+            width: 50px;
+        }
+    
+        .c-pri {
+            color: cornflowerblue;
+        }
+    
         
     }
-
-    .list-col.id{
-        width: 30px;
-    }
-
-    .list-col.date{
-        width: 75px;
-    }
-
-    .list-col.row-oper{
-        width: 120px;
-    }
-
-    .list-col.direction {
-        width: 30px;
-    }
-
-    .list-col.oper{
-        width: 50px;
-    }
-
-    .list-col.sub-oper{
-        width: 50px;
-    }
-
-    .c-pri {
-        color: cornflowerblue;
-    }
-
+    
     
 }
 

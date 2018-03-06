@@ -551,7 +551,7 @@ export default class App extends Component {
         let { groupList,type } = this.state;
         
         return (
-            <div className="record-list-container">
+            <div className="position-container">
                 {type=='stock' && this.stockRenderBlock()}
                 {type=='futures' && this.futuresRenderBlock()}
             </div>
