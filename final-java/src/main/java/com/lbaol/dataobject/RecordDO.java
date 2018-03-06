@@ -18,6 +18,20 @@ public class RecordDO {
 	private String market; // a 大陆; hk 香港;us 美股;
 	private Integer openId;
 	private Double remaining;
+	private Double returns;
+	private Double returnsPrice;
+	public Double getReturns() {
+		return returns;
+	}
+	public void setReturns(Double returns) {
+		this.returns = returns;
+	}
+	public Double getReturnsPrice() {
+		return returnsPrice;
+	}
+	public void setReturnsPrice(Double returnsPrice) {
+		this.returnsPrice = returnsPrice;
+	}
 	private List<RecordDO> closeRecordList;
 	
 	public List<RecordDO> getCloseRecordList() {

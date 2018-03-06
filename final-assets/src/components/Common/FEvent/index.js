@@ -42,21 +42,21 @@ FEvent.emit = instance.emit.bind(instance);
 
 // decorator
 export default function FEvent (classDeclaration) {
-  classDeclaration.prototype.iceEventsListener = []; // 这里放了组件所有监听的事件对象
+  classDeclaration.prototype.eventsListener = []; // 这里放了组件所有监听的事件对象
   const prototypeMethods = {
     on: function (eventName, eventListener) {
-      this.iceEventsListener.push({ eventName, eventListener });
+      this.eventsListener.push({ eventName, eventListener });
       return FEvent.on(eventName, eventListener);
     },
     once: function (eventName, eventListener) {
-      this.iceEventsListener.push({ eventName, eventListener });
+      this.eventsListener.push({ eventName, eventListener });
       return FEvent.once(eventName, eventListener);
     },
     emit: instance.emit.bind(instance),
     off: instance.off.bind(instance),
 
     componentWillUnmount: function () {
-      this.iceEventsListener.forEach(eventObj => {
+      this.eventsListener.forEach(eventObj => {
         FEvent.off(eventObj.eventName, eventObj.eventListener);
       });
     }

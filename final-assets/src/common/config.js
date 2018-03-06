@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
 import { request,request_sync} from "common/ajax.js";
-
+import FEvents from "components/Common/FEvent/index.js";
 
 const Env = 'product' //daily product
 
@@ -304,7 +304,7 @@ function getLastStockQuote(){
                         quote[k] = res[k]
                     }
                     Data.stockQuote = quote;
-                    // console.log('quoteMapper',quote);
+                    FEvents.emit('final:stock-quote-refresh-finish');
                 }, {
                     code: reqCodes.join(',')
                 }, 'jsonp')
@@ -329,7 +329,7 @@ function getLastFuturesQuote(){
                         }
                     }
                     Data.futuresQuote = quote;
-                    
+                    FEvents.emit('final:futures-quote-refresh-finish');
                 }, {
                     
                 }, 'jsonp','','','_ntes_quote_callback')

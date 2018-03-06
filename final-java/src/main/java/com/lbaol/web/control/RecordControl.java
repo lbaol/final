@@ -34,7 +34,8 @@ public class RecordControl {
 	@RequestMapping("/record/save")
 	RpcResult addOrUpdate(Integer id,String code,Double count,Double price,String date,Integer groupId,String oper,String subOper,
 			@RequestParam(value="fee",required = false,defaultValue  = "0") Double fee,String market,String type,
-			Integer openId) { 
+			Integer openId,
+			Double returnsPrice) { 
 		RpcResult rpcResult = new RpcResult();
 		
 		RecordDO recordDO = new RecordDO();
@@ -46,6 +47,9 @@ public class RecordControl {
 		}
 		if(fee!=null && fee >= 0) {
 			recordDO.setFee(fee);
+		}
+		if(returnsPrice!=null && returnsPrice >= 0) {
+			recordDO.setReturnsPrice(returnsPrice);
 		}
 		if(groupId!=null && groupId >= 0) {
 			recordDO.setGroupId(groupId);
@@ -73,48 +77,62 @@ public class RecordControl {
 		if(StringUtils.isNotEmpty(type)) {
 			recordDO.setType(type);
 		}
-
 		
-		
-		
-		
-		if("futures".equals(type)) {
-			if(id != null && id >0) {
-				recordDO.setId(id);
-				recordMapper.update(recordDO);
-				if("open".equals(subOper)) {
-					updateOpenRecordRemaining(id);
-				}else if("close".equals(subOper)) {
-					updateOpenRecordRemaining(openId);
-				}
-			}else {
-				if(subOper == "open") {
-					recordDO.setRemaining(count);
-				}
-				recordMapper.insert(recordDO);
+		if(id != null && id >0) {
+			recordDO.setId(id);
+			recordMapper.update(recordDO);
+			if(isOpenRecord(recordDO)) {
+				updateOpenRecordRemainingAndRetruns(id);
 			}
-		}
-		
-		
-		if("stock".equals(type)) {
-			if(id != null && id >0) {
-				recordDO.setId(id);
-				recordMapper.update(recordDO);
-				if("buy".equals(recordDO.getOper())) {
-					updateOpenRecordRemaining(id);
-				}else if("sell".equals(recordDO.getOper())) {
-					updateOpenRecordRemaining(openId);
-				}
-				
-			}else {
-				recordMapper.insert(recordDO);
+			if(isCloseRecord(recordDO)) {
+				updateCloseRecordReturns(id);
+				updateOpenRecordRemainingAndRetruns(openId);
 			}
+			
+		}else {
+			if(isOpenRecord(recordDO)) {
+				recordDO.setRemaining(count);
+			}
+			recordMapper.insert(recordDO);
+			if(isCloseRecord(recordDO)) {
+				updateCloseRecordReturns(recordDO.getId());
+				updateOpenRecordRemainingAndRetruns(openId);
+			}
+			
 		}
-		
 		updateRecordGroupCountAndCost(groupId);
 		rpcResult.setIsSuccess(true);
         return rpcResult;  
     }
+	
+	private boolean isOpenRecord(RecordDO recordDO) {
+		if("stock".equals(recordDO.getType())){
+			if("buy".equals(recordDO.getOper())) {
+				return true;
+			}
+		}
+		if("futures".equals(recordDO.getType())){
+			if("open".equals(recordDO.getSubOper())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isCloseRecord(RecordDO recordDO) {
+		if("stock".equals(recordDO.getType())){
+			if("sell".equals(recordDO.getOper())) {
+				return true;
+			}
+		}
+		if("futures".equals(recordDO.getType())){
+			if("close".equals(recordDO.getSubOper())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	
 	
 	@RequestMapping("/record/getById")
@@ -130,7 +148,7 @@ public class RecordControl {
 		recordMapper.deleteById(id);
 		updateRecordGroupCountAndCost(recordDO.getGroupId());
 		if(recordDO.getOpenId()!=null) {
-			updateOpenRecordRemaining(recordDO.getOpenId());
+			updateOpenRecordRemainingAndRetruns(recordDO.getOpenId());
 		}
 		rpcResult.setIsSuccess(true);
         return rpcResult;  
@@ -145,7 +163,7 @@ public class RecordControl {
     }
 	
 	//计算期货开仓剩余数量
-	private void updateOpenRecordRemaining(Integer openId) {
+	private void updateOpenRecordRemainingAndRetruns(Integer openId) {
 		RecordDO openRecord = recordMapper.getById(openId);
 		if(openId!=null && openId>0) {
 			Map params = new HashMap();
@@ -158,13 +176,46 @@ public class RecordControl {
 			
 			List<RecordDO> closeRecordList = recordMapper.getByParams(params);
 			Double closeCount = 0d;
+			Double retruns = 0d;
 			for(RecordDO closeRecord : closeRecordList) {
 				closeCount = NumberUtil.add(closeRecord.getCount(), closeCount);
+				retruns =  NumberUtil.add(closeRecord.getReturns(), retruns);
 			}
 			Double remaining = NumberUtil.sub(openRecord.getCount(), closeCount);
+			
 			openRecord.setRemaining(remaining);
+			openRecord.setReturns(retruns);
 			recordMapper.update(openRecord);
 		}
+	}
+	
+	private void updateCloseRecordReturns(Integer closeRecordId) {
+		RecordDO closeRecord = recordMapper.getById(closeRecordId);
+		
+			if(closeRecord.getPrice()!=null && closeRecord.getPrice()>0 && closeRecord.getOpenId()!=null && closeRecord.getOpenId()>0) {
+				
+				Double returnsPrice = 0d;
+				if(closeRecord.getReturnsPrice()==null || closeRecord.getReturnsPrice()==0) {
+					RecordDO openRecord = recordMapper.getById(closeRecord.getOpenId());
+					returnsPrice = openRecord.getPrice();
+					closeRecord.setReturnsPrice(returnsPrice);
+				}
+				
+				Double d = NumberUtil.sub( closeRecord.getPrice(),closeRecord.getReturnsPrice());
+				Double returns = NumberUtil.mul(d, closeRecord.getCount());
+				closeRecord.setReturns(returns);
+				
+				RecordGroupDO recordGroupDO = recordGroupMapper.getById(closeRecord.getGroupId());
+				//如果是期货做空，则收益需要取反
+				if("short".equals(recordGroupDO.getDirection())&&"futures".equals(recordGroupDO.getType())) {
+					Double returns2 = NumberUtil.div(0, returns);
+					closeRecord.setReturns(returns2);
+				}
+				
+				recordMapper.update(closeRecord);
+			}
+		
+		
 	}
 	
 	//计算股票剩余数量
