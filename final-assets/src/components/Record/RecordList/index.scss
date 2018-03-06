@@ -1,47 +1,21 @@
-.record-list {
-    
-    .list-col {
-        vertical-align: top;
-        display: inline-block;
-        width: 70px;
+.record-list-container {
+    padding: 20px;
+
+    .list-wrap {
+        display: flex;
+        
+    }
+
+    table {
         font-size: 12px;
-        height: 30px;
-        margin: 2px 0;
-        line-height: 30px;
     }
 
-    
-    .group-item{
-        background-color: aliceblue;
-        
+    .group-list {
+        margin-right: 20px;
+        flex-grow: 1;
     }
 
-    .record-item:hover{
-        background-color: aliceblue;
+    .record-list {
+        flex-grow: 1;
     }
-
-    .warn {
-        background-color: #c4ffc4;
-        display: inline-block;
-        padding: 0 2px;
-    }
-    
-    .warn-tag {
-        height: 6px;
-        width: 30px;
-        display: inline-block;
-        background-color: #77ea77;
-        border-radius: 6px;
-        
-    }
-
-    .list-col.date{
-        width: 75px;
-    }
-
-    .list-col.oper{
-        width: 100px;
-    }
-
-    
 }

@@ -5,21 +5,17 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.jdbc.SQL;
 
-import com.lbaol.dataobject.FavDO;
-import com.lbaol.dataobject.PosDO;
-import com.lbaol.dataobject.RecordDO;
 import com.lbaol.dataobject.RecordGroupDO;
-import com.lbaol.mapper.FavMapper.FavProvider;
 
 public interface RecordGroupMapper {
 	
@@ -55,6 +51,13 @@ public interface RecordGroupMapper {
 	@Delete("DELETE FROM record_group WHERE id =#{id}")
     void deleteById(Integer id);
 	
+	@SelectProvider(type = RecordGroupProvider.class, method = "getByParams")  
+	@Results({
+		@Result(property = "startDate", column = "start_date"),
+        @Result(property = "endDate", column = "end_date")
+    })
+	public List<RecordGroupDO> getByParams(Map params);
+	
 	@InsertProvider(type = RecordGroupProvider.class, method = "insert")  
 	@Options(useGeneratedKeys=true, keyProperty="id")
 	Integer insert(RecordGroupDO recordGroupDO);
@@ -72,6 +75,9 @@ public interface RecordGroupMapper {
                 FROM("record_group");      
                 if(params.get("code")!=null){      
                     WHERE("code = #{code}");      
+                }
+                if(params.get("type")!=null && StringUtils.isNotEmpty((String) params.get("type"))){      
+                    WHERE("type = #{type}");      
                 } 
                 
                 ORDER_BY("id desc");

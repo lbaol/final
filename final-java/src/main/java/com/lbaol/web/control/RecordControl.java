@@ -162,6 +162,14 @@ public class RecordControl {
         return map;  
     }
 	
+	@RequestMapping("/record/getListByGroupId")
+    Map getList(Integer groupId) {  
+		Map map = new HashMap();
+		List<RecordDO>  recordList =  recordMapper.getByGroupId(groupId);
+		map.put("list", recordList);
+        return map;  
+    }
+	
 	//计算期货开仓剩余数量
 	private void updateOpenRecordRemainingAndRetruns(Integer openId) {
 		RecordDO openRecord = recordMapper.getById(openId);

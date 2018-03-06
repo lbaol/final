@@ -120,9 +120,12 @@ public class RecordGroupControl {
     }
 	
 	@RequestMapping("/recordGroup/getList")
-    Map getList(@RequestParam(value="isGetRecord",required = false,defaultValue  = "false") Boolean isGetRecord) {  
+    Map getList(@RequestParam(value="isGetRecord",required = false,defaultValue  = "false") Boolean isGetRecord,
+    		String type) {  
 		Map map = new HashMap();
-		List<RecordGroupDO>  recordGroupList =  recordGroupMapper.getAll();
+		Map params = new HashMap();
+		params.put("type", type);
+		List<RecordGroupDO>  recordGroupList =  recordGroupMapper.getByParams(params);
 		map.put("list", recordGroupList);
         return map;  
     }

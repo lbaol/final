@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import StockPosition from "components/Position/StockPosition/index.jsx";
+import Position from "components/Position/Position/index.jsx";
 import RecordGroupEdit from "components/Record/RecordGroupEdit/index.jsx";
 import RecordEdit from "components/Record/RecordEdit/index.jsx";
 import QuoteSwitch from "components/Common/QuoteSwitch/index.jsx";
@@ -31,8 +31,8 @@ export default class App extends Component {
                 <div className="ml20 mt20">
                     <QuoteSwitch/>
                 </div>
-                <StockPosition market="a" type="stock"/>
-                <StockPosition market="" type="futures"/>
+                <Position market="a" type="stock"/>
+                <Position market="" type="futures"/>
                 <RecordGroupEdit />
                 <RecordEdit />
             </div>
