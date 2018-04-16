@@ -23,7 +23,8 @@ export default class App extends Component {
             type:props.type, //stock股票 futures期货
             stockTotalValue:0,
             futuresTotalReturns:0,
-            isGroupItemVisable:false
+            isGroupItemVisable:false,
+            cash:props.cash?props.cash:0
         };
     }
 
@@ -200,7 +201,7 @@ export default class App extends Component {
         for (let g of groupList) {
             for (let r of g.recordList) {
                 if (!r.stopPrice) {
-                    r.stopPrice = _.round(r.price * (1 - 0.08), 2);
+                    r.stopPrice = _.round(r.price * (1 - 0.07), 2);
                 }
             }
         }
@@ -285,13 +286,14 @@ export default class App extends Component {
     }
 
     stockRenderBlock=()=>{
-        let { groupList,type,stockTotalValue } = this.state;
+        let { groupList,type,stockTotalValue,cash } = this.state;
         
         return (
             <div className="mt30 mb30 ml20 record-list">
                 <div>
                     <span>{Dict.marketTypeMapper[this.props.market] + '持仓及交易记录'}</span>
                     <span className="ml30">市值：{stockTotalValue}</span>
+                    <span className="ml30">总资金：{stockTotalValue+cash}</span>
                     <span className="ml30" placehold="增加操作记录分组" >
                         <Icon className="c-p" type="plus-circle-o" onClick={this.onRecordGroupAddClick} />
                     </span>

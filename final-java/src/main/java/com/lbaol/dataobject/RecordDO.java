@@ -20,6 +20,38 @@ public class RecordDO {
 	private Double remaining;
 	private Double returns;
 	private Double returnsPrice;
+	private List<RecordDO> closeRecordList;
+	private RecordDO openRecordDO;
+	private String statStatus; //统计状态
+	private String openType;
+	private String openSignal;
+	
+	
+	public String getOpenSignal() {
+		return openSignal;
+	}
+	public void setOpenSignal(String openSignal) {
+		this.openSignal = openSignal;
+	}
+	public String getStatStatus() {
+		return statStatus;
+	}
+	public void setStatStatus(String statStatus) {
+		this.statStatus = statStatus;
+	}
+	public String getOpenType() {
+		return openType;
+	}
+	public void setOpenType(String openType) {
+		this.openType = openType;
+	}
+	public RecordDO getOpenRecordDO() {
+		return openRecordDO;
+	}
+	public void setOpenRecordDO(RecordDO openRecordDO) {
+		this.openRecordDO = openRecordDO;
+	}
+	
 	public Double getReturns() {
 		return returns;
 	}
@@ -32,7 +64,7 @@ public class RecordDO {
 	public void setReturnsPrice(Double returnsPrice) {
 		this.returnsPrice = returnsPrice;
 	}
-	private List<RecordDO> closeRecordList;
+	
 	
 	public List<RecordDO> getCloseRecordList() {
 		return closeRecordList;

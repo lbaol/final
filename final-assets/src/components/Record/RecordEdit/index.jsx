@@ -4,9 +4,9 @@ import moment from 'moment';
 import _ from 'lodash';
 import { Button, Select, Input, DatePicker, Modal,Form } from 'antd';
 import FEvents from "components/Common/FEvent/index.js";
-
 import { request } from "common/ajax.js";
 import { URL, Util,Dict } from "common/config.js";
+import './index.scss';
 
 const FormItem = Form.Item;
 
@@ -29,6 +29,9 @@ export default class App extends Component {
             type:'',
             oper:'',
             openId:'',
+            openType:'',
+            openSignal:'',
+            statStatus:'',
             visible: false
         };
     }
@@ -48,6 +51,9 @@ export default class App extends Component {
                 price:'',
                 oper:'',
                 openId:'',
+                openType:'',
+                openSignal:'',
+                statStatus:'',
                 visible: true
             },this.fetchData);
         });
@@ -108,7 +114,7 @@ export default class App extends Component {
     }
 
     render() {
-        const {id,code,count,date,price,stopPrice,fee,subOper,market,type,oper,openId} = this.state;
+        const {id,code,count,date,price,stopPrice,fee,subOper,market,type,oper,openId,openType,statStatus,openSignal} = this.state;
         const formItemLayout = {
             labelCol: {
               sm: { span: 6 },
@@ -118,8 +124,8 @@ export default class App extends Component {
             },
           };
         return (
-            <div>
-                <Modal
+            <div >
+                <Modal className="record-edit-modal"
                     title={id?'修改交易记录':'新增交易记录'}
                     visible={this.state.visible}
                     onOk={this.onSaveClick}
@@ -132,6 +138,30 @@ export default class App extends Component {
                         <Select style={{width:'165px'}} value={type}  onChange={this.onSelectChange.bind(this,'type')}>
                             {
                                 Dict.recordType.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
+                        </Select>
+                    </FormItem>
+                    <FormItem  className="required"
+                        {...formItemLayout}
+                        label="开仓信号"
+                    >
+                        <Select style={{width:'165px'}} value={openSignal}  onChange={this.onSelectChange.bind(this,'openSignal')}>
+                            {
+                                Dict.recordOpenSignal.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
+                        </Select>
+                    </FormItem>
+                    <FormItem  className="required"
+                        {...formItemLayout}
+                        label="开仓点位"
+                    >
+                        <Select style={{width:'165px'}} value={openType}  onChange={this.onSelectChange.bind(this,'openType')}>
+                            {
+                                Dict.recordOpenType.map(e=>{
                                     return <Select.Option value={e.value}>{e.label}</Select.Option>
                                 })
                             }
@@ -224,7 +254,18 @@ export default class App extends Component {
                     >
                         <Input value={fee} style={{width:'165px'}} onChange={this.onInputChange.bind(this,'fee')}/>
                     </FormItem>
-                    
+                    <FormItem  className="required"
+                        {...formItemLayout}
+                        label="统计状态"
+                    >
+                        <Select style={{width:'165px'}} value={statStatus}  onChange={this.onSelectChange.bind(this,'statStatus')}>
+                            {
+                                Dict.recordStatStatus.map(e=>{
+                                    return <Select.Option value={e.value}>{e.label}</Select.Option>
+                                })
+                            }
+                        </Select>
+                    </FormItem>
                     
                 </Modal>
             </div>

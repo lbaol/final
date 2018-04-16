@@ -202,7 +202,7 @@ export default class App extends Component {
                     >
                         <Select style={{width:'165px'}} value={status}  onChange={this.onSelectChange.bind(this,'status')}>
                         {
-                            Dict.recordStatus.map(e=>{
+                            Dict.recordGroupStatus.map(e=>{
                                 return <Select.Option value={e.value}>{e.label}</Select.Option>
                             })
                         }

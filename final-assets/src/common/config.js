@@ -30,7 +30,11 @@ let Config = {
         startDate:moment().subtract(1000, 'day').format('YYYY-MM-DD'),
         endDate: moment().format('YYYY-MM-DD')
     },
-    indexPeriods:[]
+    indexPeriods:[],
+    cash:{
+        stock:0,
+        futures:0
+    }
 }
 
 
@@ -128,10 +132,38 @@ let Dict = {
         {label:'股票',value:'stock'},
         {label:'期货',value:'futures'},
     ],
-    recordStatus:[
+    recordOpenSignal:[
+        {label:'平台突破',value:'platform'}, //平台
+        {label:'口袋支点',value:'pivot'}, //口袋支点
+        {label:'杯柄',value:'handle'}, //杯柄
+        {label:'VCP',value:'vcp'}, //VCP
+        {label:'基底突破',value:'base'}, //VCP
+        {label:'上涨趋势中',value:'rising'},
+        {label:'其他',value:'other'},
+    ],
+    recordOpenType:[
+        {label:'10日线-首次',value:'fm10'},
+        {label:'20日线-首次',value:'fm20'},
+        {label:'50日线-首次',value:'fm50'},
+        {label:'120日线-首次',value:'fm120'},
+        {label:'10日线-非',value:'m10'},
+        {label:'20日线-非',value:'m20'},
+        {label:'50日线-非',value:'m50'},
+        {label:'120日线-非',value:'m120'},
+        {label:'突破日',value:'break'},
+        {label:'其他',value:'other'},
+    ],
+    recordGroupStatus:[
         {label:'交易中',value:'trade'},
         {label:'结束',value:'finish'}
-    ]
+    ],
+    recordGroupStatus:[
+        {label:'交易中',value:'trade'},
+        {label:'结束',value:'finish'}
+    ],
+    recordStatStatus:[
+        {label:'正常',value:''},
+        {label:'忽略',value:'ignore'}]
 }
 
 

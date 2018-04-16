@@ -36,7 +36,8 @@ export default class App extends Component {
                     
             <List bordered>
                 <List.Item><Link to="/position_list">持仓</Link></List.Item>
-                <List.Item><Link to="/record_list">交易记录</Link></List.Item>
+                <List.Item><Link to="/record_group_list">交易分组列表</Link></List.Item>
+                <List.Item><Link to="/record_analysis">交易记录分析</Link></List.Item>
             </List>
             
             </div>

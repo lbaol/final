@@ -181,7 +181,7 @@ export default class App extends Component {
                                     key: 'status',
                                     render: (text, record) => {
                                         return (<div>
-                                            {Dict.recordStatusMapper[record.status]}
+                                            {Dict.recordGroupStatusMapper[record.status]}
                                         </div>)
                                     }
                                 }, {

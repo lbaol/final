@@ -139,6 +139,9 @@ public interface RecordGroupMapper {
                     if(recordGroupDO.getPrice()!=null){  
                     	SET("price = #{price}");
                     }
+                    if(recordGroupDO.getCode()!=null){  
+                    	SET("code = #{code}");
+                    }
                     if(recordGroupDO.getStatus()!=null){  
                     	SET("status = #{status}");
                     }

@@ -1,5 +1,6 @@
 package com.lbaol.web.control;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,10 @@ public class RecordControl {
 	RpcResult addOrUpdate(Integer id,String code,Double count,Double price,String date,Integer groupId,String oper,String subOper,
 			@RequestParam(value="fee",required = false,defaultValue  = "0") Double fee,String market,String type,
 			Integer openId,
-			Double returnsPrice) { 
+			Double returnsPrice,
+			String openType,
+			String openSignal,
+			@RequestParam(value="statStatus",required = false,defaultValue  = "") String statStatus) { 
 		RpcResult rpcResult = new RpcResult();
 		
 		RecordDO recordDO = new RecordDO();
@@ -48,6 +52,9 @@ public class RecordControl {
 		if(fee!=null && fee >= 0) {
 			recordDO.setFee(fee);
 		}
+		if(statStatus!=null) {
+			recordDO.setStatStatus(statStatus);
+		}
 		if(returnsPrice!=null && returnsPrice >= 0) {
 			recordDO.setReturnsPrice(returnsPrice);
 		}
@@ -57,7 +64,12 @@ public class RecordControl {
 		if(openId!=null) {
 			recordDO.setOpenId(openId);
 		}
-		
+		if(StringUtils.isNotEmpty(openType)) {
+			recordDO.setOpenType(openType);
+		}
+		if(StringUtils.isNotEmpty(openSignal)) {
+			recordDO.setOpenSignal(openSignal);
+		}
 		if(StringUtils.isNotEmpty(code)) {
 			recordDO.setCode(code);
 		}
@@ -101,9 +113,54 @@ public class RecordControl {
 			
 		}
 		updateRecordGroupCountAndCost(groupId);
+		syncOpenTypeAndStatStatus(recordDO);
 		rpcResult.setIsSuccess(true);
         return rpcResult;  
     }
+	
+	private void syncOpenTypeAndStatStatus(RecordDO recordDO) {
+		if("buy".equals(recordDO.getOper())){
+			Integer openId = recordDO.getId();
+			Map params = new HashMap();
+			params.put("open_id", openId);
+			List<RecordDO> closeList = recordMapper.getByParams(params);
+			for(RecordDO closeRecord : closeList) {
+				if(recordDO.getOpenType()!=null) {
+					closeRecord.setOpenType(recordDO.getOpenType());
+				}
+				if(recordDO.getStatStatus()!=null) {
+					closeRecord.setStatStatus(recordDO.getStatStatus());
+				}
+				if(recordDO.getMarket()!=null) {
+					closeRecord.setMarket(recordDO.getMarket());
+				}
+				if(recordDO.getOpenSignal()!=null) {
+					closeRecord.setOpenSignal(recordDO.getOpenSignal());
+				}
+				recordMapper.update(closeRecord);
+			}
+		}
+		if("sell".equals(recordDO.getOper())){
+			Integer openId = recordDO.getOpenId();
+			RecordDO openRecord = recordMapper.getById(openId);
+			if(openRecord!=null) {
+				if(recordDO.getOpenType()!=null) {
+					openRecord.setOpenType(recordDO.getOpenType());
+				}
+				if(recordDO.getStatStatus()!=null) {
+					openRecord.setStatStatus(recordDO.getStatStatus());
+				}
+				if(recordDO.getMarket()!=null) {
+					openRecord.setMarket(recordDO.getMarket());
+				}
+				if(recordDO.getOpenSignal()!=null) {
+					openRecord.setOpenSignal(recordDO.getOpenSignal());
+				}
+				recordMapper.update(openRecord);
+			}
+			
+		}
+	}
 	
 	private boolean isOpenRecord(RecordDO recordDO) {
 		if("stock".equals(recordDO.getType())){
@@ -167,6 +224,40 @@ public class RecordControl {
 		Map map = new HashMap();
 		List<RecordDO>  recordList =  recordMapper.getByGroupId(groupId);
 		map.put("list", recordList);
+        return map;  
+    }
+	
+	
+	@RequestMapping("/record/getCloseList")
+	Map getCloseList(String openType,
+			String openSignal){  
+		Map map = new HashMap();
+		Map params = new HashMap();
+		params.put("type", "stock");
+		if(StringUtils.isNotEmpty(openType)) {
+			params.put("openType", openType);
+		}
+		if(StringUtils.isNotEmpty(openSignal)) {
+			params.put("openSignal", openSignal);
+		}
+		List<RecordDO>  recordList =  recordMapper.getByParams(params);
+		Map<Integer,RecordDO> recordMap = new HashMap<Integer,RecordDO>();
+		List<RecordDO> closeRecordList = new ArrayList<RecordDO>();
+		for(RecordDO record : recordList) {
+			recordMap.put(record.getId(), record);
+			if("sell".equalsIgnoreCase(record.getOper())) {
+				closeRecordList.add(record);
+			}
+		}
+		
+		for(RecordDO closeRecord : closeRecordList) {
+			Integer operId = closeRecord.getOpenId();
+			if(recordMap.get(operId)!=null) {
+				closeRecord.setOpenRecordDO(recordMap.get(operId));
+			}
+		}
+		
+		map.put("list", closeRecordList);
         return map;  
     }
 	

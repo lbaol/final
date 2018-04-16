@@ -25,7 +25,10 @@ public interface RecordMapper {
 		@Result(property = "stopPrice", column = "stop_price"),
         @Result(property = "groupId", column = "group_id"),
         @Result(property = "subOper", column = "sub_oper"),
-        @Result(property = "openId", column = "open_id")
+        @Result(property = "openId", column = "open_id"),
+		@Result(property = "openType", column = "open_type"),
+		@Result(property = "statStatus", column = "stat_status"),
+		@Result(property = "openSignal", column = "open_signal")
 	})
 	List<RecordDO> getByGroupId(@Param("groupId") Integer groupId);
 	
@@ -34,7 +37,10 @@ public interface RecordMapper {
     	@Result(property = "stopPrice", column = "stop_price"),
         @Result(property = "groupId", column = "group_id"),
         @Result(property = "subOper", column = "sub_oper"),
-        @Result(property = "openId", column = "open_id")
+        @Result(property = "openId", column = "open_id"),
+		@Result(property = "openType", column = "open_type"),
+		@Result(property = "statStatus", column = "stat_status"),
+		@Result(property = "openSignal", column = "open_signal")
 	})
 	RecordDO getById(@Param("id") Integer id);
 	
@@ -43,7 +49,10 @@ public interface RecordMapper {
 		@Result(property = "stopPrice", column = "stop_price"),
         @Result(property = "groupId", column = "group_id"),
         @Result(property = "subOper", column = "sub_oper"),
-        @Result(property = "openId", column = "open_id")
+        @Result(property = "openId", column = "open_id"),
+		@Result(property = "openType", column = "open_type"),
+		@Result(property = "statStatus", column = "stat_status"),
+		@Result(property = "openSignal", column = "open_signal")
 	})
     List<RecordDO> getAll();
 	
@@ -52,14 +61,17 @@ public interface RecordMapper {
 		@Result(property = "stopPrice", column = "stop_price"),
         @Result(property = "groupId", column = "group_id"),
         @Result(property = "subOper", column = "sub_oper"),
-        @Result(property = "openId", column = "open_id")
+        @Result(property = "openId", column = "open_id"),
+		@Result(property = "openType", column = "open_type"),
+		@Result(property = "statStatus", column = "stat_status"),
+		@Result(property = "openSignal", column = "open_signal")
     })
 	public List<RecordDO> getByParams(Map params);  
     
 	@Delete("DELETE FROM record WHERE id =#{id}")
     void deleteById(Integer id);
 	
-	@Insert("INSERT INTO record(code,count,date,fee,stop_price,oper,sub_oper,group_id,price,open_id,remaining,type) VALUES(#{code}, #{count}, #{date}, #{fee}, #{stopPrice}, #{oper}, #{subOper}, #{groupId}, #{price}, #{openId}, #{remaining}, #{type})")
+	@Insert("INSERT INTO record(code,market,count,date,fee,stop_price,oper,sub_oper,group_id,price,open_id,remaining,type,stat_status,open_type,open_signal) VALUES(#{code},#{market},  #{count}, #{date}, #{fee}, #{stopPrice}, #{oper}, #{subOper}, #{groupId}, #{price}, #{openId}, #{remaining}, #{type}, #{statStatus}, #{openType}, #{openSignal})")
 	@Options(useGeneratedKeys=true, keyProperty="id")
 	void insert(RecordDO recordDO);
 	
@@ -83,10 +95,22 @@ public interface RecordMapper {
                 if(params.get("oper")!=null){      
                     WHERE("oper = #{oper}");      
                 }
+                if(params.get("type")!=null){      
+                    WHERE("type = #{type}");      
+                }
+                if(params.get("code")!=null){      
+                    WHERE("code = #{code}");      
+                }
+                if(params.get("openType")!=null){      
+                    WHERE("open_type = #{openType}");      
+                }
+                if(params.get("openSignal")!=null){      
+                    WHERE("open_signal = #{openSignal}");      
+                }
                 if(params.get("groupId")!=null){      
                     WHERE("group_id = #{groupId}");      
                 }
-                ORDER_BY("id desc");
+                ORDER_BY("date desc");
             }}.toString();  
         } 
     	
@@ -106,11 +130,17 @@ public interface RecordMapper {
                     if(recordDO.getRemaining()!=null){  
                     	SET("remaining = #{remaining}");
                     }
+                    if(recordDO.getCode()!=null){      
+                    	SET("code = #{code}");      
+                    }
                     if(recordDO.getPrice()!=null){  
                     	SET("price = #{price}");
                     }
                     if(recordDO.getOper()!=null){  
                     	SET("oper = #{oper}");
+                    }
+                    if(recordDO.getReturns()!=null){  
+                    	SET("returns = #{returns}");
                     }
                     if(recordDO.getSubOper()!=null){  
                     	SET("sub_oper = #{subOper}");
@@ -129,6 +159,16 @@ public interface RecordMapper {
                     }
                     if(StringUtils.isNotEmpty(recordDO.getType())){  
                     	SET("type = #{type}");
+                    }
+                    if(recordDO.getStatStatus()!=null){      
+                    	SET("stat_status = #{statStatus}");      
+                    }
+                    if(recordDO.getStatStatus()!=null){      
+                    	SET("open_signal = #{openSignal}");      
+                    }
+                    
+                    if(recordDO.getOpenType()!=null){      
+                    	SET("open_type = #{openType}");      
                     }
                     WHERE("id = #{id}");  
                 }  
