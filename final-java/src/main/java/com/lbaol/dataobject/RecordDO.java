@@ -25,8 +25,24 @@ public class RecordDO {
 	private String statStatus; //统计状态
 	private String openType;
 	private String openSignal;
+	private Integer base;
+	private String description;
 	
 	
+	
+	
+	public Integer getBase() {
+		return base;
+	}
+	public void setBase(Integer base) {
+		this.base = base;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
 	public String getOpenSignal() {
 		return openSignal;
 	}

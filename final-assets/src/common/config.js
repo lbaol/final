@@ -32,7 +32,7 @@ let Config = {
     },
     indexPeriods:[],
     cash:{
-        stock:0,
+        stock:210000,
         futures:0
     }
 }
@@ -150,7 +150,7 @@ let Dict = {
         {label:'20日线-非',value:'m20'},
         {label:'50日线-非',value:'m50'},
         {label:'120日线-非',value:'m120'},
-        {label:'突破日',value:'break'},
+        {label:'突破点',value:'break'},
         {label:'其他',value:'other'},
     ],
     recordGroupStatus:[

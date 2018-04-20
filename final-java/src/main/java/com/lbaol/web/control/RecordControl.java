@@ -39,6 +39,8 @@ public class RecordControl {
 			Double returnsPrice,
 			String openType,
 			String openSignal,
+			Integer base,
+			String description,
 			@RequestParam(value="statStatus",required = false,defaultValue  = "") String statStatus) { 
 		RpcResult rpcResult = new RpcResult();
 		
@@ -54,6 +56,12 @@ public class RecordControl {
 		}
 		if(statStatus!=null) {
 			recordDO.setStatStatus(statStatus);
+		}
+		if(base!=null) {
+			recordDO.setBase(base);;
+		}
+		if(description!=null) {
+			recordDO.setDescription(description);;
 		}
 		if(returnsPrice!=null && returnsPrice >= 0) {
 			recordDO.setReturnsPrice(returnsPrice);
@@ -122,22 +130,25 @@ public class RecordControl {
 		if("buy".equals(recordDO.getOper())){
 			Integer openId = recordDO.getId();
 			Map params = new HashMap();
-			params.put("open_id", openId);
+			params.put("openId", openId);
 			List<RecordDO> closeList = recordMapper.getByParams(params);
 			for(RecordDO closeRecord : closeList) {
-				if(recordDO.getOpenType()!=null) {
-					closeRecord.setOpenType(recordDO.getOpenType());
+				if(closeRecord.getOpenId() == openId) {
+					if(recordDO.getOpenType()!=null) {
+						closeRecord.setOpenType(recordDO.getOpenType());
+					}
+					if(recordDO.getStatStatus()!=null) {
+						closeRecord.setStatStatus(recordDO.getStatStatus());
+					}
+					if(recordDO.getMarket()!=null) {
+						closeRecord.setMarket(recordDO.getMarket());
+					}
+					if(recordDO.getOpenSignal()!=null) {
+						closeRecord.setOpenSignal(recordDO.getOpenSignal());
+					}
+					recordMapper.update(closeRecord);
 				}
-				if(recordDO.getStatStatus()!=null) {
-					closeRecord.setStatStatus(recordDO.getStatStatus());
-				}
-				if(recordDO.getMarket()!=null) {
-					closeRecord.setMarket(recordDO.getMarket());
-				}
-				if(recordDO.getOpenSignal()!=null) {
-					closeRecord.setOpenSignal(recordDO.getOpenSignal());
-				}
-				recordMapper.update(closeRecord);
+				
 			}
 		}
 		if("sell".equals(recordDO.getOper())){
@@ -258,6 +269,40 @@ public class RecordControl {
 		}
 		
 		map.put("list", closeRecordList);
+        return map;  
+    }
+	
+	@RequestMapping("/record/getOpenList")
+	Map getOpenList(String openType,
+			String openSignal,
+			@RequestParam(value="isAll",required = false,defaultValue  = "0") Integer isAll){  
+		Map map = new HashMap();
+		Map params = new HashMap();
+		params.put("type", "stock");
+		if(StringUtils.isNotEmpty(openType)) {
+			params.put("openType", openType);
+		}
+		if(StringUtils.isNotEmpty(openSignal)) {
+			params.put("openSignal", openSignal);
+		}
+		List<RecordDO>  recordList =  recordMapper.getByParams(params);
+		Map<Integer,RecordDO> recordMap = new HashMap<Integer,RecordDO>();
+		List<RecordDO> openRecordList = new ArrayList<RecordDO>();
+		for(RecordDO record : recordList) {
+			recordMap.put(record.getId(), record);
+			if("buy".equalsIgnoreCase(record.getOper())) {
+				if(isAll == 1) {
+					openRecordList.add(record);
+				}else if(record.getRemaining()>0) {
+					openRecordList.add(record);
+				}
+				
+			}
+		}
+		
+		
+		
+		map.put("list", openRecordList);
         return map;  
     }
 	

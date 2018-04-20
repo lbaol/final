@@ -132,9 +132,7 @@ export default class App extends Component {
         return (
             <div>
                 <div className="ml20 mt20">
-                    <QuoteSwitch />
-                    
-
+                    卖出分析
                 </div>
                 <div className="record-list-container">
                     <div className="list-filter  mt20">
@@ -157,7 +155,12 @@ export default class App extends Component {
                             </Select>
                         </span>
                         <span className="ml20"><Button size="small" shape="circle" icon="reload" onClick={this.onReloadClick} /></span>
-
+                        <span className="ml30"><QuoteSwitch /></span>
+                    </div>
+                    <div  className=" mt20">
+                        <div>超级强势股：平台突破，首次10日线，首次20日线，首次50日线；基底突破，首次20日线，首次50日线。</div>
+                        <div>非超级强势股：平台突破，首次50日线；基底突破，首次50日线。</div>
+                        <div>常见问题：1、短期追高，中线追高、突破追高  2、突破后回调过程中，未等到合适买点着急购买  3、在基底数（第4个及以后）过多时购买</div>
                     </div>
                     <div className=" mt20">
                         <table className="stat-table">
@@ -193,11 +196,13 @@ export default class App extends Component {
                                 columns={[{
                                     title: '序号',
                                     dataIndex: 'index',
-                                    key: 'index'
+                                    key: 'index',
+                                    width:'50px'
                                 }, {
                                     title: '名称',
                                     dataIndex: 'name',
                                     key: 'name',
+                                    width:'100px',
                                     render: (text, record) => {
                                         let quote = Data.getStockQuote(record.code);
                                         return (<div>
@@ -208,7 +213,17 @@ export default class App extends Component {
                                     title: '代码',
                                     dataIndex: 'code',
                                     key: 'code'
-                                }, {
+                                },{
+                                    title: '基底',
+                                    dataIndex: 'open-base',
+                                    key: 'open-base',
+                                    width:'50px',
+                                    render: (text, record) => {
+                                        return <div>
+                                                {record.openRecordDO.base}
+                                            </div>
+                                    }
+                                },{
                                     title: '买入信号',
                                     dataIndex: 'open-signal',
                                     key: 'open-signal',
@@ -227,9 +242,15 @@ export default class App extends Component {
                                             </div>
                                     }
                                 },{
-                                    title: '卖出时间',
-                                    dataIndex: 'date',
-                                    key: 'date'
+                                    title: '买入描述',
+                                    dataIndex: 'open-description',
+                                    key: 'open-description',
+                                    width:'150px',
+                                    render: (text, record) => {
+                                        return <div>
+                                                {record.openRecordDO.description}
+                                            </div>
+                                    }
                                 },{
                                     title: '买入时间',
                                     dataIndex: 'open-date',
@@ -239,6 +260,10 @@ export default class App extends Component {
                                                 {record.openRecordDO.date}
                                             </div>
                                     }
+                                },{
+                                    title: '卖出时间',
+                                    dataIndex: 'date',
+                                    key: 'date'
                                 },{
                                     title: '买入价格',
                                     dataIndex: 'open-price',
@@ -255,6 +280,16 @@ export default class App extends Component {
                                     render: (text, record) => {
                                         return <div>
                                                 {record.price}
+                                            </div>
+                                    }
+                                },{
+                                    title: '卖出描述',
+                                    dataIndex: 'description',
+                                    key: 'description',
+                                    width:'150px',
+                                    render: (text, record) => {
+                                        return <div>
+                                                {record.description}
                                             </div>
                                     }
                                 },{
@@ -289,7 +324,8 @@ export default class App extends Component {
                                     key: 'oper',
                                     render: (text, record) => {
                                         return <span>
-                                                    <Icon className="c-p" type="edit" onClick={this.onRecordEditClick.bind(this, record.id)} />
+                                                    <span className="ml10 c-green"><Icon className="c-p" type="edit" title="修改卖出操作" onClick={this.onRecordEditClick.bind(this, record.id)} /></span>
+                                                    <span className="ml10 c-red" ><Icon className="c-p" type="edit" title="修改买出操作" onClick={this.onRecordEditClick.bind(this, record.openRecordDO.id)} /></span>
                                             </span>
                                     }
                                 }

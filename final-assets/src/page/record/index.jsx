@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import FEvents from "components/Common/FEvent/index.js";
-import RecordAnalysis from "components/Record/RecordAnalysis/index.jsx";
+import CloseRecordAnalysis from "components/Record/CloseRecordAnalysis/index.jsx";
 import {Env} from "common/config.js";
 import { request } from "common/ajax.js";
 import { LocaleProvider  } from 'antd';
@@ -34,7 +34,7 @@ export default class App extends Component {
         return (
             <LocaleProvider locale={zhCN}>
                 <div className={"page-wrap "+"page-wrap-"+Env}>
-                    <RecordAnalysis />
+                    <CloseRecordAnalysis />
                 </div>
             </LocaleProvider>
             

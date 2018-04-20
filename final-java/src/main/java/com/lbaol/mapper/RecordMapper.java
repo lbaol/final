@@ -71,7 +71,7 @@ public interface RecordMapper {
 	@Delete("DELETE FROM record WHERE id =#{id}")
     void deleteById(Integer id);
 	
-	@Insert("INSERT INTO record(code,market,count,date,fee,stop_price,oper,sub_oper,group_id,price,open_id,remaining,type,stat_status,open_type,open_signal) VALUES(#{code},#{market},  #{count}, #{date}, #{fee}, #{stopPrice}, #{oper}, #{subOper}, #{groupId}, #{price}, #{openId}, #{remaining}, #{type}, #{statStatus}, #{openType}, #{openSignal})")
+	@Insert("INSERT INTO record(code,market,count,date,fee,stop_price,oper,sub_oper,group_id,price,open_id,remaining,type,stat_status,open_type,open_signal,base,description) VALUES(#{code},#{market},  #{count}, #{date}, #{fee}, #{stopPrice}, #{oper}, #{subOper}, #{groupId}, #{price}, #{openId}, #{remaining}, #{type}, #{statStatus}, #{openType}, #{openSignal}, #{base}, #{description})")
 	@Options(useGeneratedKeys=true, keyProperty="id")
 	void insert(RecordDO recordDO);
 	
@@ -109,6 +109,9 @@ public interface RecordMapper {
                 }
                 if(params.get("groupId")!=null){      
                     WHERE("group_id = #{groupId}");      
+                }
+                if(params.get("base")!=null){      
+                    WHERE("base = #{base}");      
                 }
                 ORDER_BY("date desc");
             }}.toString();  
@@ -166,7 +169,12 @@ public interface RecordMapper {
                     if(recordDO.getStatStatus()!=null){      
                     	SET("open_signal = #{openSignal}");      
                     }
-                    
+                    if(recordDO.getDescription()!=null){      
+                    	SET("description = #{description}");      
+                    }
+                    if(recordDO.getBase()!=null){      
+                    	SET("base = #{base}");      
+                    }
                     if(recordDO.getOpenType()!=null){      
                     	SET("open_type = #{openType}");      
                     }
